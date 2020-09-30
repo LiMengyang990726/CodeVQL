@@ -8,10 +8,10 @@ FLEX = flex
 all: $(BASE)
 
 $(BASE).tab.c $(BASE).tab.h: $(BASE).y
-        $(BISON) $(BISONFLAGS) -o $*.tab.c $<
+        $(BISON) $(BISONFLAGS) -o $@ $<
 
-$(BASE).c: $(BASE).l
-        $(FLEX) $(FLEXFLAGS) -o$@ $<
+$(BASE).lex.c: $(BASE).l
+        $(FLEX) $(FLEXFLAGS) -o $@ $<
 
 $(BASE).o: $(BASE).c $(BASE).tab.h
         $(CC) $(CFLAGS) -o $@ $^
@@ -19,7 +19,3 @@ $(BASE).o: $(BASE).c $(BASE).tab.h
 run: $(BASE)
         @echo "Translate CodeQL into Souffle.  Quit with ctrl-d."
         ./$<
-
-CLEANFILES = $(BASE) *.o                                           
-clean:
-        rm -f $(CLEANFILES)
