@@ -12,12 +12,17 @@ int oldstate;
 %}
 
 %x COMMENT
-%s BTWMODE
 
 %%
 
     /* keywords */
 import    { return IMPORT; }
+java      { return JAVA; }
+go        { return GO; }
+c#        { return CSHARP; }
+c++       { return CPP; }
+python    { return PYTHON; }
+javascript  { return JAVASCRIPT; }
 from      { return FROM; }
 where     { return WHERE; }
 or        { return OR; }
@@ -33,7 +38,7 @@ select    { return SELECT; }
 
     /* strings (only allow enclosing with "") */
 \"(.|\"\"|[^"\n])*\" { yylval.strval = strdup(yytext); return STRING_LITERAL; }
-\"(.|\"\"|[^"\n])*$    { yyerror("Unterminated string %s", yytext); }
+\"(.|\"\"|[^"\n])*$    { yyerror("Unterminated string "); }
 
     /* upper id */
 [A-Z][0-9a-z_.$]* { yylval.strval = strdup(yytext); return UPPER_ID; }
@@ -50,15 +55,15 @@ select    { return SELECT; }
 ">=" { yylval.subtok = 6; return COMPARISON; }
 
     /* comments */  
-\/\*                { oldstate = YY_START; BEGIN COMMENT; }
+"/*"                { oldstate = YY_START; BEGIN COMMENT; }
+<COMMENT>"*/"       { BEGIN oldstate; }
 <COMMENT>.|\n       ;
-<COMMENT>|\n\*\/    { BEGIN oldstate; }
 <COMMENT><<EOF>>    { yyerror("unclosed comment"); }
 
     /* whitespace */
 [ \t\n]         ;
 
     /* everything else */
-.   { yyerror("mystery character '%c'", *yytext); }
+.   { yyerror("mystery character "); }
 
 %%
