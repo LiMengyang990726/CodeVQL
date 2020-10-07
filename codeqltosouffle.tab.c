@@ -126,16 +126,16 @@ enum yysymbol_kind_t
   YYSYMBOL_THEN = 17,                      /* THEN  */
   YYSYMBOL_NOT = 18,                       /* NOT  */
   YYSYMBOL_SELECT = 19,                    /* SELECT  */
-  YYSYMBOL_STRING_LITERAL = 20,            /* STRING_LITERAL  */
-  YYSYMBOL_UPPER_ID = 21,                  /* UPPER_ID  */
-  YYSYMBOL_LOWER_ID = 22,                  /* LOWER_ID  */
-  YYSYMBOL_COMPARISON = 23,                /* COMPARISON  */
-  YYSYMBOL_24_c_ = 24,                     /* 'c'  */
-  YYSYMBOL_25_ = 25,                       /* ','  */
-  YYSYMBOL_26_ = 26,                       /* '('  */
-  YYSYMBOL_27_ = 27,                       /* ')'  */
-  YYSYMBOL_28_ = 28,                       /* '.'  */
-  YYSYMBOL_29_ = 29,                       /* "()"  */
+  YYSYMBOL_AS = 20,                        /* AS  */
+  YYSYMBOL_STRING_LITERAL = 21,            /* STRING_LITERAL  */
+  YYSYMBOL_UPPER_ID = 22,                  /* UPPER_ID  */
+  YYSYMBOL_LOWER_ID = 23,                  /* LOWER_ID  */
+  YYSYMBOL_COMMA = 24,                     /* COMMA  */
+  YYSYMBOL_LEFT_BRACKET = 25,              /* LEFT_BRACKET  */
+  YYSYMBOL_RIGHT_BRACKET = 26,             /* RIGHT_BRACKET  */
+  YYSYMBOL_DOT = 27,                       /* DOT  */
+  YYSYMBOL_UNDERSCORE = 28,                /* UNDERSCORE  */
+  YYSYMBOL_COMPARISON = 29,                /* COMPARISON  */
   YYSYMBOL_YYACCEPT = 30,                  /* $accept  */
   YYSYMBOL_stmt_list = 31,                 /* stmt_list  */
   YYSYMBOL_stmt = 32,                      /* stmt  */
@@ -143,20 +143,22 @@ enum yysymbol_kind_t
   YYSYMBOL_import_opts = 34,               /* import_opts  */
   YYSYMBOL_select_stmt = 35,               /* select_stmt  */
   YYSYMBOL_select_opts = 36,               /* select_opts  */
-  YYSYMBOL_from_opts = 37,                 /* from_opts  */
-  YYSYMBOL_var_decls = 38,                 /* var_decls  */
-  YYSYMBOL_var_decl = 39,                  /* var_decl  */
-  YYSYMBOL_where_opts = 40,                /* where_opts  */
-  YYSYMBOL_formula = 41,                   /* formula  */
-  YYSYMBOL_fparen = 42,                    /* fparen  */
-  YYSYMBOL_disjunction = 43,               /* disjunction  */
-  YYSYMBOL_conjunction = 44,               /* conjunction  */
-  YYSYMBOL_implies = 45,                   /* implies  */
-  YYSYMBOL_ifthen = 46,                    /* ifthen  */
-  YYSYMBOL_negated = 47,                   /* negated  */
-  YYSYMBOL_comparison = 48,                /* comparison  */
-  YYSYMBOL_call = 49,                      /* call  */
-  YYSYMBOL_primary = 50                    /* primary  */
+  YYSYMBOL_as_expr = 37,                   /* as_expr  */
+  YYSYMBOL_expr = 38,                      /* expr  */
+  YYSYMBOL_from_opts = 39,                 /* from_opts  */
+  YYSYMBOL_var_decls = 40,                 /* var_decls  */
+  YYSYMBOL_var_decl = 41,                  /* var_decl  */
+  YYSYMBOL_where_opts = 42,                /* where_opts  */
+  YYSYMBOL_formula = 43,                   /* formula  */
+  YYSYMBOL_fparen = 44,                    /* fparen  */
+  YYSYMBOL_disjunction = 45,               /* disjunction  */
+  YYSYMBOL_conjunction = 46,               /* conjunction  */
+  YYSYMBOL_implies = 47,                   /* implies  */
+  YYSYMBOL_ifthen = 48,                    /* ifthen  */
+  YYSYMBOL_negated = 49,                   /* negated  */
+  YYSYMBOL_comparison = 50,                /* comparison  */
+  YYSYMBOL_primary = 51,                   /* primary  */
+  YYSYMBOL_call = 52                       /* call  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -464,21 +466,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  22
+#define YYFINAL  45
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   65
+#define YYLAST   88
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  30
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  21
+#define YYNNTS  23
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  42
+#define YYNRULES  47
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  72
+#define YYNSTATES  78
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   279
+#define YYMAXUTOK   284
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -496,12 +498,12 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      26,    27,     2,     2,    25,     2,    28,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    24,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -519,18 +521,19 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    23,    29
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    47,    47,    48,    51,    52,    55,    56,    57,    58,
-      59,    60,    61,    62,    65,    66,    67,    70,    71,    74,
-      75,    76,    78,    80,    81,    82,    83,    84,    85,    86,
-      87,    88,    90,    91,    92,    93,    94,    95,    96,    97,
-      98,   100,   101
+       0,    53,    53,    54,    57,    58,    59,    62,    63,    64,
+      65,    66,    67,    68,    71,    72,    73,    76,    77,    79,
+      80,    82,    83,    86,    87,    88,    90,    92,    93,    94,
+      95,    96,    97,    98,    99,   100,   102,   103,   104,   105,
+     106,   107,   108,   110,   111,   112,   114,   115
 };
 #endif
 
@@ -548,12 +551,13 @@ static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "IMPORT", "JAVA", "GO",
   "CSHARP", "CPP", "PYTHON", "JAVASCRIPT", "FROM", "WHERE", "OR", "AND",
-  "IMPLIES", "IF", "ELSE", "THEN", "NOT", "SELECT", "STRING_LITERAL",
-  "UPPER_ID", "LOWER_ID", "COMPARISON", "'c'", "','", "'('", "')'", "'.'",
-  "\"()\"", "$accept", "stmt_list", "stmt", "import_stmt", "import_opts",
-  "select_stmt", "select_opts", "from_opts", "var_decls", "var_decl",
-  "where_opts", "formula", "fparen", "disjunction", "conjunction",
-  "implies", "ifthen", "negated", "comparison", "call", "primary", YY_NULLPTR
+  "IMPLIES", "IF", "ELSE", "THEN", "NOT", "SELECT", "AS", "STRING_LITERAL",
+  "UPPER_ID", "LOWER_ID", "COMMA", "LEFT_BRACKET", "RIGHT_BRACKET", "DOT",
+  "UNDERSCORE", "COMPARISON", "$accept", "stmt_list", "stmt",
+  "import_stmt", "import_opts", "select_stmt", "select_opts", "as_expr",
+  "expr", "from_opts", "var_decls", "var_decl", "where_opts", "formula",
+  "fparen", "disjunction", "conjunction", "implies", "ifthen", "negated",
+  "comparison", "primary", "call", YY_NULLPTR
 };
 
 static const char *
@@ -570,16 +574,16 @@ static const yytype_int16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,    99,    44,    40,    41,    46,   279
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284
 };
 #endif
 
-#define YYPACT_NINF (-30)
+#define YYPACT_NINF (-52)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-43)
+#define YYTABLE_NINF (-46)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -588,14 +592,14 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      11,     4,    -3,    -5,    16,   -30,   -30,   -30,   -30,   -30,
-     -30,   -30,   -30,   -30,   -30,   -30,    -2,    -4,   -30,     9,
-      13,   -30,   -30,   -30,   -30,    22,    -5,    -3,    -5,    22,
-      22,    -6,    22,    17,    43,   -30,   -30,   -30,   -30,   -30,
-     -30,   -30,    24,    30,   -30,   -30,   -30,    37,    43,    36,
-      19,    -5,    22,    22,    22,    38,    22,   -24,   -30,   -30,
-      43,    43,    43,   -30,   -30,    29,    32,   -30,    22,    34,
-      43,   -30
+      18,    56,   -19,    17,    17,    27,   -52,   -18,    17,     4,
+     -52,   -52,   -52,   -52,    69,   -52,   -52,   -52,   -52,   -52,
+     -52,   -52,   -13,   -12,   -52,   -52,   -52,   -52,   -52,   -52,
+     -52,     8,     7,     6,   -52,    54,    69,   -52,    10,   -52,
+      29,   -52,   -52,    24,    -2,   -52,   -52,    17,    17,    17,
+      -8,   -52,    17,    27,   -19,    17,    27,    35,    48,   -52,
+      69,    69,    69,   -52,    60,    10,   -52,    64,   -52,   -52,
+      49,    27,    17,    58,   -52,    10,    69,   -52
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -603,30 +607,30 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     2,     4,     5,     7,     8,
-       9,    11,    12,    13,    10,     6,     0,     0,    19,    20,
-      17,    14,     1,     3,    22,     0,     0,     0,     0,     0,
-       0,    41,     0,     0,    23,    24,    25,    26,    27,    28,
-      29,    30,    31,     0,    15,    21,    18,     0,    37,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,    32,    16,
-      33,    34,    35,    42,    38,     0,     0,    39,     0,     0,
-      36,    40
+       0,     0,     0,     0,     0,     0,    44,    43,     0,     0,
+       2,     4,     5,     6,    27,    28,    29,    30,    31,    32,
+      33,    34,     0,    35,     8,     9,    10,    11,    12,    13,
+       7,     0,     0,    23,    24,     0,    41,    21,    14,    17,
+      19,    22,    45,     0,     0,     1,     3,     0,     0,     0,
+       0,    26,     0,     0,     0,     0,     0,     0,     0,    36,
+      37,    38,    39,    42,     0,    15,    25,     0,    18,    20,
+       0,     0,     0,     0,    46,    16,    40,    47
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -30,   -30,    55,   -30,   -30,   -30,   -22,   -30,    35,   -30,
-     -30,   -29,   -30,   -30,   -30,   -30,   -30,   -30,   -30,     8,
-      10
+     -52,   -52,    76,   -52,   -52,   -52,   -51,    30,   -52,   -52,
+     -52,    33,    36,    -3,   -52,   -52,   -52,   -52,   -52,   -52,
+     -52,     1,     3
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5,     6,    15,     7,    21,    17,    18,    19,
-      33,    34,    35,    36,    37,    38,    39,    40,    41,    42,
-      43
+      -1,     9,    10,    11,    30,    12,    38,    39,    40,    32,
+      33,    34,    13,    14,    15,    16,    17,    18,    19,    20,
+      21,    22,    23
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -634,58 +638,62 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      47,    48,    66,    50,    44,    67,    46,    25,     8,     9,
-      10,    11,    12,    13,     1,    26,    22,    20,    16,     1,
-      24,     2,    49,    60,    61,    62,     2,    65,    14,    59,
-       3,    52,    53,    54,    27,     3,    51,    29,    28,    70,
-      30,    52,    53,    54,    31,    68,    58,   -42,    32,    52,
-      53,    54,    69,    55,    56,    52,    53,    54,    57,    23,
-      31,    71,    45,    63,     0,    64
+      35,    36,    65,    31,    45,    44,    41,     1,    42,    43,
+      47,    48,    49,     6,     2,     7,    50,   -45,    52,     3,
+      75,     1,     4,     5,    59,     6,    53,     7,     2,     8,
+      54,    51,     3,     3,    56,     4,     4,     5,     6,     6,
+       7,     7,     8,     8,    60,    61,    62,    58,     6,    57,
+       7,    63,    67,    42,    41,    37,    42,    41,    69,    42,
+      24,    25,    26,    27,    28,    29,    47,    48,    49,    76,
+      73,    55,    41,    70,    42,    74,    47,    48,    49,    71,
+      72,    47,    48,    49,    77,    46,    68,    66,    64
 };
 
 static const yytype_int8 yycheck[] =
 {
-      29,    30,    26,    32,    26,    29,    28,    11,     4,     5,
-       6,     7,     8,     9,     3,    19,     0,    22,    21,     3,
-      22,    10,    28,    52,    53,    54,    10,    56,    24,    51,
-      19,    12,    13,    14,    25,    19,    19,    15,    25,    68,
-      18,    12,    13,    14,    22,    16,    27,    23,    26,    12,
-      13,    14,    20,    23,    17,    12,    13,    14,    22,     4,
-      22,    27,    27,    55,    -1,    55
+       3,     4,    53,    22,     0,     8,     5,     3,     5,    27,
+      12,    13,    14,    21,    10,    23,    29,    29,    11,    15,
+      71,     3,    18,    19,    26,    21,    19,    23,    10,    25,
+      24,    23,    15,    15,    24,    18,    18,    19,    21,    21,
+      23,    23,    25,    25,    47,    48,    49,    23,    21,    20,
+      23,    50,    55,    50,    53,    28,    53,    56,    23,    56,
+       4,     5,     6,     7,     8,     9,    12,    13,    14,    72,
+      21,    17,    71,    25,    71,    26,    12,    13,    14,    19,
+      16,    12,    13,    14,    26,     9,    56,    54,    52
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    10,    19,    31,    32,    33,    35,     4,     5,
-       6,     7,     8,     9,    24,    34,    21,    37,    38,    39,
-      22,    36,     0,    32,    22,    11,    19,    25,    25,    15,
-      18,    22,    26,    40,    41,    42,    43,    44,    45,    46,
-      47,    48,    49,    50,    36,    38,    36,    41,    41,    28,
-      41,    19,    12,    13,    14,    23,    17,    22,    27,    36,
-      41,    41,    41,    49,    50,    41,    26,    29,    16,    20,
-      41,    27
+       0,     3,    10,    15,    18,    19,    21,    23,    25,    31,
+      32,    33,    35,    42,    43,    44,    45,    46,    47,    48,
+      49,    50,    51,    52,     4,     5,     6,     7,     8,     9,
+      34,    22,    39,    40,    41,    43,    43,    28,    36,    37,
+      38,    51,    52,    27,    43,     0,    32,    12,    13,    14,
+      29,    23,    11,    19,    24,    17,    24,    20,    23,    26,
+      43,    43,    43,    51,    42,    36,    41,    43,    37,    23,
+      25,    19,    16,    21,    26,    36,    43,    26
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    30,    31,    31,    32,    32,    33,    34,    34,    34,
+       0,    30,    31,    31,    32,    32,    32,    33,    34,    34,
       34,    34,    34,    34,    35,    35,    35,    36,    36,    37,
-      38,    38,    39,    40,    41,    41,    41,    41,    41,    41,
-      41,    41,    42,    43,    44,    45,    46,    47,    48,    49,
-      49,    50,    50
+      37,    38,    38,    39,    40,    40,    41,    42,    43,    43,
+      43,    43,    43,    43,    43,    43,    44,    45,    46,    47,
+      48,    49,    50,    51,    51,    51,    52,    52
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     1,     1,     2,     1,     1,     1,
+       0,     2,     1,     2,     1,     1,     1,     2,     1,     1,
        1,     1,     1,     1,     2,     4,     6,     1,     3,     1,
-       1,     3,     2,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     3,     3,     3,     3,     6,     2,     3,     4,
-       6,     1,     1
+       3,     1,     1,     1,     1,     3,     2,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     3,     3,     3,     3,
+       6,     2,     3,     1,     1,     1,     5,     6
 };
 
 
@@ -1152,212 +1160,254 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 4: /* stmt: import_stmt  */
-#line 51 "codeqltosouffle.y"
-                  { printf("IMPORT STMT"); }
-#line 1159 "codeqltosouffle.tab.c"
+  case 7: /* import_stmt: IMPORT import_opts  */
+#line 62 "codeqltosouffle.y"
+                                { printf("IMPORT %s \n", (yyvsp[0].strval)); }
+#line 1167 "codeqltosouffle.tab.c"
     break;
 
-  case 5: /* stmt: select_stmt  */
-#line 52 "codeqltosouffle.y"
-                  { printf("SELECT STMT"); }
-#line 1165 "codeqltosouffle.tab.c"
-    break;
-
-  case 6: /* import_stmt: IMPORT import_opts  */
-#line 55 "codeqltosouffle.y"
-                                { printf("IMPORT @%s", (yyvsp[0].strval)); }
-#line 1171 "codeqltosouffle.tab.c"
-    break;
-
-  case 7: /* import_opts: JAVA  */
-#line 56 "codeqltosouffle.y"
+  case 8: /* import_opts: JAVA  */
+#line 63 "codeqltosouffle.y"
                   { (yyval.strval) = "java"; }
-#line 1177 "codeqltosouffle.tab.c"
+#line 1173 "codeqltosouffle.tab.c"
     break;
 
-  case 8: /* import_opts: GO  */
-#line 57 "codeqltosouffle.y"
+  case 9: /* import_opts: GO  */
+#line 64 "codeqltosouffle.y"
        { (yyval.strval) = "go"; }
-#line 1183 "codeqltosouffle.tab.c"
+#line 1179 "codeqltosouffle.tab.c"
     break;
 
-  case 9: /* import_opts: CSHARP  */
-#line 58 "codeqltosouffle.y"
+  case 10: /* import_opts: CSHARP  */
+#line 65 "codeqltosouffle.y"
            { (yyval.strval) = "c#"; }
-#line 1189 "codeqltosouffle.tab.c"
-    break;
-
-  case 10: /* import_opts: 'c'  */
-#line 59 "codeqltosouffle.y"
-         { (yyval.strval) = "c"; }
-#line 1195 "codeqltosouffle.tab.c"
+#line 1185 "codeqltosouffle.tab.c"
     break;
 
   case 11: /* import_opts: CPP  */
-#line 60 "codeqltosouffle.y"
-        { (yyval.strval) = "c++"; }
-#line 1201 "codeqltosouffle.tab.c"
+#line 66 "codeqltosouffle.y"
+         { (yyval.strval) = "cpp"; }
+#line 1191 "codeqltosouffle.tab.c"
     break;
 
   case 12: /* import_opts: PYTHON  */
-#line 61 "codeqltosouffle.y"
+#line 67 "codeqltosouffle.y"
            { (yyval.strval) = "python"; }
-#line 1207 "codeqltosouffle.tab.c"
+#line 1197 "codeqltosouffle.tab.c"
     break;
 
   case 13: /* import_opts: JAVASCRIPT  */
-#line 62 "codeqltosouffle.y"
+#line 68 "codeqltosouffle.y"
                { (yyval.strval) = "javscript"; }
-#line 1213 "codeqltosouffle.tab.c"
+#line 1203 "codeqltosouffle.tab.c"
     break;
 
   case 14: /* select_stmt: SELECT select_opts  */
-#line 65 "codeqltosouffle.y"
-                                { printf("SELECT @%s", (yyvsp[0].strval)); }
-#line 1219 "codeqltosouffle.tab.c"
+#line 71 "codeqltosouffle.y"
+                                { printf("SELECT %s \n", (yyvsp[0].strval)); }
+#line 1209 "codeqltosouffle.tab.c"
     break;
 
   case 15: /* select_stmt: FROM from_opts SELECT select_opts  */
-#line 66 "codeqltosouffle.y"
-                                       { printf("SELECT @%s FROM DECLARED VARIABLES", (yyvsp[0].strval)); }
-#line 1225 "codeqltosouffle.tab.c"
+#line 72 "codeqltosouffle.y"
+                                       { printf("SELECT %s FROM DECLARED VARIABLES %s \n", (yyvsp[0].strval), (yyvsp[-2].strval)); }
+#line 1215 "codeqltosouffle.tab.c"
     break;
 
   case 16: /* select_stmt: FROM from_opts WHERE where_opts SELECT select_opts  */
-#line 67 "codeqltosouffle.y"
-                                                       { printf("SELECT @%s FROM DECLARED VARIABLES UNDER CERTAIN CONDITION", (yyvsp[0].strval)); }
-#line 1231 "codeqltosouffle.tab.c"
+#line 73 "codeqltosouffle.y"
+                                                       { printf("SELECT %s FROM DECLARED VARIABLES %s UNDER CERTAIN CONDITION\n", (yyvsp[0].strval), (yyvsp[-4].strval)); }
+#line 1221 "codeqltosouffle.tab.c"
     break;
 
-  case 17: /* select_opts: LOWER_ID  */
-#line 70 "codeqltosouffle.y"
-                      { (yyval.strval) = (yyvsp[0].strval); }
-#line 1237 "codeqltosouffle.tab.c"
+  case 17: /* select_opts: as_expr  */
+#line 76 "codeqltosouffle.y"
+                     { (yyval.strval) = (yyvsp[0].strval); }
+#line 1227 "codeqltosouffle.tab.c"
     break;
 
-  case 18: /* select_opts: LOWER_ID ',' select_opts  */
-#line 71 "codeqltosouffle.y"
-                             { (yyval.strval) = (yyvsp[-2].strval); }
-#line 1243 "codeqltosouffle.tab.c"
+  case 18: /* select_opts: select_opts COMMA as_expr  */
+#line 77 "codeqltosouffle.y"
+                               { (yyval.strval) = concatf("%s, %s", (yyvsp[-2].strval), (yyvsp[0].strval)); }
+#line 1233 "codeqltosouffle.tab.c"
     break;
 
-  case 22: /* var_decl: UPPER_ID LOWER_ID  */
-#line 78 "codeqltosouffle.y"
-                            { printf("DECLARED %s OF TYPE %s", (yyvsp[0].strval), (yyvsp[-1].strval)); }
-#line 1249 "codeqltosouffle.tab.c"
+  case 19: /* as_expr: expr  */
+#line 79 "codeqltosouffle.y"
+              { (yyval.strval) = (yyvsp[0].strval); }
+#line 1239 "codeqltosouffle.tab.c"
     break;
 
-  case 24: /* formula: fparen  */
-#line 81 "codeqltosouffle.y"
-                { (yyval.strval) = "fparen"; }
-#line 1255 "codeqltosouffle.tab.c"
+  case 20: /* as_expr: expr AS LOWER_ID  */
+#line 80 "codeqltosouffle.y"
+                     { (yyval.strval) = (yyvsp[0].strval); }
+#line 1245 "codeqltosouffle.tab.c"
     break;
 
-  case 25: /* formula: disjunction  */
+  case 21: /* expr: UNDERSCORE  */
 #line 82 "codeqltosouffle.y"
-                  { (yyval.strval) = "disjunction"; }
-#line 1261 "codeqltosouffle.tab.c"
+                 { (yyval.strval) = (yyvsp[0].strval); }
+#line 1251 "codeqltosouffle.tab.c"
     break;
 
-  case 26: /* formula: conjunction  */
+  case 22: /* expr: primary  */
 #line 83 "codeqltosouffle.y"
-                  { (yyval.strval) = "conjunction"; }
-#line 1267 "codeqltosouffle.tab.c"
+            { (yyval.strval) = (yyvsp[0].strval); }
+#line 1257 "codeqltosouffle.tab.c"
     break;
 
-  case 27: /* formula: implies  */
-#line 84 "codeqltosouffle.y"
-              { (yyval.strval) = "implies"; }
-#line 1273 "codeqltosouffle.tab.c"
-    break;
-
-  case 28: /* formula: ifthen  */
-#line 85 "codeqltosouffle.y"
-             { (yyval.strval) = "ifthen"; }
-#line 1279 "codeqltosouffle.tab.c"
-    break;
-
-  case 29: /* formula: negated  */
+  case 23: /* from_opts: var_decls  */
 #line 86 "codeqltosouffle.y"
-              { (yyval.strval) = "negated"; }
-#line 1285 "codeqltosouffle.tab.c"
+                     { (yyval.strval) = (yyvsp[0].strval); }
+#line 1263 "codeqltosouffle.tab.c"
     break;
 
-  case 30: /* formula: comparison  */
+  case 24: /* var_decls: var_decl  */
 #line 87 "codeqltosouffle.y"
-                 { (yyval.strval) = "comparison"; }
-#line 1291 "codeqltosouffle.tab.c"
+                    { (yyval.strval) = (yyvsp[0].strval); }
+#line 1269 "codeqltosouffle.tab.c"
     break;
 
-  case 32: /* fparen: '(' formula ')'  */
+  case 25: /* var_decls: var_decls COMMA var_decl  */
+#line 88 "codeqltosouffle.y"
+                             { (yyval.strval) = concatf("%s, %s", (yyvsp[-2].strval), (yyvsp[0].strval)); }
+#line 1275 "codeqltosouffle.tab.c"
+    break;
+
+  case 26: /* var_decl: UPPER_ID LOWER_ID  */
 #line 90 "codeqltosouffle.y"
-                        { printf("FORMULA @%s", (yyvsp[-1].strval)); }
-#line 1297 "codeqltosouffle.tab.c"
+                            { (yyval.strval) = concatf("%s %s", (yyvsp[-1].strval), (yyvsp[0].strval)); }
+#line 1281 "codeqltosouffle.tab.c"
     break;
 
-  case 33: /* disjunction: formula OR formula  */
-#line 91 "codeqltosouffle.y"
-                                { printf("FORMULA %s OR FORMULA %s", (yyvsp[-2].strval), (yyvsp[-1].strval)); }
-#line 1303 "codeqltosouffle.tab.c"
-    break;
-
-  case 34: /* conjunction: formula AND formula  */
+  case 27: /* where_opts: formula  */
 #line 92 "codeqltosouffle.y"
-                                 { printf("FORMULA %s AND FORMULA %s", (yyvsp[-2].strval), (yyvsp[-1].strval)); }
-#line 1309 "codeqltosouffle.tab.c"
+                    { printf("Condition: %s \n", (yyvsp[0].strval)); }
+#line 1287 "codeqltosouffle.tab.c"
     break;
 
-  case 35: /* implies: formula IMPLIES formula  */
+  case 28: /* formula: fparen  */
 #line 93 "codeqltosouffle.y"
-                                 { printf("FORMULA %s IMPLIES FORMULA %s", (yyvsp[-2].strval), (yyvsp[-1].strval)); }
-#line 1315 "codeqltosouffle.tab.c"
+                { (yyval.strval) = "fparen"; }
+#line 1293 "codeqltosouffle.tab.c"
     break;
 
-  case 36: /* ifthen: IF formula THEN formula ELSE formula  */
+  case 29: /* formula: disjunction  */
 #line 94 "codeqltosouffle.y"
-                                             { printf("IF FORMULA %s THEN FORMULA %s ELSE FORMULA %s", (yyvsp[-5].strval), (yyvsp[-4].strval)); }
-#line 1321 "codeqltosouffle.tab.c"
+                  { (yyval.strval) = "disjunction"; }
+#line 1299 "codeqltosouffle.tab.c"
     break;
 
-  case 37: /* negated: NOT formula  */
+  case 30: /* formula: conjunction  */
 #line 95 "codeqltosouffle.y"
-                     { printf("NEGATED FORMULA %s", (yyvsp[0].strval)); }
-#line 1327 "codeqltosouffle.tab.c"
+                  { (yyval.strval) = "conjunction"; }
+#line 1305 "codeqltosouffle.tab.c"
     break;
 
-  case 38: /* comparison: primary COMPARISON primary  */
+  case 31: /* formula: implies  */
 #line 96 "codeqltosouffle.y"
-                                       { printf("COMPARE %s and %s", (yyvsp[-2].strval), (yyvsp[0].strval)); }
-#line 1333 "codeqltosouffle.tab.c"
+              { (yyval.strval) = "implies"; }
+#line 1311 "codeqltosouffle.tab.c"
     break;
 
-  case 39: /* call: LOWER_ID '.' LOWER_ID "()"  */
+  case 32: /* formula: ifthen  */
 #line 97 "codeqltosouffle.y"
-                                 { (yyval.strval) = concatf("%s.%s()", (yyvsp[-3].strval), (yyvsp[-1].strval)); }
-#line 1339 "codeqltosouffle.tab.c"
+             { (yyval.strval) = "ifthen"; }
+#line 1317 "codeqltosouffle.tab.c"
     break;
 
-  case 40: /* call: LOWER_ID '.' LOWER_ID '(' STRING_LITERAL ')'  */
+  case 33: /* formula: negated  */
 #line 98 "codeqltosouffle.y"
-                                                 { (yyval.strval) = concatf("%s.%s(%s)", (yyvsp[-5].strval), (yyvsp[-3].strval), (yyvsp[-1].strval)); }
-#line 1345 "codeqltosouffle.tab.c"
+              { (yyval.strval) = "negated"; }
+#line 1323 "codeqltosouffle.tab.c"
     break;
 
-  case 41: /* primary: LOWER_ID  */
+  case 34: /* formula: comparison  */
+#line 99 "codeqltosouffle.y"
+                 { (yyval.strval) = "comparison"; }
+#line 1329 "codeqltosouffle.tab.c"
+    break;
+
+  case 35: /* formula: call  */
 #line 100 "codeqltosouffle.y"
+           { (yyval.strval) = (yyvsp[0].strval); }
+#line 1335 "codeqltosouffle.tab.c"
+    break;
+
+  case 36: /* fparen: LEFT_BRACKET formula RIGHT_BRACKET  */
+#line 102 "codeqltosouffle.y"
+                                           { printf("FORMULA %s\n", (yyvsp[-1].strval)); }
+#line 1341 "codeqltosouffle.tab.c"
+    break;
+
+  case 37: /* disjunction: formula OR formula  */
+#line 103 "codeqltosouffle.y"
+                                { printf("FORMULA %s OR FORMULA %s\n", (yyvsp[-2].strval), (yyvsp[-1].strval)); }
+#line 1347 "codeqltosouffle.tab.c"
+    break;
+
+  case 38: /* conjunction: formula AND formula  */
+#line 104 "codeqltosouffle.y"
+                                 { printf("FORMULA %s AND FORMULA %s\n", (yyvsp[-2].strval), (yyvsp[-1].strval)); }
+#line 1353 "codeqltosouffle.tab.c"
+    break;
+
+  case 39: /* implies: formula IMPLIES formula  */
+#line 105 "codeqltosouffle.y"
+                                 { printf("FORMULA %s IMPLIES FORMULA %s\n", (yyvsp[-2].strval), (yyvsp[-1].strval)); }
+#line 1359 "codeqltosouffle.tab.c"
+    break;
+
+  case 40: /* ifthen: IF formula THEN formula ELSE formula  */
+#line 106 "codeqltosouffle.y"
+                                             { printf("IF FORMULA %s THEN FORMULA %s ELSE FORMULA %s\n", (yyvsp[-5].strval), (yyvsp[-4].strval)); }
+#line 1365 "codeqltosouffle.tab.c"
+    break;
+
+  case 41: /* negated: NOT formula  */
+#line 107 "codeqltosouffle.y"
+                     { printf("NEGATED FORMULA %s\n", (yyvsp[0].strval)); }
+#line 1371 "codeqltosouffle.tab.c"
+    break;
+
+  case 42: /* comparison: primary COMPARISON primary  */
+#line 108 "codeqltosouffle.y"
+                                       { printf("COMPARE %s and %s\n", (yyvsp[-2].strval), (yyvsp[0].strval)); }
+#line 1377 "codeqltosouffle.tab.c"
+    break;
+
+  case 43: /* primary: LOWER_ID  */
+#line 110 "codeqltosouffle.y"
                   { (yyval.strval) = (yyvsp[0].strval); }
-#line 1351 "codeqltosouffle.tab.c"
+#line 1383 "codeqltosouffle.tab.c"
     break;
 
-  case 42: /* primary: call  */
-#line 101 "codeqltosouffle.y"
+  case 44: /* primary: STRING_LITERAL  */
+#line 111 "codeqltosouffle.y"
+                   { (yyval.strval) = (yyvsp[0].strval); }
+#line 1389 "codeqltosouffle.tab.c"
+    break;
+
+  case 45: /* primary: call  */
+#line 112 "codeqltosouffle.y"
          { (yyval.strval) = (yyvsp[0].strval); }
-#line 1357 "codeqltosouffle.tab.c"
+#line 1395 "codeqltosouffle.tab.c"
+    break;
+
+  case 46: /* call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET  */
+#line 114 "codeqltosouffle.y"
+                                                       { (yyval.strval) = concatf("%s.%s()", (yyvsp[-4].strval), (yyvsp[-2].strval)); }
+#line 1401 "codeqltosouffle.tab.c"
+    break;
+
+  case 47: /* call: LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET  */
+#line 115 "codeqltosouffle.y"
+                                                                    { (yyval.strval) = concatf("%s.%s(%s)", (yyvsp[-5].strval), (yyvsp[-3].strval), (yyvsp[-1].strval)); }
+#line 1407 "codeqltosouffle.tab.c"
     break;
 
 
-#line 1361 "codeqltosouffle.tab.c"
+#line 1411 "codeqltosouffle.tab.c"
 
       default: break;
     }
@@ -1551,7 +1601,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 104 "codeqltosouffle.y"
+#line 117 "codeqltosouffle.y"
 
 
 char* concatf(char *s, ...)
@@ -1585,4 +1635,4 @@ int main(int ac, char **av)
     printf("SQL parse worked\n");
   else
     printf("SQL parse failed\n");
-} /* main */
+}

@@ -20,7 +20,7 @@ import    { return IMPORT; }
 java      { return JAVA; }
 go        { return GO; }
 c#        { return CSHARP; }
-c++       { return CPP; }
+cpp       { return CPP; }
 python    { return PYTHON; }
 javascript  { return JAVASCRIPT; }
 from      { return FROM; }
@@ -33,18 +33,19 @@ else      { return ELSE; }
 then      { return THEN; }
 not       { return NOT; }
 select    { return SELECT; }
+as        { return AS; }
 
     /* question: (\\.) in regular expression? */
 
-    /* strings (only allow enclosing with "") */
-\"(.|\"\"|[^"\n])*\" { yylval.strval = strdup(yytext); return STRING_LITERAL; }
-\"(.|\"\"|[^"\n])*$    { yyerror("Unterminated string "); }
+    /* strings (only allow enclosing with double quote) */
+\"(\\.|\"\"|[^"\n])*\" { yylval.strval = strdup(yytext); return STRING_LITERAL; }
+\"(\\.|[^"\n])*$    { yyerror("Unterminated string "); }
 
     /* upper id */
-[A-Z][0-9a-z_.$]* { yylval.strval = strdup(yytext); return UPPER_ID; }
+[A-Z][0-9a-zA-Z_$]* { yylval.strval = strdup(yytext); return UPPER_ID; }
 
     /* lower id */
-[0-9a-z_.$]+ { yylval.strval = strdup(yytext); return LOWER_ID; }
+[a-z][0-9a-zA-Z_$]+ { yylval.strval = strdup(yytext); return LOWER_ID; }
 
     /* operators */
 "=" { yylval.subtok = 1; return COMPARISON; }
@@ -53,6 +54,11 @@ select    { return SELECT; }
 ">" { yylval.subtok = 4; return COMPARISON; }
 "<=" { yylval.subtok = 5; return COMPARISON; }
 ">=" { yylval.subtok = 6; return COMPARISON; }
+","  { return COMMA; }
+"_"  { return UNDERSCORE; }
+"("  { return LEFT_BRACKET; }
+")"  { return RIGHT_BRACKET; }
+"."  { return DOT; }
 
     /* comments */  
 "/*"                { oldstate = YY_START; BEGIN COMMENT; }

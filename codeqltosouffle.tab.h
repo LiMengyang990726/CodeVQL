@@ -71,10 +71,16 @@ extern int yydebug;
     THEN = 272,                    /* THEN  */
     NOT = 273,                     /* NOT  */
     SELECT = 274,                  /* SELECT  */
-    STRING_LITERAL = 275,          /* STRING_LITERAL  */
-    UPPER_ID = 276,                /* UPPER_ID  */
-    LOWER_ID = 277,                /* LOWER_ID  */
-    COMPARISON = 278               /* COMPARISON  */
+    AS = 275,                      /* AS  */
+    STRING_LITERAL = 276,          /* STRING_LITERAL  */
+    UPPER_ID = 277,                /* UPPER_ID  */
+    LOWER_ID = 278,                /* LOWER_ID  */
+    COMMA = 279,                   /* COMMA  */
+    LEFT_BRACKET = 280,            /* LEFT_BRACKET  */
+    RIGHT_BRACKET = 281,           /* RIGHT_BRACKET  */
+    DOT = 282,                     /* DOT  */
+    UNDERSCORE = 283,              /* UNDERSCORE  */
+    COMPARISON = 284               /* COMPARISON  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -89,7 +95,7 @@ union YYSTYPE
         int intval;
         int subtok;
 
-#line 93 "codeqltosouffle.tab.h"
+#line 99 "codeqltosouffle.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
