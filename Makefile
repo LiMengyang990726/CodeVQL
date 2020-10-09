@@ -5,6 +5,8 @@ CC = g++
 
 PROGRAM = codeqltosouffle
 
+.PHONY : clean
+
 all: ${PROGRAM}
 
 ${PROGRAM}.tab.c ${PROGRAM}.tab.h: ${PROGRAM}.y
@@ -21,3 +23,6 @@ lex.yy.o: lex.yy.c
 
 ${PROGRAM}: ${PROGRAM}.tab.o lex.yy.o
 	${CC} -o $@ $^
+
+clean:
+	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.o ${PROGRAM}.tab.c lex.yy.c lex.yy.o
