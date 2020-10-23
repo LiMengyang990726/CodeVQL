@@ -50,3 +50,6 @@ dkms.conf
 
 .DS_Store
 codeqltosouffle
+codeqltosouffle.tab.c
+codeqltosouffle.tab.h
+lex.yy.c
