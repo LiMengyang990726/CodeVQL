@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
-#include <symbolTable.c>
+#include "symbolTable.c"
 
 /* from the lexer */
 extern int yylex();
