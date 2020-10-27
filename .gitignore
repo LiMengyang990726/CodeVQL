@@ -49,6 +49,7 @@ Mkfile.old
 dkms.conf
 
 .DS_Store
+.vscode
 codeqltosouffle
 codeqltosouffle.tab.c
 codeqltosouffle.tab.h
