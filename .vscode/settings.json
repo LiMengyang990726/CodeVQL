@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "filesystem": "cpp",
+        "stdexcept": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "memory": "cpp",
+        "utility": "cpp"
+    }
+}

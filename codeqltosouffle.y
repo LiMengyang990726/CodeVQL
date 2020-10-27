@@ -4,7 +4,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
-#include <symbolTable.c>
+#include "symbolTable.cpp"
+#include "utility.cpp"
 
 /* from the lexer */
 extern int yylex();
@@ -37,14 +38,16 @@ void translateImportStmt(struct ast *);
 void translateFrom(struct ast *);
 void translateWhere(struct ast *);
 void translateSelect(struct ast *);
+void translateCall(struct ast *);
+void translateComparison(char * comparison);
 void eval(struct ast *);
 %}
 
 %union {
         struct ast *a;
         char *strval;
+        char *subtok;
         int intval;
-        int subtok;
 }
 
 %token <strval> IMPORT
@@ -123,7 +126,7 @@ formula: LEFT_BRACKET formula RIGHT_BRACKET { $$ = $2; }
   |   formula IMPLIES formula { $$ = newast_1(7, $1, NULL, $3); }
   |   IF formula THEN formula ELSE formula { $$ = newast_1(8, $2, $4, $6); }
   |   NOT formula { $$ = newast_1(9, $2, NULL, NULL); }
-  |   primary COMPARISON primary { $$ = newast_1(10, $1, NULL, $3); }
+  |   primary COMPARISON primary { $$ = newast_1(10, $1, newstringval($2), $3); }
   |   call { $$ = $1; }
   ;
 
@@ -132,7 +135,9 @@ primary: LOWER_ID { $$ = newstringval($1); }
   | call { $$ = $1; }
   ;
 call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET { $$ = newast_3(11, $1, NULL, $3); }
-  | LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET { $$ = newast_4(11, $1, $3, $5); }
+  | LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET { 
+    $$ = newast_4(11, $1, $3, $5); 
+    printf("DEBUG - node created of type = %d, first = %s, second = %s, third = %s\n", $$->nodetype, $1, $3, $5); }
   ;
 expr: UNDERSCORE { $$ = newstringval($1); }
   | primary { $$ = $1; }
@@ -224,16 +229,18 @@ void translateFrom(struct ast *a) {
     return;
   }
 
-  char *result;
-  strcpy(result, ".decl ");
   if (a->l) {
-    // TODO: Find the .decl in the symbol table
-    char *temp = ((struct stringval *)a->l)->value;
-    strcat(result, temp);
-    strcat(result, "( TO BE FILLED )");
-    // TODO: Store the a->m as variables and check in the select opts
+    char *result;
+    strcpy(result, ".decl ");
+    char *type = ((struct stringval *)a->l)->value;
+    char *name = ((struct stringval *)a->m)->value;
+    strcat(result, type);
+    printf("%s", result);
+    findSymbol(type);
+    printf("\n");
+    // Store into the var declaration symbol table for future use
+    storeVarSymbolTable(type, name);
   }
-  printf("%s\n", result);
 
   if (!a->r) {
     return;
@@ -244,11 +251,58 @@ void translateFrom(struct ast *a) {
 
 void translateWhere(struct ast *a) {
   // No where opts, accept
+  printf("where is executed 1");
   if (!a) {
     return;
   }
+  printf("where is executed 2");
+  printf("[prev 1]");
+  printf("[next 1]");
+  int type = a->nodetype;
+  printf("[prev 2]");
+  printf("[next 2]");
+  switch (type) {
+    case 5: 
+    case 7:
+    case 8:
+    case 9:
+      if (a->l) translateWhere(a->l);
+      if (a->m) translateWhere(a->m);
+      if (a->m) translateWhere(a->r);
+      break;
+    case 6:
+      translateWhere(a->l);
+      printf(",");
+      translateWhere(a->r);
+      break;
+    case 10:
+      translateComparison(((struct stringval *)a->m)->value);
+      break;
+    case 11:
+      translateCall(a);
+      break;
+  }
+}
 
-  // TODO
+void translateCall(struct ast *a) {
+  // No select opts
+  if (!a) {
+    yyerror("error in call opts");
+    return;
+  }
+
+  char *name = ((struct stringval *)a->l)->value;
+  char *field = ((struct stringval *)a->m)->value;
+  if (a->r) { // A direct translate call
+    printf("It should be called once");
+    char *value = ((struct stringval *)a->r)->value;
+    replace(name, field, value);
+  }
+  return;
+}
+
+void translateComparison(char* comparison) {
+  return;
 }
 
 void translateSelect(struct ast *a) {
@@ -261,15 +315,18 @@ void translateSelect(struct ast *a) {
   char *result;
   strcpy(result, ".output ");
   if (a->l) {
-    // TODO: Find the .decl in the symbol table
     char *temp = ((struct stringval *)a->l)->value;
     strcat(result, temp);
+    strcat(result, "(location: string)"); // By default, output the location
+    storeOutputVar(temp);
   }
   printf("%s\n", result);
 
   if (!a->r) {
+    printf("exit from here?");
     return;
   } else {
+    printf("or exit from here?");
     translateSelect(a->r);
   }
 }
@@ -289,6 +346,9 @@ void eval(struct ast *a) {
     case 2: 
       translateFrom(a->l);
       translateSelect(a->r);
+      printf("exited");
+      printFormulaLHS();
+      translateWhere(a->m);
       break;
     default: 
       printf("internal error: bad node %c\n", a->nodetype);
@@ -298,6 +358,9 @@ void eval(struct ast *a) {
 
 int main(int ac, char **av)
 {
+  // initialize the symbol table
+  initialize();
+
   extern FILE *yyin;
   if(ac > 1 && (yyin = fopen(av[1], "r")) == NULL) {
     perror(av[1]);

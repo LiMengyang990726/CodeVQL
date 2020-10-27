@@ -48,12 +48,12 @@ as        { return AS; }
 [a-z][0-9a-zA-Z_$]+ { yylval.strval = strdup(yytext); return LOWER_ID; }
 
     /* operators */
-"=" { yylval.subtok = 1; return COMPARISON; }
-"!=" { yylval.subtok = 2; return COMPARISON; }
-"<" { yylval.subtok = 3; return COMPARISON; }
-">" { yylval.subtok = 4; return COMPARISON; }
-"<=" { yylval.subtok = 5; return COMPARISON; }
-">=" { yylval.subtok = 6; return COMPARISON; }
+"=" { yylval.subtok = "="; return COMPARISON; }
+"!=" { yylval.subtok = "!="; return COMPARISON; }
+"<" { yylval.subtok = "<"; return COMPARISON; }
+">" { yylval.subtok = ">"; return COMPARISON; }
+"<=" { yylval.subtok = "<="; return COMPARISON; }
+">=" { yylval.subtok = ">="; return COMPARISON; }
 ","  { return COMMA; }
 "_"  { return UNDERSCORE; }
 "("  { return LEFT_BRACKET; }

@@ -73,6 +73,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include "symbolTable.cpp"
+#include "utility.cpp"
 
 /* from the lexer */
 extern int yylex();
@@ -105,9 +107,11 @@ void translateImportStmt(struct ast *);
 void translateFrom(struct ast *);
 void translateWhere(struct ast *);
 void translateSelect(struct ast *);
+void translateCall(struct ast *);
+void translateComparison(char * comparison);
 void eval(struct ast *);
 
-#line 111 "codeqltosouffle.tab.c"
+#line 115 "codeqltosouffle.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -548,10 +552,10 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    86,    86,    87,    90,    91,    94,    95,    96,    97,
-      98,    99,   100,   103,   104,   105,   108,   109,   110,   111,
-     114,   115,   118,   119,   120,   121,   122,   123,   124,   125,
-     126,   129,   130,   131,   133,   134,   136,   137
+       0,    90,    90,    91,    94,    95,    98,    99,   100,   101,
+     102,   103,   104,   107,   108,   109,   112,   113,   114,   115,
+     118,   119,   122,   123,   124,   125,   126,   127,   128,   129,
+     130,   133,   134,   135,   137,   138,   142,   143
 };
 #endif
 
@@ -1170,223 +1174,225 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* stmt_list: stmt  */
-#line 86 "codeqltosouffle.y"
+#line 90 "codeqltosouffle.y"
                 { eval((yyvsp[0].a)); }
-#line 1176 "codeqltosouffle.tab.c"
+#line 1180 "codeqltosouffle.tab.c"
     break;
 
   case 3: /* stmt_list: stmt_list stmt  */
-#line 87 "codeqltosouffle.y"
+#line 91 "codeqltosouffle.y"
                    { eval((yyvsp[0].a)); }
-#line 1182 "codeqltosouffle.tab.c"
+#line 1186 "codeqltosouffle.tab.c"
     break;
 
   case 4: /* stmt: import_stmt  */
-#line 90 "codeqltosouffle.y"
+#line 94 "codeqltosouffle.y"
                   { (yyval.a) = (yyvsp[0].a); }
-#line 1188 "codeqltosouffle.tab.c"
+#line 1192 "codeqltosouffle.tab.c"
     break;
 
   case 5: /* stmt: select_stmt  */
-#line 91 "codeqltosouffle.y"
+#line 95 "codeqltosouffle.y"
                   { (yyval.a) = (yyvsp[0].a); }
-#line 1194 "codeqltosouffle.tab.c"
+#line 1198 "codeqltosouffle.tab.c"
     break;
 
   case 6: /* import_stmt: IMPORT import_opts  */
-#line 94 "codeqltosouffle.y"
+#line 98 "codeqltosouffle.y"
                                 { (yyval.a) = newast_3(1, (yyvsp[-1].strval), NULL, (yyvsp[0].strval)); }
-#line 1200 "codeqltosouffle.tab.c"
+#line 1204 "codeqltosouffle.tab.c"
     break;
 
   case 7: /* import_opts: JAVA  */
-#line 95 "codeqltosouffle.y"
+#line 99 "codeqltosouffle.y"
                   { (yyval.strval) = "java"; }
-#line 1206 "codeqltosouffle.tab.c"
+#line 1210 "codeqltosouffle.tab.c"
     break;
 
   case 8: /* import_opts: GO  */
-#line 96 "codeqltosouffle.y"
+#line 100 "codeqltosouffle.y"
        { (yyval.strval) = "go"; }
-#line 1212 "codeqltosouffle.tab.c"
+#line 1216 "codeqltosouffle.tab.c"
     break;
 
   case 9: /* import_opts: CSHARP  */
-#line 97 "codeqltosouffle.y"
+#line 101 "codeqltosouffle.y"
            { (yyval.strval) = "c#"; }
-#line 1218 "codeqltosouffle.tab.c"
+#line 1222 "codeqltosouffle.tab.c"
     break;
 
   case 10: /* import_opts: CPP  */
-#line 98 "codeqltosouffle.y"
+#line 102 "codeqltosouffle.y"
          { (yyval.strval) = "cpp"; }
-#line 1224 "codeqltosouffle.tab.c"
+#line 1228 "codeqltosouffle.tab.c"
     break;
 
   case 11: /* import_opts: PYTHON  */
-#line 99 "codeqltosouffle.y"
+#line 103 "codeqltosouffle.y"
            { (yyval.strval) = "python"; }
-#line 1230 "codeqltosouffle.tab.c"
+#line 1234 "codeqltosouffle.tab.c"
     break;
 
   case 12: /* import_opts: JAVASCRIPT  */
-#line 100 "codeqltosouffle.y"
+#line 104 "codeqltosouffle.y"
                { (yyval.strval) = "javscript"; }
-#line 1236 "codeqltosouffle.tab.c"
+#line 1240 "codeqltosouffle.tab.c"
     break;
 
   case 13: /* select_stmt: SELECT select_opts  */
-#line 103 "codeqltosouffle.y"
+#line 107 "codeqltosouffle.y"
                                 { (yyval.a) = newast_1(2, NULL, NULL, (yyvsp[0].a)); }
-#line 1242 "codeqltosouffle.tab.c"
+#line 1246 "codeqltosouffle.tab.c"
     break;
 
   case 14: /* select_stmt: FROM from_opts SELECT select_opts  */
-#line 104 "codeqltosouffle.y"
+#line 108 "codeqltosouffle.y"
                                        { (yyval.a) = newast_1(2, (yyvsp[-2].a), NULL, (yyvsp[0].a)); }
-#line 1248 "codeqltosouffle.tab.c"
+#line 1252 "codeqltosouffle.tab.c"
     break;
 
   case 15: /* select_stmt: FROM from_opts WHERE where_opts SELECT select_opts  */
-#line 105 "codeqltosouffle.y"
+#line 109 "codeqltosouffle.y"
                                                        { (yyval.a) = newast_1(2, (yyvsp[-4].a), (yyvsp[-2].a), (yyvsp[0].a)); }
-#line 1254 "codeqltosouffle.tab.c"
+#line 1258 "codeqltosouffle.tab.c"
     break;
 
   case 16: /* select_opts: expr  */
-#line 108 "codeqltosouffle.y"
+#line 112 "codeqltosouffle.y"
                   { (yyval.a) = newast_1(3, (yyvsp[0].a), NULL, NULL); }
-#line 1260 "codeqltosouffle.tab.c"
+#line 1264 "codeqltosouffle.tab.c"
     break;
 
   case 17: /* select_opts: expr AS LOWER_ID  */
-#line 109 "codeqltosouffle.y"
+#line 113 "codeqltosouffle.y"
                      { (yyval.a) = newast_2(3, (yyvsp[0].strval), NULL, NULL);  }
-#line 1266 "codeqltosouffle.tab.c"
+#line 1270 "codeqltosouffle.tab.c"
     break;
 
   case 18: /* select_opts: select_opts COMMA expr  */
-#line 110 "codeqltosouffle.y"
+#line 114 "codeqltosouffle.y"
                            { (yyval.a) = newast_1(3, (yyvsp[0].a), NULL, (yyvsp[-2].a)); }
-#line 1272 "codeqltosouffle.tab.c"
+#line 1276 "codeqltosouffle.tab.c"
     break;
 
   case 19: /* select_opts: select_opts COMMA expr AS LOWER_ID  */
-#line 111 "codeqltosouffle.y"
+#line 115 "codeqltosouffle.y"
                                         { (yyval.a) = newast_2(3, (yyvsp[0].strval), NULL, (yyvsp[-4].a)); }
-#line 1278 "codeqltosouffle.tab.c"
+#line 1282 "codeqltosouffle.tab.c"
     break;
 
   case 20: /* from_opts: UPPER_ID LOWER_ID  */
-#line 114 "codeqltosouffle.y"
+#line 118 "codeqltosouffle.y"
                              { (yyval.a) = newast_2(4, (yyvsp[-1].strval), (yyvsp[0].strval), NULL); }
-#line 1284 "codeqltosouffle.tab.c"
+#line 1288 "codeqltosouffle.tab.c"
     break;
 
   case 21: /* from_opts: from_opts COMMA UPPER_ID LOWER_ID  */
-#line 115 "codeqltosouffle.y"
+#line 119 "codeqltosouffle.y"
                                       { (yyval.a) = newast_2(4, (yyvsp[-1].strval), (yyvsp[0].strval), (yyvsp[-3].a)); }
-#line 1290 "codeqltosouffle.tab.c"
+#line 1294 "codeqltosouffle.tab.c"
     break;
 
   case 22: /* where_opts: formula  */
-#line 118 "codeqltosouffle.y"
+#line 122 "codeqltosouffle.y"
                     { (yyval.a) = (yyvsp[0].a); }
-#line 1296 "codeqltosouffle.tab.c"
+#line 1300 "codeqltosouffle.tab.c"
     break;
 
   case 23: /* formula: LEFT_BRACKET formula RIGHT_BRACKET  */
-#line 119 "codeqltosouffle.y"
+#line 123 "codeqltosouffle.y"
                                             { (yyval.a) = (yyvsp[-1].a); }
-#line 1302 "codeqltosouffle.tab.c"
+#line 1306 "codeqltosouffle.tab.c"
     break;
 
   case 24: /* formula: formula OR formula  */
-#line 120 "codeqltosouffle.y"
+#line 124 "codeqltosouffle.y"
                          { (yyval.a) = newast_1(5, (yyvsp[-2].a), NULL, (yyvsp[0].a)); }
-#line 1308 "codeqltosouffle.tab.c"
+#line 1312 "codeqltosouffle.tab.c"
     break;
 
   case 25: /* formula: formula AND formula  */
-#line 121 "codeqltosouffle.y"
+#line 125 "codeqltosouffle.y"
                           { (yyval.a) = newast_1(6, (yyvsp[-2].a), NULL, (yyvsp[0].a)); }
-#line 1314 "codeqltosouffle.tab.c"
+#line 1318 "codeqltosouffle.tab.c"
     break;
 
   case 26: /* formula: formula IMPLIES formula  */
-#line 122 "codeqltosouffle.y"
+#line 126 "codeqltosouffle.y"
                               { (yyval.a) = newast_1(7, (yyvsp[-2].a), NULL, (yyvsp[0].a)); }
-#line 1320 "codeqltosouffle.tab.c"
+#line 1324 "codeqltosouffle.tab.c"
     break;
 
   case 27: /* formula: IF formula THEN formula ELSE formula  */
-#line 123 "codeqltosouffle.y"
+#line 127 "codeqltosouffle.y"
                                            { (yyval.a) = newast_1(8, (yyvsp[-4].a), (yyvsp[-2].a), (yyvsp[0].a)); }
-#line 1326 "codeqltosouffle.tab.c"
+#line 1330 "codeqltosouffle.tab.c"
     break;
 
   case 28: /* formula: NOT formula  */
-#line 124 "codeqltosouffle.y"
+#line 128 "codeqltosouffle.y"
                   { (yyval.a) = newast_1(9, (yyvsp[0].a), NULL, NULL); }
-#line 1332 "codeqltosouffle.tab.c"
+#line 1336 "codeqltosouffle.tab.c"
     break;
 
   case 29: /* formula: primary COMPARISON primary  */
-#line 125 "codeqltosouffle.y"
-                                 { (yyval.a) = newast_1(10, (yyvsp[-2].a), NULL, (yyvsp[0].a)); }
-#line 1338 "codeqltosouffle.tab.c"
+#line 129 "codeqltosouffle.y"
+                                 { (yyval.a) = newast_1(10, (yyvsp[-2].a), newstringval((yyvsp[-1].subtok)), (yyvsp[0].a)); }
+#line 1342 "codeqltosouffle.tab.c"
     break;
 
   case 30: /* formula: call  */
-#line 126 "codeqltosouffle.y"
+#line 130 "codeqltosouffle.y"
            { (yyval.a) = (yyvsp[0].a); }
-#line 1344 "codeqltosouffle.tab.c"
+#line 1348 "codeqltosouffle.tab.c"
     break;
 
   case 31: /* primary: LOWER_ID  */
-#line 129 "codeqltosouffle.y"
+#line 133 "codeqltosouffle.y"
                   { (yyval.a) = newstringval((yyvsp[0].strval)); }
-#line 1350 "codeqltosouffle.tab.c"
+#line 1354 "codeqltosouffle.tab.c"
     break;
 
   case 32: /* primary: STRING_LITERAL  */
-#line 130 "codeqltosouffle.y"
+#line 134 "codeqltosouffle.y"
                    { (yyval.a) = newstringval((yyvsp[0].strval)); }
-#line 1356 "codeqltosouffle.tab.c"
+#line 1360 "codeqltosouffle.tab.c"
     break;
 
   case 33: /* primary: call  */
-#line 131 "codeqltosouffle.y"
+#line 135 "codeqltosouffle.y"
          { (yyval.a) = (yyvsp[0].a); }
-#line 1362 "codeqltosouffle.tab.c"
+#line 1366 "codeqltosouffle.tab.c"
     break;
 
   case 34: /* call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET  */
-#line 133 "codeqltosouffle.y"
+#line 137 "codeqltosouffle.y"
                                                        { (yyval.a) = newast_3(11, (yyvsp[-4].strval), NULL, (yyvsp[-2].strval)); }
-#line 1368 "codeqltosouffle.tab.c"
+#line 1372 "codeqltosouffle.tab.c"
     break;
 
   case 35: /* call: LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET  */
-#line 134 "codeqltosouffle.y"
-                                                                    { (yyval.a) = newast_4(11, (yyvsp[-5].strval), (yyvsp[-3].strval), (yyvsp[-1].strval)); }
-#line 1374 "codeqltosouffle.tab.c"
-    break;
-
-  case 36: /* expr: UNDERSCORE  */
-#line 136 "codeqltosouffle.y"
-                 { (yyval.a) = newstringval((yyvsp[0].strval)); }
+#line 138 "codeqltosouffle.y"
+                                                                    { 
+    (yyval.a) = newast_4(11, (yyvsp[-5].strval), (yyvsp[-3].strval), (yyvsp[-1].strval)); 
+    printf("DEBUG - node created of type = %d, first = %s, second = %s, third = %s\n", (yyval.a)->nodetype, (yyvsp[-5].strval), (yyvsp[-3].strval), (yyvsp[-1].strval)); }
 #line 1380 "codeqltosouffle.tab.c"
     break;
 
-  case 37: /* expr: primary  */
-#line 137 "codeqltosouffle.y"
-            { (yyval.a) = (yyvsp[0].a); }
+  case 36: /* expr: UNDERSCORE  */
+#line 142 "codeqltosouffle.y"
+                 { (yyval.a) = newstringval((yyvsp[0].strval)); }
 #line 1386 "codeqltosouffle.tab.c"
     break;
 
+  case 37: /* expr: primary  */
+#line 143 "codeqltosouffle.y"
+            { (yyval.a) = (yyvsp[0].a); }
+#line 1392 "codeqltosouffle.tab.c"
+    break;
 
-#line 1390 "codeqltosouffle.tab.c"
+
+#line 1396 "codeqltosouffle.tab.c"
 
       default: break;
     }
@@ -1580,7 +1586,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 139 "codeqltosouffle.y"
+#line 145 "codeqltosouffle.y"
 
 
 void yyerror(char *s, ...) {
@@ -1668,16 +1674,18 @@ void translateFrom(struct ast *a) {
     return;
   }
 
-  char *result;
-  strcpy(result, ".decl ");
   if (a->l) {
-    // TODO: Find the .decl in the symbol table
-    char *temp = ((struct stringval *)a->l)->value;
-    strcat(result, temp);
-    strcat(result, "( TO BE FILLED )");
-    // TODO: Store the a->m as variables and check in the select opts
+    char *result;
+    strcpy(result, ".decl ");
+    char *type = ((struct stringval *)a->l)->value;
+    char *name = ((struct stringval *)a->m)->value;
+    strcat(result, type);
+    printf("%s", result);
+    findSymbol(type);
+    printf("\n");
+    // Store into the var declaration symbol table for future use
+    storeVarSymbolTable(type, name);
   }
-  printf("%s\n", result);
 
   if (!a->r) {
     return;
@@ -1688,11 +1696,58 @@ void translateFrom(struct ast *a) {
 
 void translateWhere(struct ast *a) {
   // No where opts, accept
+  printf("where is executed 1");
   if (!a) {
     return;
   }
+  printf("where is executed 2");
+  printf("[prev 1]");
+  printf("[next 1]");
+  int type = a->nodetype;
+  printf("[prev 2]");
+  printf("[next 2]");
+  switch (type) {
+    case 5: 
+    case 7:
+    case 8:
+    case 9:
+      if (a->l) translateWhere(a->l);
+      if (a->m) translateWhere(a->m);
+      if (a->m) translateWhere(a->r);
+      break;
+    case 6:
+      translateWhere(a->l);
+      printf(",");
+      translateWhere(a->r);
+      break;
+    case 10:
+      translateComparison(((struct stringval *)a->m)->value);
+      break;
+    case 11:
+      translateCall(a);
+      break;
+  }
+}
 
-  // TODO
+void translateCall(struct ast *a) {
+  // No select opts
+  if (!a) {
+    yyerror("error in call opts");
+    return;
+  }
+
+  char *name = ((struct stringval *)a->l)->value;
+  char *field = ((struct stringval *)a->m)->value;
+  if (a->r) { // A direct translate call
+    printf("It should be called once");
+    char *value = ((struct stringval *)a->r)->value;
+    replace(name, field, value);
+  }
+  return;
+}
+
+void translateComparison(char* comparison) {
+  return;
 }
 
 void translateSelect(struct ast *a) {
@@ -1705,15 +1760,18 @@ void translateSelect(struct ast *a) {
   char *result;
   strcpy(result, ".output ");
   if (a->l) {
-    // TODO: Find the .decl in the symbol table
     char *temp = ((struct stringval *)a->l)->value;
     strcat(result, temp);
+    strcat(result, "(location: string)"); // By default, output the location
+    storeOutputVar(temp);
   }
   printf("%s\n", result);
 
   if (!a->r) {
+    printf("exit from here?");
     return;
   } else {
+    printf("or exit from here?");
     translateSelect(a->r);
   }
 }
@@ -1733,6 +1791,9 @@ void eval(struct ast *a) {
     case 2: 
       translateFrom(a->l);
       translateSelect(a->r);
+      printf("exited");
+      printFormulaLHS();
+      translateWhere(a->m);
       break;
     default: 
       printf("internal error: bad node %c\n", a->nodetype);
@@ -1742,6 +1803,9 @@ void eval(struct ast *a) {
 
 int main(int ac, char **av)
 {
+  // initialize the symbol table
+  initialize();
+
   extern FILE *yyin;
   if(ac > 1 && (yyin = fopen(av[1], "r")) == NULL) {
     perror(av[1]);

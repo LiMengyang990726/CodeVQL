@@ -89,12 +89,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 42 "codeqltosouffle.y"
+#line 46 "codeqltosouffle.y"
 
         struct ast *a;
         char *strval;
+        char *subtok;
         int intval;
-        int subtok;
 
 #line 100 "codeqltosouffle.tab.h"
 

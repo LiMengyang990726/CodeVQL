@@ -951,32 +951,32 @@ YY_RULE_SETUP
 case 23:
 YY_RULE_SETUP
 #line 51 "codeqltosouffle.l"
-{ yylval.subtok = 1; return COMPARISON; }
+{ yylval.subtok = "="; return COMPARISON; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 52 "codeqltosouffle.l"
-{ yylval.subtok = 2; return COMPARISON; }
+{ yylval.subtok = "!="; return COMPARISON; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 53 "codeqltosouffle.l"
-{ yylval.subtok = 3; return COMPARISON; }
+{ yylval.subtok = "<"; return COMPARISON; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 54 "codeqltosouffle.l"
-{ yylval.subtok = 4; return COMPARISON; }
+{ yylval.subtok = ">"; return COMPARISON; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 55 "codeqltosouffle.l"
-{ yylval.subtok = 5; return COMPARISON; }
+{ yylval.subtok = "<="; return COMPARISON; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 56 "codeqltosouffle.l"
-{ yylval.subtok = 6; return COMPARISON; }
+{ yylval.subtok = ">="; return COMPARISON; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
