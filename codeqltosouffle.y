@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include "symbolTable.cpp"
 #include "utility.cpp"
-
+#include "ast/ASTNode.h"
+  
 /* from the lexer */
 extern int yylex();
 void yyerror(char *s, ...);
