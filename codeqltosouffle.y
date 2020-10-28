@@ -11,9 +11,6 @@
 extern int yylex();
 void yyerror(char *s, ...);
 
-/* utility function */
-char* concatf(char *s, ...);
-
 /* nodes in the abstract syntax tree */
 struct ast {
   int nodetype;
@@ -39,7 +36,7 @@ void translateFrom(struct ast *);
 void translateWhere(struct ast *);
 void translateSelect(struct ast *);
 void translateCall(struct ast *);
-void translateComparison(char * comparison);
+void translateComparison(struct ast *);
 void eval(struct ast *);
 %}
 
@@ -135,9 +132,7 @@ primary: LOWER_ID { $$ = newstringval($1); }
   | call { $$ = $1; }
   ;
 call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET { $$ = newast_3(11, $1, NULL, $3); }
-  | LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET { 
-    $$ = newast_4(11, $1, $3, $5); 
-    printf("DEBUG - node created of type = %d, first = %s, second = %s, third = %s\n", $$->nodetype, $1, $3, $5); }
+  | LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET { $$ = newast_4(11, $1, $3, $5); }
   ;
 expr: UNDERSCORE { $$ = newstringval($1); }
   | primary { $$ = $1; }
@@ -151,17 +146,6 @@ void yyerror(char *s, ...) {
   fprintf(stderr, "%d: error: ", yylineno);
   vfprintf(stderr, s, ap);
   fprintf(stderr, "\n");
-}
-
-char* concatf(char *s, ...)
-{
-  va_list args;
-  char* buf = NULL;
-  va_start(args, s);
-  int n = vasprintf(&buf, s, args);
-  va_end(args);
-  if (n < 0) { free(buf); buf = NULL;  }
-  return buf;
 }
 
 struct ast* newast_1(int nodetype, struct ast *l, struct ast *m, struct ast *r) {
@@ -251,16 +235,11 @@ void translateFrom(struct ast *a) {
 
 void translateWhere(struct ast *a) {
   // No where opts, accept
-  printf("where is executed 1");
   if (!a) {
     return;
   }
-  printf("where is executed 2");
-  printf("[prev 1]");
-  printf("[next 1]");
+
   int type = a->nodetype;
-  printf("[prev 2]");
-  printf("[next 2]");
   switch (type) {
     case 5: 
     case 7:
@@ -276,7 +255,7 @@ void translateWhere(struct ast *a) {
       translateWhere(a->r);
       break;
     case 10:
-      translateComparison(((struct stringval *)a->m)->value);
+      translateComparison(a);
       break;
     case 11:
       translateCall(a);
@@ -293,15 +272,35 @@ void translateCall(struct ast *a) {
 
   char *name = ((struct stringval *)a->l)->value;
   char *field = ((struct stringval *)a->m)->value;
-  if (a->r) { // A direct translate call
-    printf("It should be called once");
+  if (a->r) { // For direct translate call, it can be directly translate to a rule
     char *value = ((struct stringval *)a->r)->value;
     replace(name, field, value);
-  }
+  } // For indirect translate call, it will be handled in comparison
   return;
 }
 
-void translateComparison(char* comparison) {
+void translateComparison(struct ast *a) {
+  char *comparison = ((struct stringval *)a->m)->value;
+  struct ast *l = a->l;
+  struct ast *r = a->r;
+  if (!l || !r) {
+    yyerror("invalid comparison syntax");
+    return;
+  }
+
+  if (strcmp(comparison, "=") == 0) {
+    if (l->nodetype == 11 && r->nodetype == 0) {
+      // Create a reference
+      char *name = ((struct stringval *)l->l)->value;
+      char *field = ((struct stringval *)l->r)->value;
+      char referenceSymbol = replaceCreateReference(name, field);
+      // Store the refernce to the var
+      char *nextName = ((struct stringval *)r)->value;
+      storeRuleReferenceTable(referenceSymbol, nextName);
+    }
+  } else {
+    // I think Datalog does not provide other types of comparison like >=, <=
+  }
   return;
 }
 
@@ -323,11 +322,10 @@ void translateSelect(struct ast *a) {
   printf("%s\n", result);
 
   if (!a->r) {
-    printf("exit from here?");
     return;
   } else {
-    printf("or exit from here?");
     translateSelect(a->r);
+    return;
   }
 }
 
@@ -346,7 +344,6 @@ void eval(struct ast *a) {
     case 2: 
       translateFrom(a->l);
       translateSelect(a->r);
-      printf("exited");
       printFormulaLHS();
       translateWhere(a->m);
       break;

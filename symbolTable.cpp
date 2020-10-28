@@ -3,10 +3,14 @@
 #include <string>
 #include <unordered_map>
 #include <cstring>
+#include <vector>
+#include <sstream>
+#include "symbolTable.h"
 using namespace std;
 
 unordered_map<string, string> symbolTable;
 unordered_map<string, string> varSymbolTable;
+unordered_map<string, char> ruleReferenceTable;
 
 void initialize() {
    symbolTable["MethodAccess"] = "(id: string, location: string, getMethod: string)";
@@ -27,10 +31,32 @@ string findSymbolWithoutPrint(string key) {
    if (symbolTable.find(key) != symbolTable.end()) {
       result = symbolTable[key];
    } 
+   return result;
+}
+
+string findVarDeclSymbolWithoutPrint(string name) {
+   string result = "";
+   if (varSymbolTable.find(name) != varSymbolTable.end()) {
+      result = varSymbolTable[name];
+   } 
+   return result;
+}
+
+string findReferenceSymbol(string name) {
+   string result = "";
+   if (ruleReferenceTable.find(name) != ruleReferenceTable.end()) {
+      result = ruleReferenceTable[name];
+   } 
+   return result;
 }
 
 void storeVarSymbolTable(char* type, char* name) {
    string typeStr(type);
    string nameStr(name);
-   varSymbolTable[typeStr] = nameStr;
+   varSymbolTable[nameStr] = typeStr;
+}
+
+void storeRuleReferenceTable(char referenceSymbol, char* name) {
+   string nameStr(name);
+   ruleReferenceTable[nameStr] = referenceSymbol;
 }

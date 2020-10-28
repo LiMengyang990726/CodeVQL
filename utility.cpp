@@ -26,17 +26,17 @@ void printFormulaLHS() {
 }
 
 vector<pair<string, string> > split(string fields) {
+    fields = fields.substr(1, fields.length()-2);
     vector<pair<string, string> > result;
     stringstream ss(fields);
+    pair<string, string> curr;
     for (string i; ss >> i;) {
-        vector<string> curr;
-        stringstream ss2(i);
-        for (string j; ss2 >> j;) {
-            curr.push_back(j);
-            if (ss2.peek() == ': ') 
-                ss2.ignore();
-        } 
-        result.push_back(make_pair(curr[0], curr[1]));    
+        if (i[i.length()-1] == ':') {
+            curr.first = i.substr(0, i.length()-1);
+        } else {
+            curr.second = i;
+            result.push_back(curr);
+        }
         if (ss.peek() == ', ')
             ss.ignore();
     }
@@ -45,18 +45,68 @@ vector<pair<string, string> > split(string fields) {
 }
 
 void replace(char* name, char* field, char* value) {
-    string fields = findSymbolWithoutPrint(name);
+    string type = findVarDeclSymbolWithoutPrint(name);
+    const char* typeCharP = type.c_str();
+
+    string referenceSymbol = findReferenceSymbol(name);
+    bool isReferenced = !referenceSymbol.empty();
+
+    string fields = findSymbolWithoutPrint(type);
+    const char* fieldsCharP = fields.c_str();
+
     vector<pair<string, string> > fieldsVector = split(fields);
-    string result = name;
+
+    string result = type;
     result += "(";
     for (pair<string, string> fieldPair : fieldsVector) {
-        if (fieldPair.second == field) {
+        const char* currFieldCharP = fieldPair.first.c_str();
+        if (strcmp(field, currFieldCharP) == 0) {
             result += value;
-            result += ",";
+        } else if (strcmp("location", currFieldCharP) == 0) {
+            result += symbolOffset; // as the initial symbol will be a
+        } else if (isReferenced && strcmp("id", currFieldCharP) == 0) {
+            result += referenceSymbol;
         } else {
-            result += "_,";
+            result += "_";
         }
+        result += ",";
     }
     result[result.length()-1] = ')';
-    cout << result;
+    const char* resultCharP = result.c_str();
+    printf("%s\n", resultCharP);
+}
+
+char replaceCreateReference(char* name, char* field) {
+    string type = findVarDeclSymbolWithoutPrint(name);
+    const char* typeCharP = type.c_str();
+
+    string referenceSymbol = findReferenceSymbol(name);
+    bool isReferenced = !referenceSymbol.empty();
+
+    string fields = findSymbolWithoutPrint(type);
+    const char* fieldsCharP = fields.c_str();
+
+    vector<pair<string, string> > fieldsVector = split(fields);
+
+    char newReferenceSymbol;
+    string result = type;
+    result += "(";
+    for (pair<string, string> fieldPair : fieldsVector) {
+        const char* currFieldCharP = fieldPair.first.c_str();
+        if (strcmp(field, currFieldCharP) == 0) {
+            newReferenceSymbol = getNextSymbol();
+            result += newReferenceSymbol;
+        } else if (strcmp("location", currFieldCharP) == 0) {
+            result += symbolOffset; // as the initial symbol will be a
+        } else if (isReferenced && strcmp("id", currFieldCharP) == 0) {
+            result += referenceSymbol;
+        } else {
+            result += "_";
+        }
+        result += ",";
+    }
+    result[result.length()-1] = ')';
+    const char* resultCharP = result.c_str();
+    printf("%s\n", resultCharP);
+    return newReferenceSymbol;
 }
