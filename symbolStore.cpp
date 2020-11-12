@@ -5,14 +5,15 @@
 #include <cstring>
 #include <vector>
 #include <sstream>
-#include "symbolTable.h"
+#include "symbolStore.h"
 using namespace std;
 
 unordered_map<string, string> symbolTable;
-unordered_map<string, string> varSymbolTable;
+unordered_map<string, string> varDeclarationTable;
 unordered_map<string, char> ruleReferenceTable;
 
-void initialize() {
+/* APIs for Symbol Table */
+void initializeSymbolTable() {
    symbolTable["MethodAccess"] = "(id: string, location: string, getMethod: string)";
    symbolTable["Method"] = "(id: string, hasName: string)";
    return;
@@ -34,15 +35,28 @@ string findSymbolWithoutPrint(string key) {
    return result;
 }
 
-string findVarDeclSymbolWithoutPrint(string name) {
+/* APIs for Var Declaration Table */
+void storeVarDeclarationTable(char* type, char* name) {
+   string typeStr(type);
+   string nameStr(name);
+   varDeclarationTable[nameStr] = typeStr;
+}
+
+string findVarDeclarationWithoutPrint(string name) {
    string result = "";
-   if (varSymbolTable.find(name) != varSymbolTable.end()) {
-      result = varSymbolTable[name];
+   if (varDeclarationTable.find(name) != varDeclarationTable.end()) {
+      result = varDeclarationTable[name];
    } 
    return result;
 }
 
-string findReferenceSymbol(string name) {
+/* APIs for Rule Reference Table */
+void storeRuleReferenceTable(char referenceSymbol, char* name) {
+   string nameStr(name);
+   ruleReferenceTable[nameStr] = referenceSymbol;
+}
+
+string findRuleReferenceWithoutPrint(string name) {
    string result = "";
    if (ruleReferenceTable.find(name) != ruleReferenceTable.end()) {
       result = ruleReferenceTable[name];
@@ -50,13 +64,11 @@ string findReferenceSymbol(string name) {
    return result;
 }
 
-void storeVarSymbolTable(char* type, char* name) {
-   string typeStr(type);
-   string nameStr(name);
-   varSymbolTable[nameStr] = typeStr;
+string outputVar;
+void storeOutputVar(string output) {
+    outputVar = output;
 }
 
-void storeRuleReferenceTable(char referenceSymbol, char* name) {
-   string nameStr(name);
-   ruleReferenceTable[nameStr] = referenceSymbol;
+string getOutputVar() {
+   return outputVar;
 }

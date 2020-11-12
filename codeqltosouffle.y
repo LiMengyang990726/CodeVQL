@@ -4,8 +4,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
-#include "symbolTable.cpp"
-#include "utility.cpp"
+#include "symbolStore.cpp"
+#include "printUtils.cpp"
 #include "ast/ASTNode.h"
   
 /* from the lexer */
@@ -140,6 +140,7 @@ expr: UNDERSCORE { $$ = newstringval($1); }
   ;
 %%
 
+/* Utility for flex */
 void yyerror(char *s, ...) {
   extern int yylineno;
   va_list ap;
@@ -149,6 +150,7 @@ void yyerror(char *s, ...) {
   fprintf(stderr, "\n");
 }
 
+/* Constructos for an AST node */
 struct ast* newast_1(int nodetype, struct ast *l, struct ast *m, struct ast *r) {
   struct ast *a = (struct ast *)malloc(sizeof(struct ast));
   if (!a) {
@@ -160,17 +162,6 @@ struct ast* newast_1(int nodetype, struct ast *l, struct ast *m, struct ast *r) 
   a->m = m;
   a->r = r;
   return a;
-}
-
-struct ast* newstringval(char *value) {
-  struct stringval *a = (struct stringval *)malloc(sizeof(struct stringval));
-  if (!a) {
-    yyerror("out of space for constructing AST");
-    exit(0);
-  }
-  a->nodetype = 0;
-  a->value = value;
-  return (struct ast *)a;
 }
 
 struct ast* newast_2(int nodetype, char *valueL, char *valueM, struct ast *r) {
@@ -192,6 +183,18 @@ struct ast* newast_4(int nodetype, char *valueL, char *valueM, char *valueR) {
   return newast_1(nodetype, l, m, r);
 }
 
+struct ast* newstringval(char *value) {
+  struct stringval *a = (struct stringval *)malloc(sizeof(struct stringval));
+  if (!a) {
+    yyerror("out of space for constructing AST");
+    exit(0);
+  }
+  a->nodetype = 0;
+  a->value = value;
+  return (struct ast *)a;
+}
+
+/* Translations for AST */
 void translateImportStmt(struct ast *a) {
   // No import opts
   if (!a) {
@@ -224,7 +227,7 @@ void translateFrom(struct ast *a) {
     findSymbol(type);
     printf("\n");
     // Store into the var declaration symbol table for future use
-    storeVarSymbolTable(type, name);
+    storeVarDeclarationTable(type, name);
   }
 
   if (!a->r) {
@@ -275,7 +278,7 @@ void translateCall(struct ast *a) {
   char *field = ((struct stringval *)a->m)->value;
   if (a->r) { // For direct translate call, it can be directly translate to a rule
     char *value = ((struct stringval *)a->r)->value;
-    replace(name, field, value);
+    printRule(name, field, value);
   } // For indirect translate call, it will be handled in comparison
   return;
 }
@@ -294,7 +297,7 @@ void translateComparison(struct ast *a) {
       // Create a reference
       char *name = ((struct stringval *)l->l)->value;
       char *field = ((struct stringval *)l->r)->value;
-      char referenceSymbol = replaceCreateReference(name, field);
+      char referenceSymbol = printRuleReturnReference(name, field);
       // Store the refernce to the var
       char *nextName = ((struct stringval *)r)->value;
       storeRuleReferenceTable(referenceSymbol, nextName);
@@ -357,7 +360,7 @@ void eval(struct ast *a) {
 int main(int ac, char **av)
 {
   // initialize the symbol table
-  initialize();
+  initializeSymbolTable();
 
   extern FILE *yyin;
   if(ac > 1 && (yyin = fopen(av[1], "r")) == NULL) {

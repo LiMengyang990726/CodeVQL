@@ -4,25 +4,17 @@
 #include <cstring>
 #include <vector>
 #include <sstream>
-#include "symbolTable.h"
+#include "symbolStore.h"
 using namespace std;
 
-string outputVar;
 static int symbolIdx = 0;
 int symbolOffset = 65;
 
+/* Common APIs */
 char getNextSymbol() {
     char result = symbolOffset + symbolIdx;
     symbolIdx++;
     return result;
-}
-
-void storeOutputVar(string output) {
-    outputVar = output;
-}
-
-void printFormulaLHS() {
-    printf("%s(%c) :- ", outputVar.c_str(), getNextSymbol());
 }
 
 vector<pair<string, string> > split(string fields) {
@@ -44,12 +36,17 @@ vector<pair<string, string> > split(string fields) {
     return result;
 }
 
-void replace(char* name, char* field, char* value) {
-    string type = findVarDeclSymbolWithoutPrint(name);
+/* Output Print APIs */
+void printFormulaLHS() {
+    printf("%s(%c) :- ", getOutputVar().c_str(), getNextSymbol());
+}
+
+void printRule(char* name, char* field, char* value) {
+    string type = findVarDeclarationWithoutPrint(name);
     const char* typeCharP = type.c_str();
 
-    string referenceSymbol = findReferenceSymbol(name);
-    bool isReferenced = !referenceSymbol.empty();
+    string ruleReference = findRuleReferenceWithoutPrint(name);
+    bool isReferenced = !ruleReference.empty();
 
     string fields = findSymbolWithoutPrint(type);
     const char* fieldsCharP = fields.c_str();
@@ -65,7 +62,7 @@ void replace(char* name, char* field, char* value) {
         } else if (strcmp("location", currFieldCharP) == 0) {
             result += symbolOffset; // as the initial symbol will be a
         } else if (isReferenced && strcmp("id", currFieldCharP) == 0) {
-            result += referenceSymbol;
+            result += ruleReference;
         } else {
             result += "_";
         }
@@ -76,30 +73,30 @@ void replace(char* name, char* field, char* value) {
     printf("%s\n", resultCharP);
 }
 
-char replaceCreateReference(char* name, char* field) {
-    string type = findVarDeclSymbolWithoutPrint(name);
+char printRuleReturnReference(char* name, char* field) {
+    string type = findVarDeclarationWithoutPrint(name);
     const char* typeCharP = type.c_str();
 
-    string referenceSymbol = findReferenceSymbol(name);
-    bool isReferenced = !referenceSymbol.empty();
+    string ruleReference = findRuleReferenceWithoutPrint(name);
+    bool isReferenced = !ruleReference.empty();
 
     string fields = findSymbolWithoutPrint(type);
     const char* fieldsCharP = fields.c_str();
 
     vector<pair<string, string> > fieldsVector = split(fields);
 
-    char newReferenceSymbol;
+    char newRuleReference;
     string result = type;
     result += "(";
     for (pair<string, string> fieldPair : fieldsVector) {
         const char* currFieldCharP = fieldPair.first.c_str();
         if (strcmp(field, currFieldCharP) == 0) {
-            newReferenceSymbol = getNextSymbol();
-            result += newReferenceSymbol;
+            newRuleReference = getNextSymbol();
+            result += newRuleReference;
         } else if (strcmp("location", currFieldCharP) == 0) {
             result += symbolOffset; // as the initial symbol will be a
         } else if (isReferenced && strcmp("id", currFieldCharP) == 0) {
-            result += referenceSymbol;
+            result += ruleReference;
         } else {
             result += "_";
         }
@@ -108,5 +105,5 @@ char replaceCreateReference(char* name, char* field) {
     result[result.length()-1] = ')';
     const char* resultCharP = result.c_str();
     printf("%s\n", resultCharP);
-    return newReferenceSymbol;
+    return newRuleReference;
 }
