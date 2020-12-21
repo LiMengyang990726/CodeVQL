@@ -6,6 +6,8 @@
 #include <vector>
 #include <sstream>
 #include "symbolStore.h"
+#include "printUtils.h"
+#include "utils.h"
 using namespace std;
 
 unordered_map<string, string> symbolTable;
@@ -14,12 +16,12 @@ unordered_map<string, char> ruleReferenceTable;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
-   symbolTable["MethodAccess"] = "(id: string, location: string, getMethod: string)";
-   symbolTable["Method"] = "(id: string, hasName: string)";
+   symbolTable["MethodAccess"] = "(fqn: String, getMethod: String, version: Version)";
+   symbolTable["Method"] = "(fqn: String, hasName: String, version: Version)";
    return;
 }
 
-void findSymbol(string key) {
+void QLObjToDLDecl(string key) {
    if (symbolTable.find(key) != symbolTable.end()) {
       cout << symbolTable[key];
    } else {
@@ -27,11 +29,27 @@ void findSymbol(string key) {
    }
 }
 
-string findSymbolWithoutPrint(string key) {
+string QLObjToDLDeclWP(string key) {
    string result = "";
    if (symbolTable.find(key) != symbolTable.end()) {
       result = symbolTable[key];
    } 
+   return result;
+}
+
+string QLObjToDLOutput(string key) {
+   string result = "";
+   if (symbolTable.find(key) != symbolTable.end()) {
+      string intermediateResult = symbolTable[key];
+      vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+      vector<pair<string, string> > resultPairs;
+      for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
+         if (it->first != "version") {
+            resultPairs.push_back(make_pair(it->first, it->second));
+         }
+      }
+      result = constructDLDecl(resultPairs);
+   }
    return result;
 }
 

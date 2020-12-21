@@ -4,7 +4,9 @@
 #include <cstring>
 #include <vector>
 #include <sstream>
+#include "printUtils.h"
 #include "symbolStore.h"
+#include "utils.h"
 using namespace std;
 
 static int symbolIdx = 0;
@@ -14,25 +16,6 @@ int symbolOffset = 65;
 char getNextSymbol() {
     char result = symbolOffset + symbolIdx;
     symbolIdx++;
-    return result;
-}
-
-vector<pair<string, string> > split(string fields) {
-    fields = fields.substr(1, fields.length()-2);
-    vector<pair<string, string> > result;
-    stringstream ss(fields);
-    pair<string, string> curr;
-    for (string i; ss >> i;) {
-        if (i[i.length()-1] == ':') {
-            curr.first = i.substr(0, i.length()-1);
-        } else {
-            curr.second = i;
-            result.push_back(curr);
-        }
-        if (ss.peek() == ', ')
-            ss.ignore();
-    }
-
     return result;
 }
 
@@ -48,10 +31,10 @@ void printRule(char* name, char* field, char* value) {
     string ruleReference = findRuleReferenceWithoutPrint(name);
     bool isReferenced = !ruleReference.empty();
 
-    string fields = findSymbolWithoutPrint(type);
+    string fields = QLObjToDLDeclWP(type);
     const char* fieldsCharP = fields.c_str();
 
-    vector<pair<string, string> > fieldsVector = split(fields);
+    vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
 
     string result = type;
     result += "(";
@@ -80,10 +63,10 @@ char printRuleReturnReference(char* name, char* field) {
     string ruleReference = findRuleReferenceWithoutPrint(name);
     bool isReferenced = !ruleReference.empty();
 
-    string fields = findSymbolWithoutPrint(type);
+    string fields = QLObjToDLDeclWP(type);
     const char* fieldsCharP = fields.c_str();
 
-    vector<pair<string, string> > fieldsVector = split(fields);
+    vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
 
     char newRuleReference;
     string result = type;

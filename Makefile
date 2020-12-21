@@ -25,4 +25,4 @@ ${PROGRAM}: ${PROGRAM}.tab.o lex.yy.o
 	${CC} -o $@ $^
 
 clean:
-	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.o ${PROGRAM}.tab.c lex.yy.c lex.yy.o
+	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.c ${PROGRAM}.tab.o lex.yy.c lex.yy.o

@@ -4,10 +4,10 @@
 
 %{
 #include "codeqltosouffle.tab.h"
+#include "helper/utils.h"
 #include <stdarg.h>
 #include <string.h>
 
-void yyerror(char *s, ...);
 int oldstate;
 %}
 

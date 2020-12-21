@@ -1,6 +1,6 @@
 
-#ifndef SYMBOLTABLE_H
-#define SYMBOLTABLE_H
+#ifndef SYMBOLSTORE_H
+#define SYMBOLSTORE_H
 
 #include <iostream>
 #include <string>
@@ -10,8 +10,9 @@
 using namespace std;
 
 void initializeSymbolTable();
-void findSymbol(string key);
-string findSymbolWithoutPrint(string key);
+void QLObjToDLDecl(string key);
+string QLObjToDLDeclWP(string key);
+string QLObjToDLOutput(string key);
 
 void storeVarDeclarationTable(string type, string name);
 string findVarDeclarationWithoutPrint(string name);
