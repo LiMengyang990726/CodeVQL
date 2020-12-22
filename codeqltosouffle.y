@@ -88,7 +88,7 @@ select_opts: expr { $$ = newast(SELECT_OPTS_NODE, 1, $1); }
   ;
 
 from_opts: UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 2, newstringval($1), newstringval($2)); }
-  | from_opts COMMA UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 3, newstringval($3), newstringval($4), $1); }
+  | UPPER_ID LOWER_ID COMMA from_opts { $$ = newast(FROM_OPTS_NODE, 3, newstringval($1), newstringval($2), $4); }
   ;
 
 where_opts: formula { $$ = $1; };
@@ -98,7 +98,7 @@ formula: LEFT_BRACKET formula RIGHT_BRACKET { $$ = $2; }
   |   formula IMPLIES formula { $$ = newast(IMPLIES_FORMULA_NODE, 2, $1, $3); }
   |   IF formula THEN formula ELSE formula { $$ = newast(IF_FORMULA_NODE, 3, $2, $4, $6); }
   |   NOT formula { $$ = newast(NOT_FORMULA_NODE, 1, $2); }
-  |   primary COMPARISON primary { $$ = newast(COMPARISON_FORMULA_NODE, 2, $1, newstringval($2), $3); }
+  |   primary COMPARISON primary { $$ = newast(COMPARISON_FORMULA_NODE, 3, $1, newstringval($2), $3); }
   |   call { $$ = $1; }
   ;
 
@@ -124,8 +124,6 @@ int main(int ac, char **av)
     perror(av[1]);
     exit(1);
   }
-  if(!yyparse())
-    printf("CodeQL parse worked\n");
-  else
+  if(yyparse())
     printf("CodeQL parse failed\n");
 }

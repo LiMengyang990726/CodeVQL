@@ -10,9 +10,13 @@
 
 using namespace std;
 
-char getNextSymbol();
-void printFormulaLHS();
-void printRule(char* name, char* field, char* value);
-char printRuleReturnReference(char* name, char* field);
+void printTemplate();
+void printDecl(string type);
+void printOutputDecl(string type);
+void printInput(string type);
+void printOutput();
+void printRuleBegin();
+void printRuleTermination();
+void printRule(string name, string field, string value);
 
 #endif

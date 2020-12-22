@@ -13,5 +13,6 @@ using namespace std;
 void yyerror(char *s, ...);
 vector<pair<string, string> > destructDLDecl(string fields);
 string constructDLDecl(vector<pair<string, string> > fieldPairs);
+string constructDLRuleBegin(vector<string> fields);
 
 #endif

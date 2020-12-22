@@ -12,7 +12,7 @@ using namespace std;
 
 unordered_map<string, string> symbolTable;
 unordered_map<string, string> varDeclarationTable;
-unordered_map<string, char> ruleReferenceTable;
+unordered_map<string, string> ruleReferenceTable;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
@@ -45,6 +45,22 @@ string QLObjToDLOutput(string key) {
    return result;
 }
 
+string QLObjToDLRuleBegin(string key) {
+   string result = "";
+   if (symbolTable.find(key) != symbolTable.end()) {
+      string intermediateResult = symbolTable[key];
+      vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+      vector<string> resultPairs;
+      for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
+         if (it->first != "version") {
+            resultPairs.push_back(it->first);
+         }
+      }
+      result = constructDLRuleBegin(resultPairs);
+   }
+   return result;
+}
+
 /* APIs for Var Declaration Table */
 void storeVarDeclarationTable(string type, string name) {
    string typeStr(type);
@@ -61,9 +77,8 @@ string findVarDeclaration(string name) {
 }
 
 /* APIs for Rule Reference Table */
-void storeRuleReferenceTable(char referenceSymbol, string name) {
-   string nameStr(name);
-   ruleReferenceTable[nameStr] = referenceSymbol;
+void storeRuleReferenceTable(string reference, string name) {
+   ruleReferenceTable[name] = reference;
 }
 
 string findRuleReference(string name) {
@@ -74,6 +89,7 @@ string findRuleReference(string name) {
    return result;
 }
 
+// TODO: Currently only handle one output case
 string outputVar;
 void storeOutputVar(string output) {
     outputVar = output;

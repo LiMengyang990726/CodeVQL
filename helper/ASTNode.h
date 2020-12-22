@@ -12,5 +12,5 @@ struct stringval {
 };
 
 /* methods for constructing nodes */
-struct ast *newast(int nodetype, int childrencount, struct ast *child, ...);
+struct ast *newast(int nodetype, int childrencount, ...);
 struct ast *newstringval(char *value);

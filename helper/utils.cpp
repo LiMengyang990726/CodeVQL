@@ -44,6 +44,17 @@ string constructDLDecl(vector<pair<string, string> > fieldPairs) {
         result += it->second;
         result += ", ";
     }
+    result = result.substr(0, result.length()-3);
+    result += ")";
+    return result;
+}
+
+string constructDLRuleBegin(vector<string> fields) {
+    string result = "(";
+    for (string field : fields) {
+        result += field;
+        result += ", ";
+    }
     result = result.substr(0, result.length()-2);
     result += ")";
     return result;

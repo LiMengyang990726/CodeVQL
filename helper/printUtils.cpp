@@ -9,84 +9,65 @@
 #include "utils.h"
 using namespace std;
 
-static int symbolIdx = 0;
-int symbolOffset = 65;
-
-/* Common APIs */
-char getNextSymbol() {
-    char result = symbolOffset + symbolIdx;
-    symbolIdx++;
-    return result;
+void printTemplate() {
+    cout << "#include \"types.dl\"" << endl;
+    cout << "#include \"objectMapping.dl\"" << endl;
 }
 
-/* Output Print APIs */
-void printFormulaLHS() {
-    printf("%s(%c) :- ", getOutputVar().c_str(), getNextSymbol());
+void printDecl(string type) {
+    cout << ".decl " << type << QLObjToDLDecl(type) << endl;
 }
 
-void printRule(char* name, char* field, char* value) {
+void printOutputDecl(string type) {
+    cout << ".decl " << getOutputVar() << QLObjToDLOutput(type) << endl;
+}
+
+void printInput(string type) {
+    cout << ".input " << type << endl << endl;
+}
+
+void printOutput() {
+    cout << ".output " << getOutputVar() << endl;
+}
+
+void printRuleBegin() {
+    cout << getOutputVar() << QLObjToDLRuleBegin(findVarDeclaration(getOutputVar())) << ":- ";
+}
+
+void printRuleTermination() {
+    cout << "." << endl;
+}
+
+void printRule(string name, string field, string value) {
     string type = findVarDeclaration(name);
-    const char* typeCharP = type.c_str();
 
     string ruleReference = findRuleReference(name);
     bool isReferenced = !ruleReference.empty();
 
     string fields = QLObjToDLDecl(type);
-    const char* fieldsCharP = fields.c_str();
-
     vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
 
     string result = type;
     result += "(";
     for (pair<string, string> fieldPair : fieldsVector) {
-        const char* currFieldCharP = fieldPair.first.c_str();
-        if (strcmp(field, currFieldCharP) == 0) {
-            result += value;
-        } else if (strcmp("location", currFieldCharP) == 0) {
-            result += symbolOffset; // as the initial symbol will be a
-        } else if (isReferenced && strcmp("id", currFieldCharP) == 0) {
+        string currFieldCharP = fieldPair.first.c_str();
+        if (currFieldCharP == field) {
+            if (value.empty()) {
+                result += field;
+            } else {
+                result += value;
+            }
+        } else if (currFieldCharP == "version") {
+            result += "__VERSION"; 
+        } else if (isReferenced) {
             result += ruleReference;
+        } else if (currFieldCharP == "fqn") {
+            result += "fqn";
         } else {
             result += "_";
         }
         result += ",";
     }
     result[result.length()-1] = ')';
-    const char* resultCharP = result.c_str();
-    printf("%s\n", resultCharP);
-}
-
-char printRuleReturnReference(char* name, char* field) {
-    string type = findVarDeclaration(name);
-    const char* typeCharP = type.c_str();
-
-    string ruleReference = findRuleReference(name);
-    bool isReferenced = !ruleReference.empty();
-
-    string fields = QLObjToDLDecl(type);
-    const char* fieldsCharP = fields.c_str();
-
-    vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
-
-    char newRuleReference;
-    string result = type;
-    result += "(";
-    for (pair<string, string> fieldPair : fieldsVector) {
-        const char* currFieldCharP = fieldPair.first.c_str();
-        if (strcmp(field, currFieldCharP) == 0) {
-            newRuleReference = getNextSymbol();
-            result += newRuleReference;
-        } else if (strcmp("location", currFieldCharP) == 0) {
-            result += symbolOffset; // as the initial symbol will be a
-        } else if (isReferenced && strcmp("id", currFieldCharP) == 0) {
-            result += ruleReference;
-        } else {
-            result += "_";
-        }
-        result += ",";
-    }
-    result[result.length()-1] = ')';
-    const char* resultCharP = result.c_str();
-    printf("%s\n", resultCharP);
-    return newRuleReference;
+    cout << result << endl;
 }

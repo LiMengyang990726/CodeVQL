@@ -43,13 +43,11 @@ void translateSelect(struct ast *a)
         return;
     }
 
-    string result = ".output ";
-    struct ast *varName = a->children[0];
-    string varNameStr = ((struct stringval *)varName)->value;
-    result += varNameStr;
-    result += QLObjToDLOutput(varNameStr); // By default, output the all fields except version fields
-    cout << result << endl;
-    storeOutputVar(varNameStr);
+    struct ast *name = a->children[0];
+    string nameStr = ((struct stringval *)name)->value;
+    string typeStr = findVarDeclaration(nameStr);
+    storeOutputVar(nameStr);
+    printOutputDecl(typeStr);
 
     if (a->childrencount == 1)
     {
@@ -75,13 +73,12 @@ void translateFrom(struct ast *a)
         return;
     }
 
-    string result = ".decl ";
     struct ast *type = a->children[0];
     string typeStr = ((struct stringval *)type)->value;
     struct ast *name = a->children[1];
     string nameStr = ((struct stringval *)name)->value;
-    result += typeStr;
-    cout << result << QLObjToDLDecl(typeStr) << endl;
+    printDecl(typeStr);
+    printInput(typeStr);
     storeVarDeclarationTable(typeStr, nameStr);
 
     if (a->childrencount == 2)
@@ -102,14 +99,14 @@ void translateWhere(struct ast *a)
     {
         return;
     }
-
+    
     switch (a->nodetype)
     {
     case OR_FORMULA_NODE:
     case IMPLIES_FORMULA_NODE:
         if (a->childrencount != 2)
         {
-            yyerror("error in WHERE node in AST construction");
+            yyerror("error in WHERE node (OR/IMPLIES) in AST construction");
             return;
         }
         /* TODO */
@@ -119,7 +116,7 @@ void translateWhere(struct ast *a)
     case AND_FORMULA_NODE:
         if (a->childrencount != 2)
         {
-            yyerror("error in WHERE node in AST construction");
+            yyerror("error in WHERE node (AND) in AST construction");
             return;
         }
         translateWhere(a->children[0]);
@@ -129,7 +126,7 @@ void translateWhere(struct ast *a)
     case IF_FORMULA_NODE:
         if (a->childrencount != 3)
         {
-            yyerror("error in WHERE node in AST construction");
+            yyerror("error in WHERE node (IF) in AST construction");
             return;
         }
         /* TODO */
@@ -140,16 +137,16 @@ void translateWhere(struct ast *a)
     case NOT_FORMULA_NODE:
         if (a->childrencount != 1)
         {
-            yyerror("error in WHERE node in AST construction");
+            yyerror("error in WHERE node (NOT) in AST construction");
             return;
         }
         /* TODO */
         translateWhere(a->children[0]);
         break;
     case COMPARISON_FORMULA_NODE:
-        if (a->childrencount != 2)
+        if (a->childrencount != 3)
         {
-            yyerror("error in WHERE node in AST construction");
+            yyerror("error in WHERE node (COMPARISON) in AST construction");
             return;
         }
         translateComparison(a);
@@ -157,7 +154,7 @@ void translateWhere(struct ast *a)
     case CALL_NODE:
         if (a->childrencount < 2 || a->childrencount > 3)
         {
-            yyerror("error in WHERE node in AST construction");
+            yyerror("error in WHERE node (CALL) in AST construction");
             return;
         }
         translateCall(a);
@@ -167,45 +164,48 @@ void translateWhere(struct ast *a)
 
 void translateComparison(struct ast *a)
 {
-    // char *comparison = ((struct stringval *)a->m)->value;
-    // struct ast *l = a->l;
-    // struct ast *r = a->r;
-    // if (!l || !r) {
-    //   yyerror("invalid comparison syntax");
-    //   return;
-    // }
+    // No where opts, accept
+    if (!a || a->childrencount != 3)
+    {
+        yyerror("error in constructing where comparison");
+        return;
+    }
 
-    // if (strcmp(comparison, "=") == 0) {
-    //   if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE) {
-    //     // Create a reference
-    //     char *name = ((struct stringval *)l->l)->value;
-    //     char *field = ((struct stringval *)l->r)->value;
-    //     char referenceSymbol = printRuleReturnReference(name, field);
-    //     // Store the refernce to the var
-    //     char *nextName = ((struct stringval *)r)->value;
-    //     storeRuleReferenceTable(referenceSymbol, nextName);
-    //   }
-    // } else {
-    //   // I think Datalog does not provide other types of comparison like >=, <=
-    // }
-    // return;
+    string comparison = ((struct stringval *)a->children[1])->value;
+    struct ast *l = a->children[0];
+    struct ast *r = a->children[2];
+
+    if (comparison == "=") {
+      if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE) {
+        string nameStr = ((struct stringval *)l->children[0])->value;
+        string fieldStr = ((struct stringval *)l->children[1])->value;
+        printRule(nameStr, fieldStr, "");
+
+        // Create a reference
+        string nextName = ((struct stringval *)r)->value;
+        storeRuleReferenceTable(fieldStr, nextName);
+      }
+    } else {
+      // TODO: For other comparison types like >=, >, etc.
+    }
+    return;
 }
 
 void translateCall(struct ast *a)
 {
-    // // No select opts
-    // if (!a) {
-    //   yyerror("error in call opts");
-    //   return;
-    // }
+    // No select opts
+    if (!a || a->childrencount < 2 || a->childrencount > 3) {
+      yyerror("error in constructing function call");
+      return;
+    }
 
-    // char *name = ((struct stringval *)a->l)->value;
-    // char *field = ((struct stringval *)a->m)->value;
-    // if (a->r) { // For direct translate call, it can be directly translate to a rule
-    //   char *value = ((struct stringval *)a->r)->value;
-    //   printRule(name, field, value);
-    // } // For indirect translate call, it will be handled in comparison
-    // return;
+    string nameStr = ((struct stringval *)a->children[0])->value;
+    string fieldStr = ((struct stringval *)a->children[1])->value;
+    if (a->childrencount == 3) { // For direct translate call, it can be directly translate to a rule
+      char *value = ((struct stringval *)a->children[2])->value;
+      printRule(nameStr, fieldStr, value);
+    } // For indirect translate call, it will be handled in comparison
+    return;
 }
 
 void eval(struct ast *a)
@@ -224,6 +224,7 @@ void eval(struct ast *a)
         break;
     /* select statement */
     case SELECT_STMT_NODE:
+        printTemplate();
         switch (a->childrencount)
         {
         case 1:
@@ -235,15 +236,20 @@ void eval(struct ast *a)
             break;
         case 3:
             translateFrom(a->children[0]);
-            translateWhere(a->children[1]);
             translateSelect(a->children[2]);
+            printRuleBegin();
+            translateWhere(a->children[1]);
+            printRuleTermination();
             break;
         default:
             yyerror("incomplete query");
             return;
         }
+        printOutput();
+        break;
     default:
         printf("internal error: bad node %c\n", a->nodetype);
+        return;
     }
     return;
 }

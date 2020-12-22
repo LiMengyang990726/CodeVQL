@@ -8,7 +8,7 @@
 # include "utils.h"
 
 /* methods for constructing nodes */
-struct ast *newast(int nodetype, int childrencount, struct ast * child, ...) {
+struct ast *newast(int nodetype, int childrencount, ...) {
   struct ast *a = (struct ast *)malloc(sizeof(struct ast));
   a->nodetype = nodetype;
   a->childrencount = childrencount;
