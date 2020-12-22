@@ -10,15 +10,14 @@
 using namespace std;
 
 void initializeSymbolTable();
-void QLObjToDLDecl(string key);
-string QLObjToDLDeclWP(string key);
+string QLObjToDLDecl(string key);
 string QLObjToDLOutput(string key);
 
 void storeVarDeclarationTable(string type, string name);
-string findVarDeclarationWithoutPrint(string name);
+string findVarDeclaration(string name);
 
 void storeRuleReferenceTable(string type, string name);
-string findRuleReferenceWithoutPrint(string name);
+string findRuleReference(string name);
 
 void storeOutputVar(string output);
 string getOutputVar();

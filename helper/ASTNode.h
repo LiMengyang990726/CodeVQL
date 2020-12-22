@@ -2,7 +2,7 @@
 struct ast {
   int nodetype;
   int childrencount;
-  vector<struct ast *> children;
+  std::vector<struct ast *> children;
 };
 typedef struct ast ast;
 

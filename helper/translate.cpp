@@ -81,9 +81,7 @@ void translateFrom(struct ast *a)
     struct ast *name = a->children[1];
     string nameStr = ((struct stringval *)name)->value;
     result += typeStr;
-    printf("%s", result);
-    QLObjToDLDecl(typeStr);
-    printf("\n");
+    cout << result << QLObjToDLDecl(typeStr) << endl;
     storeVarDeclarationTable(typeStr, nameStr);
 
     if (a->childrencount == 2)

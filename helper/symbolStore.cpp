@@ -21,15 +21,7 @@ void initializeSymbolTable() {
    return;
 }
 
-void QLObjToDLDecl(string key) {
-   if (symbolTable.find(key) != symbolTable.end()) {
-      cout << symbolTable[key];
-   } else {
-      cout << "Error: cannot find the corresponding symbol in symbol table";
-   }
-}
-
-string QLObjToDLDeclWP(string key) {
+string QLObjToDLDecl(string key) {
    string result = "";
    if (symbolTable.find(key) != symbolTable.end()) {
       result = symbolTable[key];
@@ -54,13 +46,13 @@ string QLObjToDLOutput(string key) {
 }
 
 /* APIs for Var Declaration Table */
-void storeVarDeclarationTable(char* type, char* name) {
+void storeVarDeclarationTable(string type, string name) {
    string typeStr(type);
    string nameStr(name);
    varDeclarationTable[nameStr] = typeStr;
 }
 
-string findVarDeclarationWithoutPrint(string name) {
+string findVarDeclaration(string name) {
    string result = "";
    if (varDeclarationTable.find(name) != varDeclarationTable.end()) {
       result = varDeclarationTable[name];
@@ -69,12 +61,12 @@ string findVarDeclarationWithoutPrint(string name) {
 }
 
 /* APIs for Rule Reference Table */
-void storeRuleReferenceTable(char referenceSymbol, char* name) {
+void storeRuleReferenceTable(char referenceSymbol, string name) {
    string nameStr(name);
    ruleReferenceTable[nameStr] = referenceSymbol;
 }
 
-string findRuleReferenceWithoutPrint(string name) {
+string findRuleReference(string name) {
    string result = "";
    if (ruleReferenceTable.find(name) != ruleReferenceTable.end()) {
       result = ruleReferenceTable[name];

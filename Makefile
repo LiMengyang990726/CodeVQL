@@ -4,6 +4,7 @@ FLEX = flex
 CC = g++
 
 PROGRAM = codeqltosouffle
+HELPER = helper
 
 .PHONY : clean
 
@@ -21,8 +22,23 @@ ${PROGRAM}.tab.o: ${PROGRAM}.tab.c
 lex.yy.o: lex.yy.c
 	${CC} $< -o $@ -c
 
-${PROGRAM}: ${PROGRAM}.tab.o lex.yy.o
+${HELPER}/ASTNode.o: ${HELPER}/ASTNode.cpp
+	${CC} $< -o $@ -c
+
+${HELPER}/printUtils.o: ${HELPER}/printUtils.cpp
+	${CC} $< -o $@ -c
+
+${HELPER}/symbolStore.o: ${HELPER}/symbolStore.cpp
+	${CC} $< -o $@ -c
+
+${HELPER}/translate.o: ${HELPER}/translate.cpp
+	${CC} $< -o $@ -c
+
+${HELPER}/utils.o: ${HELPER}/utils.cpp
+	${CC} $< -o $@ -c
+
+${PROGRAM}: ${PROGRAM}.tab.o lex.yy.o ${HELPER}/ASTNode.o ${HELPER}/printUtils.o ${HELPER}/symbolStore.o ${HELPER}/translate.o ${HELPER}/utils.o
 	${CC} -o $@ $^
 
 clean:
-	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.c ${PROGRAM}.tab.o lex.yy.c lex.yy.o
+	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.c ${PROGRAM}.tab.o lex.yy.c lex.yy.o ${HELPER}/ASTNode.o ${HELPER}/printUtils.o ${HELPER}/symbolStore.o ${HELPER}/translate.o ${HELPER}/utils.o

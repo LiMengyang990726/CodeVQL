@@ -25,13 +25,13 @@ void printFormulaLHS() {
 }
 
 void printRule(char* name, char* field, char* value) {
-    string type = findVarDeclarationWithoutPrint(name);
+    string type = findVarDeclaration(name);
     const char* typeCharP = type.c_str();
 
-    string ruleReference = findRuleReferenceWithoutPrint(name);
+    string ruleReference = findRuleReference(name);
     bool isReferenced = !ruleReference.empty();
 
-    string fields = QLObjToDLDeclWP(type);
+    string fields = QLObjToDLDecl(type);
     const char* fieldsCharP = fields.c_str();
 
     vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
@@ -57,13 +57,13 @@ void printRule(char* name, char* field, char* value) {
 }
 
 char printRuleReturnReference(char* name, char* field) {
-    string type = findVarDeclarationWithoutPrint(name);
+    string type = findVarDeclaration(name);
     const char* typeCharP = type.c_str();
 
-    string ruleReference = findRuleReferenceWithoutPrint(name);
+    string ruleReference = findRuleReference(name);
     bool isReferenced = !ruleReference.empty();
 
-    string fields = QLObjToDLDeclWP(type);
+    string fields = QLObjToDLDecl(type);
     const char* fieldsCharP = fields.c_str();
 
     vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
