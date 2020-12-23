@@ -34,6 +34,8 @@ then      { return THEN; }
 not       { return NOT; }
 select    { return SELECT; }
 as        { return AS; }
+range     { return RANGE; }
+is        { return IS; }
 
     /* question: (\\.) in regular expression? */
 

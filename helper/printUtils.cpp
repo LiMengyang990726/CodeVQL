@@ -8,10 +8,12 @@
 #include "symbolStore.h"
 #include "utils.h"
 using namespace std;
+#define CURRENT_VERSION "\"831fcb0\""
 
 void printTemplate() {
     cout << "#include \"types.dl\"" << endl;
     cout << "#include \"objectMapping.dl\"" << endl;
+    cout << "#define __VERSION " << CURRENT_VERSION << endl << endl; 
 }
 
 void printDecl(string type) {
@@ -35,11 +37,13 @@ void printRuleBegin() {
 }
 
 void printRuleTermination() {
-    cout << "." << endl;
+    cout << "." << endl << endl;
 }
 
 void printRule(string name, string field, string value) {
     string type = findVarDeclaration(name);
+
+    string varRange = findVarRange(name);
 
     string ruleReference = findRuleReference(name);
     bool isReferenced = !ruleReference.empty();
@@ -58,7 +62,11 @@ void printRule(string name, string field, string value) {
                 result += value;
             }
         } else if (currFieldCharP == "version") {
-            result += "__VERSION"; 
+            if (varRange.empty() || varRange == CURRENT_VERSION) {
+                result += "__VERSION"; 
+            } else {
+                result += varRange;
+            }
         } else if (isReferenced) {
             result += ruleReference;
         } else if (currFieldCharP == "fqn") {
@@ -69,5 +77,5 @@ void printRule(string name, string field, string value) {
         result += ",";
     }
     result[result.length()-1] = ')';
-    cout << result << endl;
+    cout << result;
 }

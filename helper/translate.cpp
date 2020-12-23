@@ -92,6 +92,36 @@ void translateFrom(struct ast *a)
     }
 }
 
+void translateRange(struct ast *a) {
+    // No range opts, accept
+    if (!a) {
+        return;
+    } else if (a->childrencount < 2 || a->childrencount > 3) {
+        yyerror("error in RANGE node in AST construction");
+        return;
+    }
+
+    struct ast *name = a->children[0];
+    string nameStr = ((struct stringval *)name)->value;
+    struct ast *range = a->children[1];
+    string rangeStr = ((struct stringval *)range)->value;
+    if (findVarDeclaration(nameStr).empty()) {
+        yyerror("The variable in RANGE clause is not declared");
+        return;
+    }
+    storeVarRangeTable(nameStr, rangeStr);
+
+    if (a->childrencount == 2)
+    {
+        return;
+    }
+    else
+    {
+        translateRange(a->children[2]);
+        return;
+    }
+}
+
 void translateWhere(struct ast *a)
 {
     // No where opts, accept
@@ -239,6 +269,14 @@ void eval(struct ast *a)
             translateSelect(a->children[2]);
             printRuleBegin();
             translateWhere(a->children[1]);
+            printRuleTermination();
+            break;
+        case 4: 
+            translateFrom(a->children[0]);
+            translateRange(a->children[1]);
+            translateSelect(a->children[3]);
+            printRuleBegin();
+            translateWhere(a->children[2]);
             printRuleTermination();
             break;
         default:

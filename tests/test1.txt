@@ -1,5 +1,6 @@
 import java
 
 from MethodAccess call, Method method
+range call is "831fcb0", method is "831fcb0"
 where call.getMethod()=method and method.hasName("getMaxFrameSize")
 select call

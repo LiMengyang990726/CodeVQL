@@ -1,5 +1,0 @@
-import java
-
-from MethodAccess(version 1) call, Method method
-where call.getMethod()=method and method.hasName("getMaxFrameSize")
-select call

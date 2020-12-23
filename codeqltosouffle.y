@@ -49,9 +49,11 @@ extern int yylex();
 %token <strval> DOT
 %token <strval> UNDERSCORE
 %token <subtok> COMPARISON
+%token <strval> RANGE
+%token <strval> IS
 
 %type <a> stmt import_stmt select_stmt
-%type <a> select_opts from_opts where_opts 
+%type <a> select_opts from_opts where_opts range_opts
 %type <a> formula call primary expr
 %type <strval> import_opts   
 
@@ -79,6 +81,7 @@ import_opts: JAVA { $$ = "java"; }
 select_stmt: SELECT select_opts { $$ = newast(SELECT_STMT_NODE, 1, $2); }
   | FROM from_opts SELECT select_opts  { $$ = newast(SELECT_STMT_NODE, 2, $2, $4); }
   | FROM from_opts WHERE where_opts SELECT select_opts { $$ = newast(SELECT_STMT_NODE, 3, $2, $4, $6); }
+  | FROM from_opts RANGE range_opts WHERE where_opts SELECT select_opts { $$ = newast(SELECT_STMT_NODE, 4, $2, $4, $6, $8); }
   ;
 
 select_opts: expr { $$ = newast(SELECT_OPTS_NODE, 1, $1); }
@@ -89,6 +92,10 @@ select_opts: expr { $$ = newast(SELECT_OPTS_NODE, 1, $1); }
 
 from_opts: UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 2, newstringval($1), newstringval($2)); }
   | UPPER_ID LOWER_ID COMMA from_opts { $$ = newast(FROM_OPTS_NODE, 3, newstringval($1), newstringval($2), $4); }
+  ;
+
+range_opts: LOWER_ID IS STRING_LITERAL { $$ = newast(RANGE_OPTS_NODE, 2, newstringval($1), newstringval($3)); }
+  | LOWER_ID IS STRING_LITERAL COMMA range_opts { $$ = newast(RANGE_OPTS_NODE, 3, newstringval($1), newstringval($3), $5); }
   ;
 
 where_opts: formula { $$ = $1; };

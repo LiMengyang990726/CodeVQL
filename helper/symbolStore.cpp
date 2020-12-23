@@ -12,6 +12,7 @@ using namespace std;
 
 unordered_map<string, string> symbolTable;
 unordered_map<string, string> varDeclarationTable;
+unordered_map<string, string> varRangeTable;
 unordered_map<string, string> ruleReferenceTable;
 
 /* APIs for Symbol Table */
@@ -63,9 +64,7 @@ string QLObjToDLRuleBegin(string key) {
 
 /* APIs for Var Declaration Table */
 void storeVarDeclarationTable(string type, string name) {
-   string typeStr(type);
-   string nameStr(name);
-   varDeclarationTable[nameStr] = typeStr;
+   varDeclarationTable[name] = type;
 }
 
 string findVarDeclaration(string name) {
@@ -73,6 +72,19 @@ string findVarDeclaration(string name) {
    if (varDeclarationTable.find(name) != varDeclarationTable.end()) {
       result = varDeclarationTable[name];
    } 
+   return result;
+}
+
+/* APIs for Variable Range(Version) Table */
+void storeVarRangeTable(string name, string range) {
+   varRangeTable[name] = range;
+}
+
+string findVarRange(string name) {
+   string result = "";
+   if (varRangeTable.find(name) != varRangeTable.end()) {
+      result = varRangeTable[name];
+   }
    return result;
 }
 

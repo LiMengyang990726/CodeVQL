@@ -1,5 +1,6 @@
 void translateImportStmt(struct ast *);
 void translateFrom(struct ast *);
+void translateRange(struct ast *);
 void translateWhere(struct ast *);
 void translateSelect(struct ast *);
 void translateCall(struct ast *);
