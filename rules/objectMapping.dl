@@ -1,0 +1,3 @@
+#define Method IsMethod
+#define MethodAccess Call
+#define History history

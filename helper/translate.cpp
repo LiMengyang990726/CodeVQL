@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include "nodetype.h"
 #include "symbolStore.h"
-#include "printUtils.h"
+#include "populateMainDL.h"
+#include "populateRelDL.h"
+#include "populateVersionDL.h"
 #include "utils.h"
 #include "ASTNode.h"
 #include "translate.h"
@@ -47,7 +49,7 @@ void translateSelect(struct ast *a)
     string nameStr = ((struct stringval *)name)->value;
     string typeStr = findVarDeclaration(nameStr);
     storeOutputVar(nameStr);
-    printOutputDecl(typeStr);
+    writeOutputDecl(typeStr);
 
     if (a->childrencount == 1)
     {
@@ -77,8 +79,8 @@ void translateFrom(struct ast *a)
     string typeStr = ((struct stringval *)type)->value;
     struct ast *name = a->children[1];
     string nameStr = ((struct stringval *)name)->value;
-    printDecl(typeStr);
-    printInput(typeStr);
+    writeDecl(typeStr);
+    writeInput(typeStr);
     storeVarDeclarationTable(typeStr, nameStr);
 
     if (a->childrencount == 2)
@@ -109,7 +111,8 @@ void translateRange(struct ast *a) {
         yyerror("The variable in RANGE clause is not declared");
         return;
     }
-    storeVarRangeTable(nameStr, rangeStr);
+    writeVersion(nameStr);
+    writeVersionDL(rangeStr, nameStr);
 
     if (a->childrencount == 2)
     {
@@ -150,7 +153,7 @@ void translateWhere(struct ast *a)
             return;
         }
         translateWhere(a->children[0]);
-        printf(",");
+        writeParallelRule();
         translateWhere(a->children[1]);
         break;
     case IF_FORMULA_NODE:
@@ -209,7 +212,7 @@ void translateComparison(struct ast *a)
       if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE) {
         string nameStr = ((struct stringval *)l->children[0])->value;
         string fieldStr = ((struct stringval *)l->children[1])->value;
-        printRule(nameStr, fieldStr, "");
+        writeRule(nameStr, fieldStr, "");
 
         // Create a reference
         string nextName = ((struct stringval *)r)->value;
@@ -233,7 +236,7 @@ void translateCall(struct ast *a)
     string fieldStr = ((struct stringval *)a->children[1])->value;
     if (a->childrencount == 3) { // For direct translate call, it can be directly translate to a rule
       char *value = ((struct stringval *)a->children[2])->value;
-      printRule(nameStr, fieldStr, value);
+      writeRule(nameStr, fieldStr, value);
     } // For indirect translate call, it will be handled in comparison
     return;
 }
@@ -246,6 +249,7 @@ void eval(struct ast *a)
         return;
     }
 
+    writeAllRelDLs();
     switch (a->nodetype)
     {
     /* import statement */
@@ -254,7 +258,7 @@ void eval(struct ast *a)
         break;
     /* select statement */
     case SELECT_STMT_NODE:
-        printTemplate();
+        writeTemplate();
         switch (a->childrencount)
         {
         case 1:
@@ -267,26 +271,26 @@ void eval(struct ast *a)
         case 3:
             translateFrom(a->children[0]);
             translateSelect(a->children[2]);
-            printRuleBegin();
+            writeRuleBegin();
             translateWhere(a->children[1]);
-            printRuleTermination();
+            writeRuleTermination();
             break;
         case 4: 
             translateFrom(a->children[0]);
             translateRange(a->children[1]);
             translateSelect(a->children[3]);
-            printRuleBegin();
+            writeRuleBegin();
             translateWhere(a->children[2]);
-            printRuleTermination();
+            writeRuleTermination();
             break;
         default:
             yyerror("incomplete query");
             return;
         }
-        printOutput();
+        writeOutput();
         break;
     default:
-        printf("internal error: bad node %c\n", a->nodetype);
+        yyerror("internal error: bad node %c\n", a->nodetype);
         return;
     }
     return;

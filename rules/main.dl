@@ -1,0 +1,42 @@
+#include "types.dl"
+#include "objectMapping.dl"
+
+.decl MethodAccess(fqn: String, getMethod: String, version: Version)
+.input MethodAccess
+
+.decl Method(fqn: String, hasName: String, version: Version)
+.input Method
+
+.decl SelectedVersioncall(version: Version)
+.input SelectedVersioncall
+
+.decl SelectedVersionmethod(version: Version)
+.input SelectedVersionmethod
+
+.decl call(fqn: String,, getMethod: String)
+call(fqn, getMethod):- MethodAccess(fqn,getMethod,versioncall),SelectedVersioncall(versioncall), 
+
+Method(getMethod,"getArea",versionmethod),SelectedVersionmethod(versionmethod).
+
+.output call
+#include "types.dl"
+#include "objectMapping.dl"
+
+.decl MethodAccess(fqn: String, getMethod: String, version: Version)
+.input MethodAccess
+
+.decl Method(fqn: String, hasName: String, version: Version)
+.input Method
+
+.decl SelectedVersioncall(version: Version)
+.input SelectedVersioncall
+
+.decl SelectedVersionmethod(version: Version)
+.input SelectedVersionmethod
+
+.decl call(fqn: String,, getMethod: String)
+call(fqn, getMethod):- MethodAccess(fqn,getMethod,versioncall),SelectedVersioncall(versioncall), 
+
+Method(getMethod,"getArea",versionmethod),SelectedVersionmethod(versionmethod).
+
+.output call

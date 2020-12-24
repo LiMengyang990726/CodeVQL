@@ -17,9 +17,6 @@ string QLObjToDLRuleBegin(string key);
 void storeVarDeclarationTable(string type, string name);
 string findVarDeclaration(string name);
 
-void storeVarRangeTable(string name, string range);
-string findVarRange(string name);
-
 void storeRuleReferenceTable(string reference, string name);
 string findRuleReference(string name);
 

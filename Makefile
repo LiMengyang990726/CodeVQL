@@ -25,7 +25,7 @@ lex.yy.o: lex.yy.c
 ${HELPER}/ASTNode.o: ${HELPER}/ASTNode.cpp
 	${CC} $< -o $@ -c
 
-${HELPER}/printUtils.o: ${HELPER}/printUtils.cpp
+${HELPER}/populateMainDL.o: ${HELPER}/populateMainDL.cpp
 	${CC} $< -o $@ -c
 
 ${HELPER}/symbolStore.o: ${HELPER}/symbolStore.cpp
@@ -37,8 +37,14 @@ ${HELPER}/translate.o: ${HELPER}/translate.cpp
 ${HELPER}/utils.o: ${HELPER}/utils.cpp
 	${CC} $< -o $@ -c
 
-${PROGRAM}: ${PROGRAM}.tab.o lex.yy.o ${HELPER}/ASTNode.o ${HELPER}/printUtils.o ${HELPER}/symbolStore.o ${HELPER}/translate.o ${HELPER}/utils.o
+${HELPER}/populateRelDL.o: ${HELPER}/populateRelDL.cpp
+	${CC} $< -o $@ -c
+
+${HELPER}/populateVersionDL.o: ${HELPER}/populateVersionDL.cpp
+	${CC} $< -o $@ -c
+
+${PROGRAM}: ${PROGRAM}.tab.o lex.yy.o ${HELPER}/ASTNode.o ${HELPER}/populateMainDL.o ${HELPER}/symbolStore.o ${HELPER}/translate.o ${HELPER}/utils.o ${HELPER}/populateRelDL.o ${HELPER}/populateVersionDL.o
 	${CC} -o $@ $^
 
 clean:
-	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.c ${PROGRAM}.tab.o lex.yy.c lex.yy.o ${HELPER}/ASTNode.o ${HELPER}/printUtils.o ${HELPER}/symbolStore.o ${HELPER}/translate.o ${HELPER}/utils.o
+	$(RM) ${PROGRAM} ${PROGRAM}.tab.h ${PROGRAM}.tab.c ${PROGRAM}.tab.o lex.yy.c lex.yy.o ${HELPER}/ASTNode.o ${HELPER}/populateMainDL.o ${HELPER}/symbolStore.o ${HELPER}/translate.o ${HELPER}/utils.o ${HELPER}/populateRelDL.o ${HELPER}/populateVersionDL.o

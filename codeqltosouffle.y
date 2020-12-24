@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "helper/symbolStore.h"
-#include "helper/printUtils.h"
+#include "helper/populateMainDL.h"
 #include "helper/utils.h"
 #include "helper/nodetype.h"
 #include "helper/ASTNode.h"
