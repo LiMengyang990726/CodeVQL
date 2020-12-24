@@ -22,8 +22,8 @@ void writeVersionDL(string range, string name) {
         int n = 0;
         ss >> n;
         writeVersionDLNthAncestor(range, name, n);
-    } else if (regex_match(range, regex("^\"[a-zA-Z0-9]{40}\^[0-9]+\"$"))) {
-        string nStr = range.substr(range.find("^"), range.size());
+    } else if (regex_match(range, regex("^\"[a-zA-Z0-9]{40}\\^[0-9]+\"$"))) {
+        string nStr = range.substr(range.find("^")+1, range.size());
         stringstream ss(nStr);
         int n = 0;
         ss >> n;
