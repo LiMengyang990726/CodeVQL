@@ -35,7 +35,7 @@ not       { return NOT; }
 select    { return SELECT; }
 as        { return AS; }
 range     { return RANGE; }
-is        { return IS; }
+@        { return AT; }
 
     /* question: (\\.) in regular expression? */
 

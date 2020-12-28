@@ -50,7 +50,7 @@ extern int yylex();
 %token <strval> UNDERSCORE
 %token <subtok> COMPARISON
 %token <strval> RANGE
-%token <strval> IS
+%token <strval> AT
 
 %type <a> stmt import_stmt select_stmt
 %type <a> select_opts from_opts where_opts range_opts
@@ -94,8 +94,8 @@ from_opts: UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 2, newstringval($1), 
   | UPPER_ID LOWER_ID COMMA from_opts { $$ = newast(FROM_OPTS_NODE, 3, newstringval($1), newstringval($2), $4); }
   ;
 
-range_opts: LOWER_ID IS STRING_LITERAL { $$ = newast(RANGE_OPTS_NODE, 2, newstringval($1), newstringval($3)); }
-  | LOWER_ID IS STRING_LITERAL COMMA range_opts { $$ = newast(RANGE_OPTS_NODE, 3, newstringval($1), newstringval($3), $5); }
+range_opts: LOWER_ID AT STRING_LITERAL { $$ = newast(RANGE_OPTS_NODE, 2, newstringval($1), newstringval($3)); }
+  | LOWER_ID AT STRING_LITERAL COMMA range_opts { $$ = newast(RANGE_OPTS_NODE, 3, newstringval($1), newstringval($3), $5); }
   ;
 
 where_opts: formula { $$ = $1; };

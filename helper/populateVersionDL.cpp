@@ -49,16 +49,13 @@ void writeVersionDLNthAncestor(string range, string name, int n) {
     ofstream versionDL;
     versionDL.open(VERSION_DL_PREFIX + name + VERSION_DL_POSTFIX, ios_base::app);
 
-    for (int i = 0; i < n-1; i++) {
-        string varName = "IntermediateVersion" + to_string(i);
-        versionDL << ".decl " << varName << "(version: Version)" << endl;
-        versionDL << varName << "(version) :- History(X, version, DEFAULT_PARENT_INDEX), InputVersion(X)." << endl << endl;
-    }
+    versionDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
+    versionDL << "CommitDist(CURRENT_VERSION, CURRENT_VERSION, 0)." << endl;
+    versionDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), Parent(y, x, 0)." << endl << endl;
 
     string varName = "SelectedVersion" + name;
-    string lastIntermediateVersionName = "IntermediateVersion" + to_string(n-2);
     versionDL << ".decl " << varName << "(version: Version)" << endl;
-    versionDL << varName << "(version) :- History(X, version, DEFAULT_PARENT_INDEX), " << lastIntermediateVersionName << "(X)." << endl;
+    versionDL << varName << "(version) :- CommitDist(CURRENT_VERSION, version, " << n << ")." << endl;
     versionDL << ".output " << varName << "(IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << varName << VERSION_OUTPUT_POSTFIX << "\")" << endl;
 
     versionDL.close();
@@ -70,7 +67,7 @@ void writeVersionDLNthParent(string range, string name, int n) {
 
     string varName = "SelectedVersion" + name;
     versionDL << ".decl " << varName << "(version: Version)" << endl;
-    versionDL << varName << "(version) :- History(X, version, "<< n << "), InputVersion(X)." << endl;
+    versionDL << varName << "(version) :- Parent(X, version, "<< n << "), InputVersion(X)." << endl;
     versionDL << ".output " << varName << "(IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << varName << VERSION_OUTPUT_POSTFIX << "\")" << endl;
 
     versionDL.close();
@@ -85,8 +82,8 @@ void writeVersionDLTemplate (string name) {
     versionDL << "#define DEFAULT_PARENT_INDEX 0" << endl;
     versionDL << "#define CURRENT_VERSION \"c0a13d8cc528a449967e83b7d0f4043787597e81\"" << endl << endl; /* todo */
 
-    versionDL << ".decl History(child: Version, parent: Version, index: Int)" << endl;
-    versionDL << ".input History" << endl << endl;
+    versionDL << ".decl Parent(child: Version, parent: Version, index: Int)" << endl;
+    versionDL << ".input Parent" << endl << endl;
 
     versionDL << ".decl InputVersion(version: Version)" << endl;
     versionDL << "InputVersion(CURRENT_VERSION)." << endl << endl;
