@@ -203,7 +203,14 @@ void translateRange(struct ast *a)
             return;
         }
 
-        /* TODO: New facts required for branch difference */
+        struct ast *name = a->children[0];
+        string nameStr = ((struct stringval *)name)->value;
+        struct ast *compBranch = a->children[1];
+        string compBranchStr = ((struct stringval *)compBranch)->value;
+        struct ast *baseBranch = a->children[2];
+        string baseBranchStr = ((struct stringval *)baseBranch)->value;
+        writeVersion(nameStr);
+        writeVersionDLBranch(nameStr, compBranchStr, baseBranchStr);
 
         // Do the recursion
         if (a->childrencount == 3)

@@ -77,6 +77,12 @@ void writeVersionDL(string name, vector<string> ranges) {
     writeVersionDLOutput(name);
 }
 
+void writeVersionDLBranch(string name, string compBranch, string baseBranch) {
+    writeVersionDLTemplate(name);
+    writeVersionDLBranchComp(name, compBranch, baseBranch);
+    writeVersionDLOutput(name);
+}
+
 void writeVersionDLDirect(string name) {
     ofstream versionDL;
     versionDL.open(VERSION_DL_PREFIX + name + VERSION_DL_POSTFIX, ios_base::app);
@@ -113,6 +119,16 @@ void writeVersionDLNthParent(string name, string start, int n) {
     versionDL.close();
 }
 
+void writeVersionDLBranchComp(string name, string compBranch, string baseBranch) {
+    ofstream versionDL;
+    versionDL.open(VERSION_DL_PREFIX + name + VERSION_DL_POSTFIX, ios_base::app);
+
+    string varName = "SelectedVersion" + name;
+    versionDL << varName << "(version) :- Branch(version, " << baseBranch << "), !Branch(version, " << compBranch << ")." << endl << endl;
+
+    versionDL.close();
+}
+
 void writeVersionDLTemplate(string name) {
     ofstream versionDL;
     versionDL.open(VERSION_DL_PREFIX + name + VERSION_DL_POSTFIX, ios_base::app);
@@ -122,6 +138,9 @@ void writeVersionDLTemplate(string name) {
 
     versionDL << ".decl Parent(child: Version, parent: Version, index: Int)" << endl;
     versionDL << ".input Parent" << endl << endl;
+
+    versionDL << ".decl Branch(commit: Version, branch: String)" << endl;
+    versionDL << ".input Branch" << endl << endl;
 
     string varName = "SelectedVersion" + name;
     versionDL << ".decl " << varName << "(version: Version)" << endl << endl;
