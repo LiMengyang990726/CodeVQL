@@ -54,7 +54,7 @@ extern int yylex();
 
 %type <a> stmt import_stmt select_stmt
 %type <a> select_opts from_opts where_opts range_opts
-%type <a> formula call primary expr
+%type <a> multiple_range_opts formula call primary expr
 %type <strval> import_opts   
 
 %start stmt_list
@@ -94,8 +94,16 @@ from_opts: UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 2, newstringval($1), 
   | UPPER_ID LOWER_ID COMMA from_opts { $$ = newast(FROM_OPTS_NODE, 3, newstringval($1), newstringval($2), $4); }
   ;
 
-range_opts: LOWER_ID AT STRING_LITERAL { $$ = newast(RANGE_OPTS_NODE, 2, newstringval($1), newstringval($3)); }
-  | LOWER_ID AT STRING_LITERAL COMMA range_opts { $$ = newast(RANGE_OPTS_NODE, 3, newstringval($1), newstringval($3), $5); }
+range_opts: LOWER_ID AT STRING_LITERAL { $$ = newast(SINGLE_VERSION_NODE, 2, newstringval($1), newstringval($3)); }
+  | LOWER_ID AT STRING_LITERAL COMMA range_opts { $$ = newast(SINGLE_VERSION_NODE, 3, newstringval($1), newstringval($3), $5); }
+  | LOWER_ID AT LEFT_BRACKET multiple_range_opts RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 2, newstringval($1), $4); }
+  | LOWER_ID AT LEFT_BRACKET multiple_range_opts RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 3, newstringval($1), $4, $7); } 
+  | LOWER_ID AT LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 3, newstringval($1), newstringval($4), newstringval($7)); }
+  | LOWER_ID AT LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 4, newstringval($1), newstringval($4), newstringval($7), $10); }
+  ;
+
+multiple_range_opts: STRING_LITERAL { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 1, newstringval($1)); }
+  | STRING_LITERAL COMMA multiple_range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 2, newstringval($1), $3); }
   ;
 
 where_opts: formula { $$ = $1; };

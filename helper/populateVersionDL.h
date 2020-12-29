@@ -2,8 +2,11 @@
 
 using namespace std;
 
-void writeVersionDL(string range, string name);
-void writeVersionDLDirect(string range, string name);
-void writeVersionDLNthAncestor(string range, string name, int n);
-void writeVersionDLNthParent(string range, string name, int n);
-void writeVersionDLTemplate (string name);
+void writeVersionDL(string name, string range);
+void writeVersionDL(string name, vector<string> ranges);
+void writeVersionDLDirect(string name);
+void writeVersionDLNthAncestor(string name, string start, int n);
+void writeVersionDLNthParent(string name, string start, int n);
+void writeVersionDLTemplate(string name);
+void writeVersionDLInput(string name, string version);
+void writeVersionDLOutput(string name);

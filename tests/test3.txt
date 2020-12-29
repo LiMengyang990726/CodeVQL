@@ -1,6 +1,6 @@
 import java
 
 from MethodAccess call, Method method
-range call @ "831fcb06722f0fe3022b9fe357e668ad248c46c7^2", method @ "831fcb06722f0fe3022b9fe357e668ad248c46c7^2"
+range call @ "c0a13d8cc528a449967e83b7d0f4043787597e81^2", method @ "c0a13d8cc528a449967e83b7d0f4043787597e81^2"
 where call.getMethod()=method and method.hasName("getArea")
 select call
