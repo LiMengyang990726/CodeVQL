@@ -51,9 +51,12 @@ extern int yylex();
 %token <subtok> COMPARISON
 %token <strval> RANGE
 %token <strval> AT
+%token <strval> EXISTS
+%token <strval> FORALL
+%token <strval> THAT
 
 %type <a> stmt import_stmt select_stmt
-%type <a> select_opts from_opts where_opts range_opts
+%type <a> select_opts from_opts where_opts range_opts reason_opts
 %type <a> multiple_range_opts formula call primary expr
 %type <strval> import_opts   
 
@@ -106,7 +109,12 @@ multiple_range_opts: STRING_LITERAL { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_
   | STRING_LITERAL COMMA multiple_range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 2, newstringval($1), $3); }
   ;
 
-where_opts: formula { $$ = $1; };
+where_opts: EXISTS reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval($1), $2, $4); }
+  | FORALL reason_opts THAT formula { newast(WHERE_OPTS_NODE, 3, newstringval($1), $2, $4); }
+  ;
+reason_opts: LOWER_ID { $$ = newast(REASON_OPTS_NODE, 1, newstringval($1)); }
+  | LOWER_ID COMMA reason_opts { $$ = newast(REASON_OPTS_NODE, 2, newstringval($1), $3); }
+  ;
 formula: LEFT_BRACKET formula RIGHT_BRACKET { $$ = $2; }
   |   formula OR formula { $$ = newast(OR_FORMULA_NODE, 2, $1, $3); }
   |   formula AND formula { $$ = newast(AND_FORMULA_NODE, 2, $1, $3); }

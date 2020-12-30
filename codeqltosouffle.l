@@ -35,7 +35,10 @@ not       { return NOT; }
 select    { return SELECT; }
 as        { return AS; }
 range     { return RANGE; }
-@        { return AT; }
+@         { return AT; }
+exists    { return EXISTS; }
+forall    { return FORALL; }
+that      { return THAT; }
 
     /* question: (\\.) in regular expression? */
 
