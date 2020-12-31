@@ -2,7 +2,9 @@
 #include <sstream>
 #include <string>
 #include <regex>
+#include <unordered_map>
 #include "populateVersionDL.h"
+#include "constants.h"
 #include "utils.h"
 
 #define VERSION_DL_PREFIX "rules/version"
@@ -12,12 +14,23 @@
 #define PLAIN_VERSION_REGEX "^\"[a-zA-Z0-9]{40}\"$"
 #define NTH_ANCESTOR_REGEX "^\"[a-zA-Z0-9]{40}~[0-9]+\"$"
 #define NTH_PARENT_REGEX "^\"[a-zA-Z0-9]{40}\\^[0-9]+\"$"
+#define EXPERIMENT_BRANCH "experiment"
+#define EXPERIMENT_BRANCH_MOST_RECENT_COMMIT "\"f3db11791569ea3e4fd741a2ee243e02561d1008\"" /* todo: obtain it dynamically */
+#define MASTER_BRANCH "master"
+#define MASTER_BRANCH_MOST_RECENT_COMMIT "\"c0a13d8cc528a449967e83b7d0f4043787597e81\"" /* todo: obtain it dynamically */
 using namespace std;
 
 int numVersions = 1;
 bool isCommitDistDeclared = false;
+unordered_map<string, string> branchMostRecentCommit;
+
+void init() {
+    branchMostRecentCommit.insert(make_pair(EXPERIMENT_BRANCH, EXPERIMENT_BRANCH_MOST_RECENT_COMMIT));
+    branchMostRecentCommit.insert(make_pair(MASTER_BRANCH, MASTER_BRANCH_MOST_RECENT_COMMIT));
+}
 
 void writeVersionDL(string name, string range) {
+    init();
     writeVersionDLTemplate(name);
 
     if (regex_match(range, regex(PLAIN_VERSION_REGEX))) {
@@ -45,10 +58,12 @@ void writeVersionDL(string name, string range) {
     writeVersionDLOutput(name);
 }
 
-void writeVersionDL(string name, vector<string> ranges) {
+void writeVersionDL(string name, int type, vector<string> ranges) {
+    init();
     writeVersionDLTemplate(name);
 
-    for (string range : ranges) {
+    if (type == MULTIPLE_VERSIONS_TYPE_1) {
+        for (string range : ranges) {
         if (regex_match(range, regex(PLAIN_VERSION_REGEX))) {
             writeVersionDLInput(name, range);
             writeVersionDLDirect(name);
@@ -73,13 +88,23 @@ void writeVersionDL(string name, vector<string> ranges) {
         }
         numVersions++;
     }
-
-    writeVersionDLOutput(name);
-}
-
-void writeVersionDLBranch(string name, string compBranch, string baseBranch) {
-    writeVersionDLTemplate(name);
-    writeVersionDLBranchComp(name, compBranch, baseBranch);
+    } else if (type == MULTIPLE_VERSIONS_TYPE_2) {
+        if (ranges.size() != 2) {
+            yyerror("invalid branch comparison in multiple versions selection");
+            return;
+        }
+        writeVersionDLBranchComp(name, ranges[0], ranges[1]);
+    } else if (type == MULTIPLE_VERSIONS_TYPE_3) {
+        if (ranges.size() != 2) {
+            yyerror("invalid versionInRange parameter in multiple versions selection");
+            return;
+        }
+        writeVersionDLVersionInRange(name, ranges[0], ranges[1]);
+    } else {
+        yyerror("invalid multiple versions selection type");
+        return;
+    }
+    
     writeVersionDLOutput(name);
 }
 
@@ -123,8 +148,24 @@ void writeVersionDLBranchComp(string name, string compBranch, string baseBranch)
     ofstream versionDL;
     versionDL.open(VERSION_DL_PREFIX + name + VERSION_DL_POSTFIX, ios_base::app);
 
+    if (branchMostRecentCommit.find(compBranch) == branchMostRecentCommit.end() || branchMostRecentCommit.find(baseBranch) == branchMostRecentCommit.end()) {
+        yyerror("Cannot get the most recent commit id of the branch comparison in the RANGE clause");
+        return;
+    }
+    string compBranchMostRecentCommit = branchMostRecentCommit.at(compBranch);
+    string baseBranchMostRecentCommit = branchMostRecentCommit.at(baseBranch);
     string varName = "SelectedVersion" + name;
-    versionDL << varName << "(version) :- Branch(version, " << baseBranch << "), !Branch(version, " << compBranch << ")." << endl << endl;
+    versionDL << varName << "(version) :- Branch(version, " << compBranchMostRecentCommit << "), !Branch(version, " << baseBranchMostRecentCommit << ")." << endl << endl;
+
+    versionDL.close();
+}
+
+void writeVersionDLVersionInRange(string name, string endCommit, string startCommit) {
+    ofstream versionDL;
+    versionDL.open(VERSION_DL_PREFIX + name + VERSION_DL_POSTFIX, ios_base::app);
+
+    string varName = "SelectedVersion" + name;
+    versionDL << varName << "(version) :- VersionInRange(version,  " << endCommit << ", " << startCommit << ")." << endl << endl; 
 
     versionDL.close();
 }
@@ -139,8 +180,13 @@ void writeVersionDLTemplate(string name) {
     versionDL << ".decl Parent(child: Version, parent: Version, index: Int)" << endl;
     versionDL << ".input Parent" << endl << endl;
 
-    versionDL << ".decl Branch(commit: Version, branch: String)" << endl;
-    versionDL << ".input Branch" << endl << endl;
+    versionDL << ".decl Reachable(a:Version, b:Version)" << endl;
+    versionDL << "Reachable(a, b) :- Parent(a, b, _)." << endl;
+    versionDL << "Reachable(a, x) :- Parent(a, b, _), Reachable(b, x)." << endl << endl;
+
+    versionDL << ".decl VersionInRange(x: Version, a:Version, b:Version)" << endl;
+    versionDL << "VersionInRange(x, a, b) :- Reachable(b, x), Parent(_,a,_), !Reachable(a, x)." << endl;
+    versionDL << "VersionInRange(x, a, b) :- Reachable(b, x), Parent(a,_,_), !Reachable(a, x)." << endl << endl;
 
     string varName = "SelectedVersion" + name;
     versionDL << ".decl " << varName << "(version: Version)" << endl << endl;

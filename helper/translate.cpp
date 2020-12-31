@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include "constants.h"
 #include "nodetype.h"
 #include "symbolStore.h"
 #include "populateMainDL.h"
@@ -181,7 +182,7 @@ void translateRange(struct ast *a)
             return;
         }
         writeVersion(nameStr);
-        writeVersionDL(nameStr, rangeStrs);
+        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_1, rangeStrs);
 
         // Do the recursion
         if (a->childrencount == 2)
@@ -209,8 +210,43 @@ void translateRange(struct ast *a)
         string compBranchStr = ((struct stringval *)compBranch)->value;
         struct ast *baseBranch = a->children[2];
         string baseBranchStr = ((struct stringval *)baseBranch)->value;
+        vector<string> rangeStrs;
+        rangeStrs.push_back(compBranchStr);
+        rangeStrs.push_back(baseBranchStr);
         writeVersion(nameStr);
-        writeVersionDLBranch(nameStr, compBranchStr, baseBranchStr);
+        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_2, rangeStrs);
+
+        // Do the recursion
+        if (a->childrencount == 3)
+        {
+            return;
+        }
+        else
+        {
+            translateRange(a->children[3]);
+            return;
+        }
+    }
+    else if (a->nodetype == MULTIPLE_VERSIONS_TYPE_3_NODE) 
+    {
+        // Check if children count is valid
+        if (a->childrencount < 3 || a->childrencount > 4)
+        {
+            yyerror("error in (multiple versions) RANGE node in AST construction: no such number of children supported");
+            return;
+        }
+
+        struct ast *name = a->children[0];
+        string nameStr = ((struct stringval *)name)->value;
+        struct ast *endCommit = a->children[1];
+        string endCommitStr = ((struct stringval *)endCommit)->value;
+        struct ast *startCommit = a->children[2];
+        string startCommitStr = ((struct stringval *)startCommit)->value;
+        vector<string> rangeStrs;
+        rangeStrs.push_back(endCommitStr);
+        rangeStrs.push_back(startCommitStr);
+        writeVersion(nameStr);
+        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_3, rangeStrs);
 
         // Do the recursion
         if (a->childrencount == 3)
@@ -230,7 +266,31 @@ void translateRange(struct ast *a)
     }
 }
 
-void translateWhere(struct ast *a)
+void translateWhere(struct ast *a) 
+{
+    // No where opts, accept
+    if (!a)
+    {
+        return;
+    } else if (a->childrencount != 3) {
+        yyerror("error in WHERE statement");
+        return;
+    }
+
+    struct ast* reason = a->children[0];
+    string reasonStr = ((struct stringval *)reason)->value;
+    cout << "debug " << reasonStr << endl;
+    if (reasonStr == "exists") {
+        translateFormula(a->children[2]);
+    } else if (reasonStr == "forall") {
+        translateFormula(a->children[2]);
+    } else {
+        yyerror("error in WHERE reasoning statement");
+        return;
+    }
+}
+
+void translateFormula(struct ast *a)
 {
     // No where opts, accept
     if (!a)
@@ -248,8 +308,8 @@ void translateWhere(struct ast *a)
             return;
         }
         /* TODO */
-        translateWhere(a->children[0]);
-        translateWhere(a->children[1]);
+        translateFormula(a->children[0]);
+        translateFormula(a->children[1]);
         break;
     case AND_FORMULA_NODE:
         if (a->childrencount != 2)
@@ -257,9 +317,9 @@ void translateWhere(struct ast *a)
             yyerror("error in WHERE node (AND) in AST construction");
             return;
         }
-        translateWhere(a->children[0]);
+        translateFormula(a->children[0]);
         writeParallelRule();
-        translateWhere(a->children[1]);
+        translateFormula(a->children[1]);
         break;
     case IF_FORMULA_NODE:
         if (a->childrencount != 3)
@@ -268,9 +328,9 @@ void translateWhere(struct ast *a)
             return;
         }
         /* TODO */
-        translateWhere(a->children[0]);
-        translateWhere(a->children[1]);
-        translateWhere(a->children[2]);
+        translateFormula(a->children[0]);
+        translateFormula(a->children[1]);
+        translateFormula(a->children[2]);
         break;
     case NOT_FORMULA_NODE:
         if (a->childrencount != 1)
@@ -279,7 +339,7 @@ void translateWhere(struct ast *a)
             return;
         }
         /* TODO */
-        translateWhere(a->children[0]);
+        translateFormula(a->children[0]);
         break;
     case COMPARISON_FORMULA_NODE:
         if (a->childrencount != 3)
