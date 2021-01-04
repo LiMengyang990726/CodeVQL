@@ -51,7 +51,6 @@ extern int yylex();
 %token <subtok> COMPARISON
 %token <strval> RANGE
 %token <strval> AT
-%token <strval> VERSIONINRANGE
 %token <strval> EXISTS
 %token <strval> FORALL
 %token <strval> THAT
@@ -104,15 +103,13 @@ range_opts: LOWER_ID AT STRING_LITERAL { $$ = newast(SINGLE_VERSION_NODE, 2, new
   | LOWER_ID AT LEFT_BRACKET multiple_range_opts RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 3, newstringval($1), $4, $7); } 
   | LOWER_ID AT LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 3, newstringval($1), newstringval($4), newstringval($7)); }
   | LOWER_ID AT LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 4, newstringval($1), newstringval($4), newstringval($7), $10); }
-  | LOWER_ID AT VERSIONINRANGE LEFT_BRACKET STRING_LITERAL COMMA STRING_LITERAL RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_3_NODE, 3, newstringval($1), newstringval($5), newstringval($7)); }
-  | LOWER_ID AT VERSIONINRANGE LEFT_BRACKET STRING_LITERAL COMMA STRING_LITERAL RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_3_NODE, 4, newstringval($1), newstringval($5), newstringval($7), $10); }
   ;
 multiple_range_opts: STRING_LITERAL { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 1, newstringval($1)); }
   | STRING_LITERAL COMMA multiple_range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 2, newstringval($1), $3); }
   ;
 
-where_opts: EXISTS reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval($1), $2, $4); }
-  | FORALL reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval($1), $2, $4); }
+where_opts: EXISTS reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("exists"), $2, $4); }
+  | FORALL reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("forall"), $2, $4); }
   ;
 reason_opts: LOWER_ID { $$ = newast(REASON_OPTS_NODE, 1, newstringval($1)); }
   | LOWER_ID COMMA reason_opts { $$ = newast(REASON_OPTS_NODE, 2, newstringval($1), $3); }

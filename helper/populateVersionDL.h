@@ -2,14 +2,14 @@
 
 using namespace std;
 
-void init();
-void writeVersionDL(string name, string range);
-void writeVersionDL(string name, int type, vector<string> ranges);
-void writeVersionDLDirect(string name);
-void writeVersionDLNthAncestor(string name, string start, int n);
-void writeVersionDLNthParent(string name, string start, int n);
-void writeVersionDLBranchComp(string name, string compBranch, string baseBranch);
-void writeVersionDLVersionInRange(string name, string endCommit, string startCommit);
-void writeVersionDLTemplate(string name);
-void writeVersionDLInput(string name, string version);
-void writeVersionDLOutput(string name);
+void writeVersionDL(string varName, string version);
+void writeVersionDL(string varName, int type, vector<string> versions);
+
+void writeVersionDLDirect(string filename, string varName);
+void writeVersionDLNthAncestor(string filename, string varName, string commitId, int n);
+void writeVersionDLNthParent(string filename, string varName, string commitId, int n);
+void writeVersionDLComp(string filename, string varName, string from, string base);
+
+void writeVersionDLTemplate(string filename, string varName);
+void writeVersionDLInput(string filename, string varName, string commitId);
+void writeVersionDLOutput(string filename, string varName);

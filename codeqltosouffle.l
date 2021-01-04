@@ -36,7 +36,6 @@ select    { return SELECT; }
 as        { return AS; }
 range     { return RANGE; }
 @         { return AT; }
-versionInRange  { return VERSIONINRANGE; }
 exists    { return EXISTS; }
 forall    { return FORALL; }
 that      { return THAT; }

@@ -206,47 +206,15 @@ void translateRange(struct ast *a)
 
         struct ast *name = a->children[0];
         string nameStr = ((struct stringval *)name)->value;
-        struct ast *compBranch = a->children[1];
-        string compBranchStr = ((struct stringval *)compBranch)->value;
-        struct ast *baseBranch = a->children[2];
-        string baseBranchStr = ((struct stringval *)baseBranch)->value;
+        struct ast *fromCommit = a->children[1];
+        string fromCommitStr = ((struct stringval *)fromCommit)->value;
+        struct ast *baseCommit = a->children[2];
+        string baseCommitStr = ((struct stringval *)baseCommit)->value;
         vector<string> rangeStrs;
-        rangeStrs.push_back(compBranchStr);
-        rangeStrs.push_back(baseBranchStr);
+        rangeStrs.push_back(fromCommitStr);
+        rangeStrs.push_back(baseCommitStr);
         writeVersion(nameStr);
         writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_2, rangeStrs);
-
-        // Do the recursion
-        if (a->childrencount == 3)
-        {
-            return;
-        }
-        else
-        {
-            translateRange(a->children[3]);
-            return;
-        }
-    }
-    else if (a->nodetype == MULTIPLE_VERSIONS_TYPE_3_NODE) 
-    {
-        // Check if children count is valid
-        if (a->childrencount < 3 || a->childrencount > 4)
-        {
-            yyerror("error in (multiple versions) RANGE node in AST construction: no such number of children supported");
-            return;
-        }
-
-        struct ast *name = a->children[0];
-        string nameStr = ((struct stringval *)name)->value;
-        struct ast *endCommit = a->children[1];
-        string endCommitStr = ((struct stringval *)endCommit)->value;
-        struct ast *startCommit = a->children[2];
-        string startCommitStr = ((struct stringval *)startCommit)->value;
-        vector<string> rangeStrs;
-        rangeStrs.push_back(endCommitStr);
-        rangeStrs.push_back(startCommitStr);
-        writeVersion(nameStr);
-        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_3, rangeStrs);
 
         // Do the recursion
         if (a->childrencount == 3)
@@ -279,7 +247,6 @@ void translateWhere(struct ast *a)
 
     struct ast* reason = a->children[0];
     string reasonStr = ((struct stringval *)reason)->value;
-    cout << "debug " << reasonStr << endl;
     if (reasonStr == "exists") {
         translateFormula(a->children[2]);
     } else if (reasonStr == "forall") {

@@ -3,7 +3,7 @@ void translateFrom(struct ast *);
 vector<string> translateMultipleVersionType1Opts(struct ast *a, vector<string>& initial) ;
 void translateRange(struct ast *);
 void translateWhere(struct ast *);
-void translateFormula(struct ast *a);
+void translateFormula(struct ast *);
 void translateSelect(struct ast *);
 void translateCall(struct ast *);
 void translateComparison(struct ast *);
