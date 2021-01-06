@@ -26,7 +26,7 @@ void writeVersionsCombination(vector<string> inputs)
     string filename = VERSION_DL;
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
-    versionDL << "#include \"types.dl\"" << endl;
+    versionDL << "#include \"types.dl\"" << endl << endl;
 
     for (string input : inputs) {
         string varName = VARNAME_PREFIX + input;
@@ -63,7 +63,7 @@ void writeVersionsCombination(vector<string> inputs)
             versionDL << varName << "(" << c << "), ";
         }
     }
-    versionDL << ".output" << VARNAME_PREFIX << endl;
+    versionDL << ".output " << VARNAME_PREFIX << "(IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << VARNAME_PREFIX << VERSION_OUTPUT_POSTFIX << "\")" << endl;
 }
 
 void writeVersionDL(string varName, string version)

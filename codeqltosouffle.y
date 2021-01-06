@@ -66,7 +66,7 @@ extern int yylex();
 %%
 
 stmt_list: stmt { eval($1); }
-  | stmt_list stmt { eval($2); }
+  | stmt stmt_list { eval($1); }
   ;
 
 stmt: import_stmt { $$ = $1; }

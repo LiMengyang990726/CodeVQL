@@ -223,7 +223,7 @@ void translateRange(struct ast *a)
     string varNameStr = ((struct stringval *)varName)->value;
     struct ast *versionName = a->children[1];
     string versionNameStr = ((struct stringval *)versionName)->value;
-    if (!findVersionDeclaration(varNameStr)) {
+    if (!findVersionDeclaration(versionNameStr)) {
         yyerror("version is not defined");
         return;
     }
@@ -252,7 +252,12 @@ vector<string> translateReasonOpts(struct ast *a, vector<string> &prev)
 
     struct ast *varName = a->children[0];
     string varNameStr = ((struct stringval *)varName)->value;
-    prev.push_back(varNameStr);
+    string versionNameStr = findVersionVarAssociation(varNameStr);
+    if (versionNameStr == "") {
+        yyerror("The current variable has not declared its selected versions");
+        return prev;
+    }
+    prev.push_back(versionNameStr);
 
     if (a->childrencount == 1)
     {
@@ -481,7 +486,6 @@ void eval(struct ast *a)
             writeRuleTermination();
             break;
         case 4:
-            cout << "here" << endl;
             translateFrom(a->children[0]);
             translateRange(a->children[1]);
             translateSelect(a->children[3]);
