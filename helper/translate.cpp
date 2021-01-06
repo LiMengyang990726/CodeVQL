@@ -17,10 +17,10 @@ using namespace std;
 /* Translations for AST */
 void translateImportStmt(struct ast *a)
 {
-    // No import opts
+    // No import opts, reject
     if (!a || a->childrencount != 1)
     {
-        yyerror("no import language");
+        yyerror("error in import statement");
         return;
     }
 
@@ -32,33 +32,146 @@ void translateImportStmt(struct ast *a)
     }
 }
 
-void translateSelect(struct ast *a)
+void translateDefineStmt(struct ast *a)
 {
-    // No select opts
-    if (!a)
+    // No define opts, reject
+    if (!a || a->childrencount != 1)
     {
-        yyerror("error in select opts");
+        yyerror("error in define statement");
         return;
-    }
-    else if (a->childrencount < 1 || a->childrencount > 2)
+    } 
+
+    translateDefineOpts(a->children[0]);
+    return;
+}
+
+vector<string> translateMultipleVersionType1Opts(struct ast *a, vector<string> &prev)
+{
+    // No opts multiple selections, reject
+    if (!a || (a->childrencount < 1) || (a->childrencount > 2))
+
     {
-        yyerror("error in SELECT node in AST construction");
-        return;
+        yyerror("Error in multiple version selection");
+        return prev;
     }
 
-    struct ast *name = a->children[0];
-    string nameStr = ((struct stringval *)name)->value;
-    string typeStr = findVarDeclaration(nameStr);
-    storeOutputVar(nameStr);
-    writeOutputDecl(typeStr);
+    struct ast *range = a->children[0];
+    string rangeStr = ((struct stringval *)range)->value;
+    prev.push_back(rangeStr);
 
     if (a->childrencount == 1)
     {
-        return;
+        return prev;
     }
     else
     {
-        translateSelect(a->children[1]);
+        translateMultipleVersionType1Opts(a->children[1], prev);
+        return prev;
+    }
+}
+
+void translateDefineOpts(struct ast *a)
+{
+    if (!a) {
+        yyerror("error in define statement opts");
+        return;
+    }
+
+    if (a->nodetype == SINGLE_VERSION_NODE)
+    {
+        // Check if children count is valid
+        if (a->childrencount < 2 || a->childrencount > 3)
+        {
+            yyerror("error in define statement AST construction: children count not supported in single version selection");
+            return;
+        }
+
+        // Logic for single version translation
+        struct ast *name = a->children[0];
+        string nameStr = ((struct stringval *)name)->value;
+        struct ast *range = a->children[1];
+        string rangeStr = ((struct stringval *)range)->value;
+        storeVersionDeclarationTable(nameStr);
+        writeVersion(nameStr);
+        writeVersionDL(nameStr, rangeStr);
+
+        // Do the recursion
+        if (a->childrencount == 2)
+        {
+            return;
+        }
+        else
+        {
+            translateDefineOpts(a->children[2]);
+            return;
+        }
+    }
+    else if (a->nodetype == MULTIPLE_VERSIONS_TYPE_1_NODE)
+    {
+        // Check if children count is valid
+        if (a->childrencount < 2 || a->childrencount > 3)
+        {
+            yyerror("error in define statement AST construction: children count not supported in multiple version selection");
+            return;
+        }
+
+        // Logic for multiple versions translation
+        struct ast *name = a->children[0];
+        string nameStr = ((struct stringval *)name)->value;
+        struct ast *range = a->children[1];
+        vector<string> rangeStrs;
+        rangeStrs = translateMultipleVersionType1Opts(range, rangeStrs);
+        storeVersionDeclarationTable(nameStr);
+        writeVersion(nameStr);
+        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_1, rangeStrs);
+
+        // Do the recursion
+        if (a->childrencount == 2)
+        {
+            return;
+        }
+        else
+        {
+            translateDefineOpts(a->children[2]);
+            return;
+        }
+    }
+    else if (a->nodetype == MULTIPLE_VERSIONS_TYPE_2_NODE)
+    {
+        // Check if children count is valid
+        if (a->childrencount < 3 || a->childrencount > 4)
+        {
+            yyerror("error in define statement AST construction: children count not supported in single version selection");
+            return;
+        }
+
+        struct ast *name = a->children[0];
+        string nameStr = ((struct stringval *)name)->value;
+        struct ast *fromCommit = a->children[1];
+        string fromCommitStr = ((struct stringval *)fromCommit)->value;
+        struct ast *baseCommit = a->children[2];
+        string baseCommitStr = ((struct stringval *)baseCommit)->value;
+        vector<string> rangeStrs;
+        rangeStrs.push_back(fromCommitStr);
+        rangeStrs.push_back(baseCommitStr);
+        storeVersionDeclarationTable(nameStr);
+        writeVersion(nameStr);
+        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_2, rangeStrs);
+
+        // Do the recursion
+        if (a->childrencount == 3)
+        {
+            return;
+        }
+        else
+        {
+            translateDefineOpts(a->children[3]);
+            return;
+        }
+    }
+    else
+    {
+        yyerror("error in define statement AST construction: no such version selection method");
         return;
     }
 }
@@ -95,142 +208,60 @@ void translateFrom(struct ast *a)
     }
 }
 
-vector<string> translateMultipleVersionType1Opts(struct ast *a, vector<string> &initial)
-{
-    // No opts multiple selections, reject
-    if (!a || (a->childrencount < 1) || (a->childrencount > 2))
-
-    {
-        yyerror("Error in multiple version selection");
-        return initial;
-    }
-
-    struct ast *range = a->children[0];
-    string rangeStr = ((struct stringval *)range)->value;
-    initial.push_back(rangeStr);
-
-    if (a->childrencount == 1)
-    {
-        return initial;
-    }
-    else
-    {
-        translateMultipleVersionType1Opts(a->children[1], initial);
-        return initial;
-    }
-}
-
 void translateRange(struct ast *a)
 {
     // No range opts, accept
     if (!a)
     {
         return;
+    } else if (a->childrencount < 2 || a->childrencount > 3) {
+        yyerror("error in range clause");
+        return;
     }
 
-    if (a->nodetype == SINGLE_VERSION_NODE)
-    {
-        // Check if children count is valid
-        if (a->childrencount < 2 || a->childrencount > 3)
-        {
-            yyerror("error in (single version) RANGE node in AST construction: no such number of children supported");
-            return;
-        }
-
-        // Logic for single version translation
-        struct ast *name = a->children[0];
-        string nameStr = ((struct stringval *)name)->value;
-        struct ast *range = a->children[1];
-        string rangeStr = ((struct stringval *)range)->value;
-        if (findVarDeclaration(nameStr).empty())
-        {
-            yyerror("The variable in RANGE clause is not declared");
-            return;
-        }
-        writeVersion(nameStr);
-        writeVersionDL(nameStr, rangeStr);
-
-        // Do the recursion
-        if (a->childrencount == 2)
-        {
-            return;
-        }
-        else
-        {
-            translateRange(a->children[2]);
-            return;
-        }
+    struct ast *varName = a->children[0];
+    string varNameStr = ((struct stringval *)varName)->value;
+    struct ast *versionName = a->children[1];
+    string versionNameStr = ((struct stringval *)versionName)->value;
+    if (!findVersionDeclaration(varNameStr)) {
+        yyerror("version is not defined");
+        return;
     }
-    else if (a->nodetype == MULTIPLE_VERSIONS_TYPE_1_NODE)
+    storeVersionVarAssociationTable(versionNameStr, varNameStr);
+
+    if (a->childrencount == 2)
     {
-        // Check if children count is valid
-        if (a->childrencount < 2 || a->childrencount > 3)
-        {
-            yyerror("error in (multiple versions) RANGE node in AST construction: no such number of children supported");
-            return;
-        }
-
-        // Logic for multiple versions translation
-        struct ast *name = a->children[0];
-        string nameStr = ((struct stringval *)name)->value;
-        struct ast *range = a->children[1];
-        vector<string> rangeStrs;
-        rangeStrs = translateMultipleVersionType1Opts(range, rangeStrs);
-        if (findVarDeclaration(nameStr).empty())
-        {
-            yyerror("The variable in RANGE clause is not declared");
-            return;
-        }
-        writeVersion(nameStr);
-        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_1, rangeStrs);
-
-        // Do the recursion
-        if (a->childrencount == 2)
-        {
-            return;
-        }
-        else
-        {
-            translateRange(a->children[2]);
-            return;
-        }
-    }
-    else if (a->nodetype == MULTIPLE_VERSIONS_TYPE_2_NODE)
-    {
-        // Check if children count is valid
-        if (a->childrencount < 3 || a->childrencount > 4)
-        {
-            yyerror("error in (multiple versions) RANGE node in AST construction: no such number of children supported");
-            return;
-        }
-
-        struct ast *name = a->children[0];
-        string nameStr = ((struct stringval *)name)->value;
-        struct ast *fromCommit = a->children[1];
-        string fromCommitStr = ((struct stringval *)fromCommit)->value;
-        struct ast *baseCommit = a->children[2];
-        string baseCommitStr = ((struct stringval *)baseCommit)->value;
-        vector<string> rangeStrs;
-        rangeStrs.push_back(fromCommitStr);
-        rangeStrs.push_back(baseCommitStr);
-        writeVersion(nameStr);
-        writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_2, rangeStrs);
-
-        // Do the recursion
-        if (a->childrencount == 3)
-        {
-            return;
-        }
-        else
-        {
-            translateRange(a->children[3]);
-            return;
-        }
+        return;
     }
     else
     {
-        yyerror("error in RANGE node in AST construction: no such node type supported");
+        translateRange(a->children[2]);
         return;
+    }
+}
+
+vector<string> translateReasonOpts(struct ast *a, vector<string> &prev)
+{
+    // No opts multiple selections, reject
+    if (!a || (a->childrencount < 1) || (a->childrencount > 2))
+
+    {
+        yyerror("Error in reasoning opts");
+        return prev;
+    }
+
+    struct ast *varName = a->children[0];
+    string varNameStr = ((struct stringval *)varName)->value;
+    prev.push_back(varNameStr);
+
+    if (a->childrencount == 1)
+    {
+        return prev;
+    }
+    else
+    {
+        translateReasonOpts(a->children[1], prev);
+        return prev;
     }
 }
 
@@ -248,11 +279,44 @@ void translateWhere(struct ast *a)
     struct ast* reason = a->children[0];
     string reasonStr = ((struct stringval *)reason)->value;
     if (reasonStr == "exists") {
+        vector<string> varNames;
+        writeVersionsCombination(translateReasonOpts(a->children[1], varNames));
         translateFormula(a->children[2]);
     } else if (reasonStr == "forall") {
         translateFormula(a->children[2]);
     } else {
         yyerror("error in WHERE reasoning statement");
+        return;
+    }
+}
+
+void translateSelect(struct ast *a)
+{
+    // No select opts
+    if (!a)
+    {
+        yyerror("error in select opts");
+        return;
+    }
+    else if (a->childrencount < 1 || a->childrencount > 2)
+    {
+        yyerror("error in SELECT node in AST construction");
+        return;
+    }
+
+    struct ast *name = a->children[0];
+    string nameStr = ((struct stringval *)name)->value;
+    string typeStr = findVarDeclaration(nameStr);
+    storeOutputVar(nameStr);
+    writeOutputDecl(typeStr);
+
+    if (a->childrencount == 1)
+    {
+        return;
+    }
+    else
+    {
+        translateSelect(a->children[1]);
         return;
     }
 }
@@ -388,15 +452,18 @@ void eval(struct ast *a)
     }
 
     writeAllRelDLs();
+    writeTemplate();
     switch (a->nodetype)
     {
     /* import statement */
     case IMPORT_STMT_NODE:
         translateImportStmt(a);
         break;
+    case DEFINE_STMT_NODE:
+        translateDefineStmt(a);
+        break;
     /* select statement */
     case SELECT_STMT_NODE:
-        writeTemplate();
         switch (a->childrencount)
         {
         case 1:
@@ -414,6 +481,7 @@ void eval(struct ast *a)
             writeRuleTermination();
             break;
         case 4:
+            cout << "here" << endl;
             translateFrom(a->children[0]);
             translateRange(a->children[1]);
             translateSelect(a->children[3]);

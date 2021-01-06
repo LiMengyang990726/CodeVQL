@@ -7,9 +7,10 @@
 #include "constants.h"
 #include "utils.h"
 
-#define VERSION_DL_PREFIX "rules/"
-#define VERSION_DL_POSTFIX "Version.dl"
-#define VERSION_OUTPUT_PREFIX "output/"
+#define VERSION_DL_PREFIX "rules/SelectedVersion"
+#define VERSION_DL_POSTFIX ".dl"
+#define VERSION_DL VERSION_DL_PREFIX VERSION_DL_POSTFIX
+#define VERSION_OUTPUT_PREFIX "../.facts/20-deps/"
 #define VERSION_OUTPUT_POSTFIX ".facts"
 #define PLAIN_VERSION_REGEX "^\"[a-zA-Z0-9]{40}\"$"
 #define NTH_ANCESTOR_REGEX "^\"[a-zA-Z0-9]{40}~[0-9]+\"$"
@@ -19,6 +20,51 @@ using namespace std;
 
 int numVersions = 1;
 bool isCommitDistDeclared = false;
+
+void writeVersionsCombination(vector<string> inputs)
+{
+    string filename = VERSION_DL;
+    ofstream versionDL;
+    versionDL.open(filename, ios_base::app);
+    versionDL << "#include \"types.dl\"" << endl;
+
+    for (string input : inputs) {
+        string varName = VARNAME_PREFIX + input;
+        versionDL << ".decl " << varName << "(version: Version)" << endl;
+        versionDL << ".input " << varName << "." << endl << endl;
+    }
+
+    versionDL << ".decl " << VARNAME_PREFIX << "(";
+    for (int i = 0; i < inputs.size(); i++) {
+        char c = i + 'a';
+        if (i == inputs.size() - 1) {
+            versionDL << c << ": Version)" << endl;
+        } else {
+            versionDL << c << ": Version, ";
+        }
+    }
+
+    versionDL << VARNAME_PREFIX << "(";
+    for (int i = 0; i < inputs.size(); i++) {
+        char c = i + 'a';
+        if (i == inputs.size() - 1) {
+            versionDL << c << ") :- ";
+        } else {
+            versionDL << c << ", ";
+        }
+    }
+
+    for (int i = 0; i < inputs.size(); i++) {
+        char c = i + 'a';
+        string varName = VARNAME_PREFIX + inputs[i];
+        if (i == inputs.size() - 1) {
+            versionDL << varName << "(" << c << "). " << endl;
+        } else {
+            versionDL << varName << "(" << c << "), ";
+        }
+    }
+    versionDL << ".output" << VARNAME_PREFIX << endl;
+}
 
 void writeVersionDL(string varName, string version)
 {

@@ -2,6 +2,8 @@
 
 using namespace std;
 
+void writeVersionsCombination(vector<string> inputs);
+
 void writeVersionDL(string varName, string version);
 void writeVersionDL(string varName, int type, vector<string> versions);
 

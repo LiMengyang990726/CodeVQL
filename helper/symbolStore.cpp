@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <cstring>
 #include <vector>
 #include <sstream>
@@ -12,6 +13,8 @@ using namespace std;
 
 unordered_map<string, string> symbolTable;
 unordered_map<string, string> varDeclarationTable;
+unordered_set<string> versionDeclarationSet;
+unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, string> ruleReferenceTable;
 
 /* APIs for Symbol Table */
@@ -70,6 +73,28 @@ string findVarDeclaration(string name) {
    string result = "";
    if (varDeclarationTable.find(name) != varDeclarationTable.end()) {
       result = varDeclarationTable[name];
+   } 
+   return result;
+}
+
+/* APIs for Version Declaration Table */
+void storeVersionDeclarationTable(string name) {
+   versionDeclarationSet.insert(name);
+}
+
+bool findVersionDeclaration(string name) {
+   return versionDeclarationSet.find(name) != versionDeclarationSet.end();
+}
+
+/* APIs for Version Variable Association Table */
+void storeVersionVarAssociationTable(string version, string name) {
+   versionVarAssocTable[name] = version;
+}
+
+string findVersionVarAssociation(string name) {
+   string result = "";
+   if (versionVarAssocTable.find(name) != versionVarAssocTable.end()) {
+      result = versionVarAssocTable[name];
    } 
    return result;
 }

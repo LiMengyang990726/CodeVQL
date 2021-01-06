@@ -17,6 +17,7 @@ int oldstate;
 
     /* keywords */
 import    { return IMPORT; }
+define    { return DEFINE; }
 java      { return JAVA; }
 go        { return GO; }
 c#        { return CSHARP; }

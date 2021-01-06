@@ -29,6 +29,7 @@ extern int yylex();
 %token <strval> CPP
 %token <strval> PYTHON
 %token <strval> JAVASCRIPT
+%token <strval> DEFINE
 %token <strval> FROM
 %token <strval> WHERE
 %token <strval> OR
@@ -55,9 +56,9 @@ extern int yylex();
 %token <strval> FORALL
 %token <strval> THAT
 
-%type <a> stmt import_stmt select_stmt
-%type <a> select_opts from_opts where_opts range_opts reason_opts
-%type <a> multiple_range_opts formula call primary expr
+%type <a> stmt import_stmt define_stmt select_stmt
+%type <a> version_selection_opts select_opts from_opts range_opts where_opts reason_opts
+%type <a> multiple_versions_selection_opts formula call primary expr
 %type <strval> import_opts   
 
 %start stmt_list
@@ -69,6 +70,7 @@ stmt_list: stmt { eval($1); }
   ;
 
 stmt: import_stmt { $$ = $1; }
+  |   define_stmt { $$ = $1; }
   |   select_stmt { $$ = $1; }
   ;
 
@@ -79,6 +81,18 @@ import_opts: JAVA { $$ = "java"; }
   | CPP  { $$ = "cpp"; }
   | PYTHON { $$ = "python"; }
   | JAVASCRIPT { $$ = "javscript"; }
+  ;
+
+define_stmt: DEFINE version_selection_opts { $$ = newast(DEFINE_STMT_NODE, 1, $2); } ;
+version_selection_opts: LOWER_ID STRING_LITERAL { $$ = newast(SINGLE_VERSION_NODE, 2, newstringval($1), newstringval($2)); }
+  | LOWER_ID STRING_LITERAL COMMA version_selection_opts { $$ = newast(SINGLE_VERSION_NODE, 3, newstringval($1), newstringval($2), $4); }
+  | LOWER_ID LEFT_BRACKET multiple_versions_selection_opts RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 2, newstringval($1), $3); }
+  | LOWER_ID LEFT_BRACKET multiple_versions_selection_opts RIGHT_BRACKET COMMA version_selection_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 3, newstringval($1), $3, $6); } 
+  | LOWER_ID LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 3, newstringval($1), newstringval($3), newstringval($6)); }
+  | LOWER_ID LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET COMMA version_selection_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 4, newstringval($1), newstringval($3), newstringval($6), $9); }
+  ;
+multiple_versions_selection_opts: STRING_LITERAL { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE_OPTS, 1, newstringval($1)); }
+  | STRING_LITERAL COMMA multiple_versions_selection_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE_OPTS, 2, newstringval($1), $3); }
   ;
 
 select_stmt: SELECT select_opts { $$ = newast(SELECT_STMT_NODE, 1, $2); }
@@ -97,15 +111,8 @@ from_opts: UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 2, newstringval($1), 
   | UPPER_ID LOWER_ID COMMA from_opts { $$ = newast(FROM_OPTS_NODE, 3, newstringval($1), newstringval($2), $4); }
   ;
 
-range_opts: LOWER_ID AT STRING_LITERAL { $$ = newast(SINGLE_VERSION_NODE, 2, newstringval($1), newstringval($3)); }
-  | LOWER_ID AT STRING_LITERAL COMMA range_opts { $$ = newast(SINGLE_VERSION_NODE, 3, newstringval($1), newstringval($3), $5); }
-  | LOWER_ID AT LEFT_BRACKET multiple_range_opts RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 2, newstringval($1), $4); }
-  | LOWER_ID AT LEFT_BRACKET multiple_range_opts RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_NODE, 3, newstringval($1), $4, $7); } 
-  | LOWER_ID AT LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 3, newstringval($1), newstringval($4), newstringval($7)); }
-  | LOWER_ID AT LEFT_BRACKET STRING_LITERAL DOT DOT STRING_LITERAL RIGHT_BRACKET COMMA range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_2_NODE, 4, newstringval($1), newstringval($4), newstringval($7), $10); }
-  ;
-multiple_range_opts: STRING_LITERAL { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 1, newstringval($1)); }
-  | STRING_LITERAL COMMA multiple_range_opts { $$ = newast(MULTIPLE_VERSIONS_TYPE_1_OPTS_NODE, 2, newstringval($1), $3); }
+range_opts: LOWER_ID AT LOWER_ID { $$ = newast(RANGE_OPTS_NODE, 2, newstringval($1), newstringval($3)); }
+  | LOWER_ID AT LOWER_ID COMMA range_opts { $$ = newast(RANGE_OPTS_NODE, 3, newstringval($1), newstringval($3), $5); }
   ;
 
 where_opts: EXISTS reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("exists"), $2, $4); }

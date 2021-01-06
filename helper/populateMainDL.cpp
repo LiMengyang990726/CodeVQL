@@ -13,8 +13,13 @@
 using namespace std;
 
 const string VERSION_DECL_PREFIX = "SelectedVersion";
+bool isTemplateWritten = false;
 
 void writeTemplate() {
+    if (isTemplateWritten) {
+        return;
+    }
+    isTemplateWritten = true;
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << "#include \"types.dl\"" << endl;
@@ -45,6 +50,7 @@ void writeOutputDecl(string type) {
 }
 
 void writeInput(string type) {
+    isTemplateWritten = false;
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << ".input " << type << endl << endl;
