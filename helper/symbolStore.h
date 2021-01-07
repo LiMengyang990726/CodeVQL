@@ -29,4 +29,9 @@ string findRuleReference(string name);
 
 void storeOutputVar(string output);
 string getOutputVar();
+
+void storeVersionCombDim(int dim);
+int getVersionCombDim();
+
+int getVersionCombCount();
 #endif

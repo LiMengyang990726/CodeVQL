@@ -31,7 +31,7 @@ void writeVersionsCombination(vector<string> inputs)
     for (string input : inputs) {
         string varName = VARNAME_PREFIX + input;
         versionDL << ".decl " << varName << "(version: Version)" << endl;
-        versionDL << ".input " << varName << "." << endl << endl;
+        versionDL << ".input " << varName << endl << endl;
     }
 
     versionDL << ".decl " << VARNAME_PREFIX << "(";

@@ -14,6 +14,7 @@ using namespace std;
 
 const string VERSION_DECL_PREFIX = "SelectedVersion";
 static bool isTemplateWritten = false;
+static bool isVersionCombWritten = false;
 
 void writeTemplate() {
     if (isTemplateWritten) {
@@ -32,6 +33,24 @@ void writeVersion(string name) {
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << ".decl SelectedVersion" << name << "(version: Version)" << endl;  
     mainDLFile << ".input SelectedVersion" << name << endl << endl;
+    mainDLFile.close();
+}
+
+void writeVersionComb() {
+    ofstream mainDLFile;
+    mainDLFile.open(mainDLFileName, ios_base::app);
+    mainDLFile << ".decl SelectedVersion (";  
+    int versionCombDim = getVersionCombDim();
+    for (int i = 0; i < versionCombDim; i++) {
+        char c = i + 'a';
+        mainDLFile << c << ": Version";
+        if (i == versionCombDim - 1) {
+            mainDLFile << ") " << endl;
+        } else {
+            mainDLFile << ", ";
+        }
+    }
+    mainDLFile << ".input SelectedVersion" << endl << endl;
     mainDLFile.close();
 }
 
@@ -80,7 +99,7 @@ void writeRuleTermination() {
 void writeParallelRule() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ", " << endl << endl;
+    mainDLFile << ", ";
     mainDLFile.close();
 }
 
@@ -96,7 +115,27 @@ void writeRule(string name, string field, string value) {
     string fields = QLObjToDLDecl(type);
     vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
 
-    string result = type;
+    string result = "";
+
+    if (!isVersionCombWritten) {
+        result += "SelectedVersion(";
+        int versionCombDim = getVersionCombDim();
+        for (int i = 0; i < versionCombDim; i++) {
+            char c = i + 'a';
+            result += c;
+            if (i == versionCombDim - 1) {
+                result += "), ";
+            } else {
+                result += ", ";
+            }
+        }
+        isVersionCombWritten = true;
+    } 
+    result += type;
+
+    int versionCombCount = getVersionCombCount();
+    char c = versionCombCount + 'a';
+
     result += "(";
     for (pair<string, string> fieldPair : fieldsVector) {
         string currFieldCharP = fieldPair.first.c_str();
@@ -107,7 +146,7 @@ void writeRule(string name, string field, string value) {
                 result += value;
             }
         } else if (currFieldCharP == "version") {
-            result += ("version" + name);
+            result += c; 
         } else if (isReferenced) {
             result += ruleReference;
         } else if (currFieldCharP == "fqn") {
@@ -118,7 +157,8 @@ void writeRule(string name, string field, string value) {
         result += ",";
     }
     result[result.length()-1] = ')';
-    result += ("," + VERSION_DECL_PREFIX + name + "(version" + name + ")");
+    string versionName = findVersionVarAssociation(name);
+    result += ("," + VERSION_DECL_PREFIX + versionName + "(" + c + ")");
     mainDLFile << result;
 
     mainDLFile.close();

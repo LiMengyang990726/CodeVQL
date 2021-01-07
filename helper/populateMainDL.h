@@ -12,6 +12,7 @@ using namespace std;
 
 void writeTemplate();
 void writeVersion(string name);
+void writeVersionComb();
 void writeDecl(string type);
 void writeOutputDecl(string type);
 void writeInput(string type);

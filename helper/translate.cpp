@@ -285,7 +285,9 @@ void translateWhere(struct ast *a)
     string reasonStr = ((struct stringval *)reason)->value;
     if (reasonStr == "exists") {
         vector<string> varNames;
-        writeVersionsCombination(translateReasonOpts(a->children[1], varNames));
+        vector<string> result = translateReasonOpts(a->children[1], varNames);
+        writeVersionsCombination(result);
+        storeVersionCombDim(result.size());
         translateFormula(a->children[2]);
     } else if (reasonStr == "forall") {
         translateFormula(a->children[2]);
@@ -492,6 +494,7 @@ void eval(struct ast *a)
             writeRuleBegin();
             translateWhere(a->children[2]);
             writeRuleTermination();
+            writeVersionComb();
             break;
         default:
             yyerror("incomplete query");

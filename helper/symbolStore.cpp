@@ -121,3 +121,19 @@ void storeOutputVar(string output) {
 string getOutputVar() {
    return outputVar;
 }
+
+int versionCombDim = 0;
+void storeVersionCombDim(int dim) {
+   versionCombDim = dim;
+}
+
+int getVersionCombDim() {
+   return versionCombDim;
+}
+
+int versionCombCount = 0;
+int getVersionCombCount() {
+   int result = versionCombCount;
+   versionCombCount++;
+   return result;
+}
