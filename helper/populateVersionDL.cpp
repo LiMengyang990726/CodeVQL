@@ -26,40 +26,55 @@ void writeVersionsCombination(vector<string> inputs)
     string filename = VERSION_DL;
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
-    versionDL << "#include \"types.dl\"" << endl << endl;
+    versionDL << "#include \"types.dl\"" << endl
+              << endl;
 
-    for (string input : inputs) {
+    for (string input : inputs)
+    {
         string varName = VARNAME_PREFIX + input;
         versionDL << ".decl " << varName << "(version: Version)" << endl;
-        versionDL << ".input " << varName << endl << endl;
+        versionDL << ".input " << varName << endl
+                  << endl;
     }
 
     versionDL << ".decl " << VARNAME_PREFIX << "(";
-    for (int i = 0; i < inputs.size(); i++) {
+    for (int i = 0; i < inputs.size(); i++)
+    {
         char c = i + 'a';
-        if (i == inputs.size() - 1) {
+        if (i == inputs.size() - 1)
+        {
             versionDL << c << ": Version)" << endl;
-        } else {
+        }
+        else
+        {
             versionDL << c << ": Version, ";
         }
     }
 
     versionDL << VARNAME_PREFIX << "(";
-    for (int i = 0; i < inputs.size(); i++) {
+    for (int i = 0; i < inputs.size(); i++)
+    {
         char c = i + 'a';
-        if (i == inputs.size() - 1) {
+        if (i == inputs.size() - 1)
+        {
             versionDL << c << ") :- ";
-        } else {
+        }
+        else
+        {
             versionDL << c << ", ";
         }
     }
 
-    for (int i = 0; i < inputs.size(); i++) {
+    for (int i = 0; i < inputs.size(); i++)
+    {
         char c = i + 'a';
         string varName = VARNAME_PREFIX + inputs[i];
-        if (i == inputs.size() - 1) {
+        if (i == inputs.size() - 1)
+        {
             versionDL << varName << "(" << c << "). " << endl;
-        } else {
+        }
+        else
+        {
             versionDL << varName << "(" << c << "), ";
         }
     }
@@ -157,6 +172,8 @@ void writeVersionDL(string varName, int type, vector<string> versions)
         // Check the fromCommitId
         string fromCommitId = versions[0];
         bool isFromCommitIdRegex = false;
+        string fromVarName = varName + "from";
+        string fromFileName = VERSION_DL_PREFIX + fromVarName + VERSION_DL_POSTFIX;
         if (regex_match(fromCommitId, regex(NTH_ANCESTOR_REGEX)))
         {
             string commitId = fromCommitId.substr(0, fromCommitId.find("~")) + "\"";
@@ -164,9 +181,10 @@ void writeVersionDL(string varName, int type, vector<string> versions)
             stringstream ss(nStr);
             int n = 0;
             ss >> n;
-            writeVersionDLNthAncestor(filename, varName + "from", commitId, n);
-            isCommitDistDeclared = true;
             isFromCommitIdRegex = true;
+            writeVersionDLTemplate(fromFileName, fromVarName);
+            writeVersionDLNthAncestor(fromFileName, fromVarName, commitId, n);
+            writeVersionDLOutput(fromFileName, fromVarName);
         }
         else if (regex_match(fromCommitId, regex(NTH_PARENT_REGEX)))
         {
@@ -175,9 +193,11 @@ void writeVersionDL(string varName, int type, vector<string> versions)
             stringstream ss(nStr);
             int n = 0;
             ss >> n;
-            writeVersionDLInput(filename, varName + "from", commitId);
-            writeVersionDLNthParent(filename, varName + "from", commitId, n);
             isFromCommitIdRegex = true;
+            writeVersionDLTemplate(fromFileName, fromVarName);
+            writeVersionDLInput(fromFileName, fromVarName, commitId);
+            writeVersionDLNthParent(fromFileName, fromVarName, commitId, n);
+            writeVersionDLOutput(fromFileName, fromVarName);
         }
         else if (!regex_match(fromCommitId, regex(PLAIN_VERSION_REGEX)))
         {
@@ -188,6 +208,8 @@ void writeVersionDL(string varName, int type, vector<string> versions)
         // Check the baseCommitId
         string baseCommitId = versions[1];
         bool isBaseCommitIdRegex = false;
+        string baseVarName = varName + "base";
+        string baseFileName = VERSION_DL_PREFIX + baseVarName + VERSION_DL_POSTFIX;
         if (regex_match(baseCommitId, regex(NTH_ANCESTOR_REGEX)))
         {
             string commitId = baseCommitId.substr(0, baseCommitId.find("~")) + "\"";
@@ -195,9 +217,10 @@ void writeVersionDL(string varName, int type, vector<string> versions)
             stringstream ss(nStr);
             int n = 0;
             ss >> n;
-            writeVersionDLNthAncestor(filename, varName + "base", commitId, n);
-            isCommitDistDeclared = true;
             isBaseCommitIdRegex = true;
+            writeVersionDLTemplate(baseFileName, baseVarName);
+            writeVersionDLNthAncestor(baseFileName, baseVarName, commitId, n);
+            writeVersionDLOutput(baseFileName, baseVarName);
         }
         else if (regex_match(baseCommitId, regex(NTH_PARENT_REGEX)))
         {
@@ -206,9 +229,11 @@ void writeVersionDL(string varName, int type, vector<string> versions)
             stringstream ss(nStr);
             int n = 0;
             ss >> n;
-            writeVersionDLInput(filename, varName + "base", commitId);
-            writeVersionDLNthParent(filename, varName + "base", commitId, n);
             isBaseCommitIdRegex = true;
+            writeVersionDLTemplate(baseFileName, baseVarName);
+            writeVersionDLInput(baseFileName, baseVarName, commitId);
+            writeVersionDLNthParent(baseFileName, baseVarName, commitId, n);
+            writeVersionDLOutput(baseFileName, baseVarName);
         }
         else if (!regex_match(baseCommitId, regex(PLAIN_VERSION_REGEX)))
         {
@@ -217,8 +242,8 @@ void writeVersionDL(string varName, int type, vector<string> versions)
         }
 
         writeVersionDLComp(filename, varName,
-                           isFromCommitIdRegex ? VARNAME_PREFIX + varName + "from" : fromCommitId,
-                           isBaseCommitIdRegex ? baseCommitId + varName + "base" : baseCommitId);
+                           isFromCommitIdRegex ? fromVarName : fromCommitId,
+                           isBaseCommitIdRegex ? baseVarName : baseCommitId);
     }
     else
     {
@@ -250,8 +275,8 @@ void writeVersionDLNthAncestor(string filename, string varName, string commitId,
         versionDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
         versionDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), Parent(y, x, 0)." << endl
                   << endl;
+        versionDL << "CommitDist(" << commitId << ", " << commitId << ", 0)." << endl;
     }
-    versionDL << "CommitDist(" << commitId << ", " << commitId << ", 0)." << endl;
 
     versionDL << VARNAME_PREFIX << varName << "(version) :- CommitDist(" << commitId << ", version, " << n << ")." << endl
               << endl;
@@ -275,7 +300,22 @@ void writeVersionDLComp(string filename, string varName, string from, string bas
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
 
-    versionDL << VARNAME_PREFIX << varName << "(version) :- VersionInRange(version, " << from << ", " << base << ")." << endl
+    string ruleFrom = "";
+    string ruleBase = "";
+    if (!regex_match(from, regex(PLAIN_VERSION_REGEX)))
+    {
+        versionDL << ".decl SelectedVersion" << from << "(version: Version)" << endl;
+        versionDL << ".input SelectedVersion" << from << "." << endl << endl;
+        ruleFrom = ", SelectedVersion" + from + "(" + from + ")";
+    }
+    if (!regex_match(base, regex(PLAIN_VERSION_REGEX)))
+    {
+        versionDL << ".decl SelectedVersion" << base << "(version: Version)" << endl;
+        versionDL << ".input SelectedVersion" << base << "." << endl << endl;
+        ruleBase = ", SelectedVersion" + base + "(" + base + ")";
+    }
+    versionDL << VARNAME_PREFIX << varName << "(version) :- VersionInRange(version, " << from << ", " << base << ")"
+              << ruleFrom << ruleBase << "." << endl
               << endl;
 
     versionDL.close();
@@ -303,9 +343,7 @@ void writeVersionDLTemplate(string filename, string varName)
     versionDL << "VersionInRange(x, a, b) :- Reachable(b, x), Parent(a,_,_), !Reachable(a, x)." << endl
               << endl;
 
-    versionDL << ".decl " << VARNAME_PREFIX << varName << "(version: Version)" << endl;
-    versionDL << ".decl " << VARNAME_PREFIX << varName << "from" << "(version: Version)" << endl;
-    versionDL << ".decl " << VARNAME_PREFIX << varName << "base" << "(version: Version)" << endl
+    versionDL << ".decl " << VARNAME_PREFIX << varName << "(version: Version)" << endl
               << endl;
 
     versionDL.close();

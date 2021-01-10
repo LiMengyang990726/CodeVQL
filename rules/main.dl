@@ -1,0 +1,22 @@
+#include "types.dl"
+#include "objectMapping.dl"
+
+.decl SelectedVersionv2(version: Version)
+.input SelectedVersionv2
+
+.decl SelectedVersionv1(version: Version)
+.input SelectedVersionv1
+
+.decl MethodAccess(fqn: String, getMethod: String, version: Version)
+.input MethodAccess
+
+.decl Method(fqn: String, hasName: String, version: Version)
+.input Method
+
+.decl query(version: Version, fqn: String, getMethod: String)
+query(version, fqn, getMethod):- SelectedVersion(v2, v1), MethodAccess(fqn,getMethod,v1),SelectedVersionv1(v1), Method(getMethod,"getArea",v2),SelectedVersionv2(v2).
+
+.decl SelectedVersion(v2: Version, v1: Version) 
+.input SelectedVersion
+
+.output query

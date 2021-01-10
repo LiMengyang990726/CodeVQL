@@ -1,0 +1,24 @@
+#include "types.dl"
+#include "objectMapping.dl"
+.decl Parent(child: Version, parent: Version, index: Int)
+.input Parent
+
+.decl Reachable(a:Version, b:Version)
+Reachable(a, b) :- Parent(a, b, _).
+Reachable(a, x) :- Parent(a, b, _), Reachable(b, x).
+
+.decl VersionInRange(x: Version, a:Version, b:Version)
+VersionInRange(x, a, b) :- Reachable(b, x), Parent(_,a,_), !Reachable(a, x).
+VersionInRange(x, a, b) :- Reachable(b, x), Parent(a,_,_), !Reachable(a, x).
+
+.decl SelectedVersionv1(version: Version)
+
+.decl SelectedVersionv1from(version: Version)
+.input SelectedVersionv1from.
+
+.decl SelectedVersionv1base(version: Version)
+.input SelectedVersionv1base.
+
+SelectedVersionv1(version) :- VersionInRange(version, v1from, v1base), SelectedVersionv1from(v1from), SelectedVersionv1base(v1base).
+
+.output SelectedVersionv1(IO=file, filename="../.facts/20-deps/SelectedVersionv1.facts")
