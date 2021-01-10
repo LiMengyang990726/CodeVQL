@@ -1,2 +1,5 @@
 #define MULTIPLE_VERSIONS_TYPE_1 1
 #define MULTIPLE_VERSIONS_TYPE_2 2
+
+#define TYPE_VERISON "Version"
+#define OUTPUT_NAME "query"

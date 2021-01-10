@@ -14,7 +14,7 @@ void writeTemplate();
 void writeVersion(string name);
 void writeVersionComb();
 void writeDecl(string type);
-void writeOutputDecl(string type);
+void writeOutputDecl();
 void writeInput(string type);
 void writeOutput();
 void writeRuleBegin();

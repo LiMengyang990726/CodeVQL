@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <cstring>
 #include <vector>
 #include <sstream>
@@ -37,7 +38,12 @@ vector<pair<string, string> > destructDLDecl(string fields) {
 
 string constructDLDecl(vector<pair<string, string> > fieldPairs) {
     string result = "(";
+    unordered_set<string> seenFields;
     for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
+        if (seenFields.find(it->first) != seenFields.end()) {
+            continue;
+        }
+        seenFields.insert(it->first);
         result += it->first + ": " + it->second + ", ";
     }
     result = result.substr(0, result.length()-2);
@@ -47,7 +53,12 @@ string constructDLDecl(vector<pair<string, string> > fieldPairs) {
 
 string constructDLRuleBegin(vector<string> fields) {
     string result = "(";
+    unordered_set<string> seenFields;
     for (string field : fields) {
+        if (seenFields.find(field) != seenFields.end()) {
+            continue;
+        }
+        seenFields.insert(field);
         result += field + ", ";
     }
     result = result.substr(0, result.length()-2);

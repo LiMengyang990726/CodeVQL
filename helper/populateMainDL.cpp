@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include "populateMainDL.h"
+#include "constants.h"
 #include "symbolStore.h"
 #include "utils.h"
 
@@ -39,17 +40,18 @@ void writeVersion(string name) {
 void writeVersionComb() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl SelectedVersion (";  
-    int versionCombDim = getVersionCombDim();
-    for (int i = 0; i < versionCombDim; i++) {
-        char c = i + 'a';
-        mainDLFile << c << ": Version";
-        if (i == versionCombDim - 1) {
-            mainDLFile << ") " << endl;
-        } else {
-            mainDLFile << ", ";
-        }
+    mainDLFile << ".decl SelectedVersion(";  
+
+    string result = "";
+    unordered_set<string> versions = getVersions(); 
+    for (auto it = versions.begin(); it != versions.end(); it++) {
+        result += *it;
+        result += ": Version, ";
     }
+    result = result.substr(0, result.size()-2);
+    result += ") ";
+
+    mainDLFile << result << endl;
     mainDLFile << ".input SelectedVersion" << endl << endl;
     mainDLFile.close();
 }
@@ -61,10 +63,10 @@ void writeDecl(string type) {
     mainDLFile.close();
 }
 
-void writeOutputDecl(string type) {
+void writeOutputDecl() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl " << getOutputVar() << QLObjToDLOutput(type) << endl;
+    mainDLFile << ".decl " << OUTPUT_NAME << QLObjToDLOutput(getOutputVars()) << endl;
     mainDLFile.close();
 }
 
@@ -78,14 +80,14 @@ void writeInput(string type) {
 void writeOutput() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".output " << getOutputVar() << endl;
+    mainDLFile << ".output " << OUTPUT_NAME << endl;
     mainDLFile.close();
 }
 
 void writeRuleBegin() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << getOutputVar() << QLObjToDLRuleBegin(findVarDeclaration(getOutputVar())) << ":- ";
+    mainDLFile << OUTPUT_NAME << QLObjToDLRuleBegin(getOutputVars()) << ":- ";
     mainDLFile.close();
 }
 
@@ -108,10 +110,9 @@ void writeRule(string name, string field, string value) {
     mainDLFile.open(mainDLFileName, ios_base::app);
 
     string type = findVarDeclaration(name);
-
+    string version = findVersionVarAssociation(name);
     string ruleReference = findRuleReference(name);
     bool isReferenced = !ruleReference.empty();
-
     string fields = QLObjToDLDecl(type);
     vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
 
@@ -119,22 +120,16 @@ void writeRule(string name, string field, string value) {
 
     if (!isVersionCombWritten) {
         result += "SelectedVersion(";
-        int versionCombDim = getVersionCombDim();
-        for (int i = 0; i < versionCombDim; i++) {
-            char c = i + 'a';
-            result += c;
-            if (i == versionCombDim - 1) {
-                result += "), ";
-            } else {
-                result += ", ";
-            }
+        unordered_set<string> versions = getVersions(); 
+        for (auto it = versions.begin(); it != versions.end(); it++) {
+            result += *it;
+            result += ", ";
         }
+        result = result.substr(0, result.size()-2);
+        result += "), ";
         isVersionCombWritten = true;
     } 
     result += type;
-
-    int versionCombCount = getVersionCombCount();
-    char c = versionCombCount + 'a';
 
     result += "(";
     for (pair<string, string> fieldPair : fieldsVector) {
@@ -146,7 +141,7 @@ void writeRule(string name, string field, string value) {
                 result += value;
             }
         } else if (currFieldCharP == "version") {
-            result += c; 
+            result += version; 
         } else if (isReferenced) {
             result += ruleReference;
         } else if (currFieldCharP == "fqn") {
@@ -157,8 +152,7 @@ void writeRule(string name, string field, string value) {
         result += ",";
     }
     result[result.length()-1] = ')';
-    string versionName = findVersionVarAssociation(name);
-    result += ("," + VERSION_DECL_PREFIX + versionName + "(" + c + ")");
+    result += ("," + VERSION_DECL_PREFIX + version + "(" + version + ")");
     mainDLFile << result;
 
     mainDLFile.close();

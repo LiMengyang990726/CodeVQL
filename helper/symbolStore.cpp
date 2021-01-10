@@ -16,11 +16,13 @@ unordered_map<string, string> varDeclarationTable;
 unordered_set<string> versionDeclarationSet;
 unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, string> ruleReferenceTable;
+unordered_set<string> outputVars;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
    symbolTable["MethodAccess"] = "(fqn: String, getMethod: String, version: Version)";
    symbolTable["Method"] = "(fqn: String, hasName: String, version: Version)";
+   symbolTable["Version"] = "(version: Version)";
    return;
 }
 
@@ -32,36 +34,46 @@ string QLObjToDLDecl(string key) {
    return result;
 }
 
-string QLObjToDLOutput(string key) {
-   string result = "";
-   if (symbolTable.find(key) != symbolTable.end()) {
-      string intermediateResult = symbolTable[key];
-      vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
-      vector<pair<string, string> > resultPairs;
-      for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-         if (it->first != "version") {
+string QLObjToDLOutput(unordered_set<string> outputVars) {
+   vector<pair<string, string> > resultPairs;
+   for (auto iter = outputVars.begin(); iter != outputVars.end(); iter++) {
+      string type = findVarDeclaration(*iter);
+      if (symbolTable.find(type) != symbolTable.end()) {
+         string intermediateResult = symbolTable[type];
+         vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+         for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
+            if (it->first == "version") {
+               if (type == "Version") {
+                  resultPairs.push_back(make_pair(it->first, it->second));
+               }
+               continue;
+            }
             resultPairs.push_back(make_pair(it->first, it->second));
          }
       }
-      result = constructDLDecl(resultPairs);
    }
-   return result;
+   return constructDLDecl(resultPairs);
 }
 
-string QLObjToDLRuleBegin(string key) {
-   string result = "";
-   if (symbolTable.find(key) != symbolTable.end()) {
-      string intermediateResult = symbolTable[key];
-      vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
-      vector<string> resultPairs;
-      for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-         if (it->first != "version") {
+string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
+   vector<string> resultPairs;
+   for (auto iter = outputVars.begin(); iter != outputVars.end(); iter++) {
+      string type = findVarDeclaration(*iter);
+      if (symbolTable.find(type) != symbolTable.end()) {
+         string intermediateResult = symbolTable[type];
+         vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+         for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
+            if (it->first == "version") {
+               if (type == "Version") {
+                  resultPairs.push_back(it->first);
+               }
+               continue;
+            }
             resultPairs.push_back(it->first);
          }
       }
-      result = constructDLRuleBegin(resultPairs);
    }
-   return result;
+   return constructDLRuleBegin(resultPairs);
 }
 
 /* APIs for Var Declaration Table */
@@ -84,6 +96,10 @@ void storeVersionDeclarationTable(string name) {
 
 bool findVersionDeclaration(string name) {
    return versionDeclarationSet.find(name) != versionDeclarationSet.end();
+}
+
+unordered_set<string> getVersions() {
+   return versionDeclarationSet;
 }
 
 /* APIs for Version Variable Association Table */
@@ -113,27 +129,10 @@ string findRuleReference(string name) {
 }
 
 // TODO: Currently only handle one output case
-string outputVar;
 void storeOutputVar(string output) {
-    outputVar = output;
+    outputVars.insert(output);
 }
 
-string getOutputVar() {
-   return outputVar;
-}
-
-int versionCombDim = 0;
-void storeVersionCombDim(int dim) {
-   versionCombDim = dim;
-}
-
-int getVersionCombDim() {
-   return versionCombDim;
-}
-
-int versionCombCount = 0;
-int getVersionCombCount() {
-   int result = versionCombCount;
-   versionCombCount++;
-   return result;
+unordered_set<string> getOutputVars() {
+   return outputVars;
 }

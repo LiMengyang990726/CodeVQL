@@ -91,6 +91,7 @@ void translateDefineOpts(struct ast *a)
         string nameStr = ((struct stringval *)name)->value;
         struct ast *range = a->children[1];
         string rangeStr = ((struct stringval *)range)->value;
+        storeVarDeclarationTable(TYPE_VERISON, nameStr);
         storeVersionDeclarationTable(nameStr);
         writeVersion(nameStr);
         writeVersionDL(nameStr, rangeStr);
@@ -121,6 +122,7 @@ void translateDefineOpts(struct ast *a)
         struct ast *range = a->children[1];
         vector<string> rangeStrs;
         rangeStrs = translateMultipleVersionType1Opts(range, rangeStrs);
+        storeVarDeclarationTable(TYPE_VERISON, nameStr);
         storeVersionDeclarationTable(nameStr);
         writeVersion(nameStr);
         writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_1, rangeStrs);
@@ -154,6 +156,7 @@ void translateDefineOpts(struct ast *a)
         vector<string> rangeStrs;
         rangeStrs.push_back(fromCommitStr);
         rangeStrs.push_back(baseCommitStr);
+        storeVarDeclarationTable(TYPE_VERISON, nameStr);
         storeVersionDeclarationTable(nameStr);
         writeVersion(nameStr);
         writeVersionDL(nameStr, MULTIPLE_VERSIONS_TYPE_2, rangeStrs);
@@ -285,9 +288,7 @@ void translateWhere(struct ast *a)
     string reasonStr = ((struct stringval *)reason)->value;
     if (reasonStr == "exists") {
         vector<string> varNames;
-        vector<string> result = translateReasonOpts(a->children[1], varNames);
-        writeVersionsCombination(result);
-        storeVersionCombDim(result.size());
+        writeVersionsCombination(translateReasonOpts(a->children[1], varNames));
         translateFormula(a->children[2]);
     } else if (reasonStr == "forall") {
         translateFormula(a->children[2]);
@@ -313,9 +314,7 @@ void translateSelect(struct ast *a)
 
     struct ast *name = a->children[0];
     string nameStr = ((struct stringval *)name)->value;
-    string typeStr = findVarDeclaration(nameStr);
     storeOutputVar(nameStr);
-    writeOutputDecl(typeStr);
 
     if (a->childrencount == 1)
     {
@@ -483,6 +482,7 @@ void eval(struct ast *a)
         case 3:
             translateFrom(a->children[0]);
             translateSelect(a->children[2]);
+            writeOutputDecl();
             writeRuleBegin();
             translateWhere(a->children[1]);
             writeRuleTermination();
@@ -491,6 +491,7 @@ void eval(struct ast *a)
             translateFrom(a->children[0]);
             translateRange(a->children[1]);
             translateSelect(a->children[3]);
+            writeOutputDecl();
             writeRuleBegin();
             translateWhere(a->children[2]);
             writeRuleTermination();
