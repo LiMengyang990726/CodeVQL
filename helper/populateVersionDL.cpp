@@ -305,13 +305,13 @@ void writeVersionDLComp(string filename, string varName, string from, string bas
     if (!regex_match(from, regex(PLAIN_VERSION_REGEX)))
     {
         versionDL << ".decl SelectedVersion" << from << "(version: Version)" << endl;
-        versionDL << ".input SelectedVersion" << from << "." << endl << endl;
+        versionDL << ".input SelectedVersion" << from << endl << endl;
         ruleFrom = ", SelectedVersion" + from + "(" + from + ")";
     }
     if (!regex_match(base, regex(PLAIN_VERSION_REGEX)))
     {
         versionDL << ".decl SelectedVersion" << base << "(version: Version)" << endl;
-        versionDL << ".input SelectedVersion" << base << "." << endl << endl;
+        versionDL << ".input SelectedVersion" << base << endl << endl;
         ruleBase = ", SelectedVersion" + base + "(" + base + ")";
     }
     versionDL << VARNAME_PREFIX << varName << "(version) :- VersionInRange(version, " << from << ", " << base << ")"
@@ -335,7 +335,8 @@ void writeVersionDLTemplate(string filename, string varName)
 
     versionDL << ".decl Reachable(a:Version, b:Version)" << endl;
     versionDL << "Reachable(a, b) :- Parent(a, b, _)." << endl;
-    versionDL << "Reachable(a, x) :- Parent(a, b, _), Reachable(b, x)." << endl
+    versionDL << "Reachable(a, x) :- Parent(a, b, _), Reachable(b, x)." << endl;
+    versionDL << "Reachable(a, a) :- Parent(a, _, _); Parent(_, a, _)." << endl
               << endl;
 
     versionDL << ".decl VersionInRange(x: Version, a:Version, b:Version)" << endl;

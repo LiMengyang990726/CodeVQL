@@ -6,6 +6,7 @@
 .decl Reachable(a:Version, b:Version)
 Reachable(a, b) :- Parent(a, b, _).
 Reachable(a, x) :- Parent(a, b, _), Reachable(b, x).
+Reachable(a, a) :- Parent(a, _, _); Parent(_, a, _).
 
 .decl VersionInRange(x: Version, a:Version, b:Version)
 VersionInRange(x, a, b) :- Reachable(b, x), Parent(_,a,_), !Reachable(a, x).
@@ -14,11 +15,8 @@ VersionInRange(x, a, b) :- Reachable(b, x), Parent(a,_,_), !Reachable(a, x).
 .decl SelectedVersionv1(version: Version)
 
 .decl SelectedVersionv1from(version: Version)
-.input SelectedVersionv1from.
+.input SelectedVersionv1from
 
-.decl SelectedVersionv1base(version: Version)
-.input SelectedVersionv1base.
-
-SelectedVersionv1(version) :- VersionInRange(version, v1from, v1base), SelectedVersionv1from(v1from), SelectedVersionv1base(v1base).
+SelectedVersionv1(version) :- VersionInRange(version, v1from, "c0a13d8cc528a449967e83b7d0f4043787597e81"), SelectedVersionv1from(v1from).
 
 .output SelectedVersionv1(IO=file, filename="../.facts/20-deps/SelectedVersionv1.facts")

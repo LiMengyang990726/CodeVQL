@@ -65,7 +65,7 @@ string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
             if (it->first == "version") {
                if (type == "Version") {
-                  resultPairs.push_back(it->first);
+                  resultPairs.push_back(*iter);
                }
                continue;
             }

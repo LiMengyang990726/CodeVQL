@@ -6,6 +6,7 @@
 .decl Reachable(a:Version, b:Version)
 Reachable(a, b) :- Parent(a, b, _).
 Reachable(a, x) :- Parent(a, b, _), Reachable(b, x).
+Reachable(a, a) :- Parent(a, _, _); Parent(_, a, _).
 
 .decl VersionInRange(x: Version, a:Version, b:Version)
 VersionInRange(x, a, b) :- Reachable(b, x), Parent(_,a,_), !Reachable(a, x).
@@ -16,7 +17,7 @@ VersionInRange(x, a, b) :- Reachable(b, x), Parent(a,_,_), !Reachable(a, x).
 .decl CommitDist(child: Version, parent: Version, index: Int)
 CommitDist(a, x, n+1) :- CommitDist(a, y, n), Parent(y, x, 0).
 
-CommitDist("4f7a988d5132e9f446bd9c46a58998761be751b9", "4f7a988d5132e9f446bd9c46a58998761be751b9", 0).
-SelectedVersionv1from(version) :- CommitDist("4f7a988d5132e9f446bd9c46a58998761be751b9", version, 2).
+CommitDist("c0a13d8cc528a449967e83b7d0f4043787597e81", "c0a13d8cc528a449967e83b7d0f4043787597e81", 0).
+SelectedVersionv1from(version) :- CommitDist("c0a13d8cc528a449967e83b7d0f4043787597e81", version, 2).
 
 .output SelectedVersionv1from(IO=file, filename="../.facts/20-deps/SelectedVersionv1from.facts")

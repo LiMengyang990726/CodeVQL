@@ -6,6 +6,7 @@
 .decl Reachable(a:Version, b:Version)
 Reachable(a, b) :- Parent(a, b, _).
 Reachable(a, x) :- Parent(a, b, _), Reachable(b, x).
+Reachable(a, a) :- Parent(a, _, _); Parent(_, a, _).
 
 .decl VersionInRange(x: Version, a:Version, b:Version)
 VersionInRange(x, a, b) :- Reachable(b, x), Parent(_,a,_), !Reachable(a, x).

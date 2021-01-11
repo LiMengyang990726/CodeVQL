@@ -14,7 +14,7 @@
 .input Method
 
 .decl query(version: Version, fqn: String, getMethod: String)
-query(version, fqn, getMethod):- SelectedVersion(v2, v1), MethodAccess(fqn,getMethod,v1),SelectedVersionv1(v1), Method(getMethod,"getArea",v2),SelectedVersionv2(v2).
+query(v1, fqn, getMethod):- SelectedVersion(v2, v1), MethodAccess(fqn,getMethod,v1),SelectedVersionv1(v1), Method(getMethod,"getArea",v2),SelectedVersionv2(v2).
 
 .decl SelectedVersion(v2: Version, v1: Version) 
 .input SelectedVersion
