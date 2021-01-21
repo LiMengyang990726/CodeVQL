@@ -78,7 +78,7 @@ void writeVersionsCombination(vector<string> inputs)
             versionDL << varName << "(" << c << "), ";
         }
     }
-    versionDL << ".output Version (IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << "Version" << VERSION_OUTPUT_POSTFIX << "\")" << endl;
+    versionDL << ".output " << VARNAME_PREFIX << "(IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << "VersionComb" << VERSION_OUTPUT_POSTFIX << "\")" << endl;
 }
 
 void writeVersionDL(string varName, string version)

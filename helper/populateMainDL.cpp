@@ -40,7 +40,7 @@ void writeVersion(string name) {
 void writeVersionComb() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl SelectedVersion(";  
+    mainDLFile << ".decl VersionComb(";  
 
     string result = "";
     unordered_set<string> versions = getVersions(); 
@@ -52,7 +52,7 @@ void writeVersionComb() {
     result += ") ";
 
     mainDLFile << result << endl;
-    mainDLFile << ".input SelectedVersion" << endl << endl;
+    mainDLFile << ".input VersionComb" << endl << endl;
     mainDLFile.close();
 }
 
@@ -119,7 +119,7 @@ void writeRule(string name, string field, string value) {
     string result = "";
 
     if (!isVersionCombWritten) {
-        result += "SelectedVersion(";
+        result += "VersionComb(";
         unordered_set<string> versions = getVersions(); 
         for (auto it = versions.begin(); it != versions.end(); it++) {
             result += *it;

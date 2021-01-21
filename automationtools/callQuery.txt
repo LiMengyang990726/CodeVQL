@@ -1,0 +1,10 @@
+import java
+
+from MethodAccess call, Method method
+range call @ v1, method @ v2
+where exists call, method that call.getMethod()=method and method.hasName("io.fabric8.maven.docker.access.AuthConfig.getAuth")
+select call, v1
+
+define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e~2".."e7fefdaddd99294d5842ef8c5b16070ce230d29e")
+define v2 "e7fefdaddd99294d5842ef8c5b16070ce230d29e"
+
