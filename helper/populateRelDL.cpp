@@ -10,6 +10,7 @@ void writeObjectMappingDL() {
     objectMappingDL.open(objectMappingDLFileName);
     objectMappingDL << "#define Method IsMethod" << endl;
     objectMappingDL << "#define MethodAccess Call" << endl;
+    objectMappingDL << "#define Parent history" << endl;
     objectMappingDL.close();
 }
 

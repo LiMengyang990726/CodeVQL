@@ -1,3 +1,0 @@
-.type String <: symbol
-.type Version <: symbol
-.type Int <: unsigned

@@ -9,7 +9,7 @@
 
 #define VERSION_DL_PREFIX "rules/SelectedVersion"
 #define VERSION_DL_POSTFIX ".dl"
-#define VERSION_DL VERSION_DL_PREFIX VERSION_DL_POSTFIX
+#define VERSION_DL "rules/Version.dl"
 #define VERSION_OUTPUT_PREFIX "../.facts/20-deps/"
 #define VERSION_OUTPUT_POSTFIX ".facts"
 #define PLAIN_VERSION_REGEX "^\"[a-zA-Z0-9]{40}\"$"
@@ -78,7 +78,7 @@ void writeVersionsCombination(vector<string> inputs)
             versionDL << varName << "(" << c << "), ";
         }
     }
-    versionDL << ".output " << VARNAME_PREFIX << "(IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << VARNAME_PREFIX << VERSION_OUTPUT_POSTFIX << "\")" << endl;
+    versionDL << ".output Version (IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << "Version" << VERSION_OUTPUT_POSTFIX << "\")" << endl;
 }
 
 void writeVersionDL(string varName, string version)
