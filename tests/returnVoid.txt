@@ -1,0 +1,8 @@
+import java
+
+from Method method
+range method @ v1
+where exists method that method.hasReturn("void")
+select method, v1
+
+define v1 ("c0a13d8cc528a449967e83b7d0f4043787597e81~2".."c0a13d8cc528a449967e83b7d0f4043787597e81")

@@ -1,0 +1,9 @@
+import java
+
+from MethodAccess call, Method method
+range call @ v1, method @ v2
+where exists call, method that call.getMethod()=method and method.hasClassName("Square") and method.isConstructor()
+select call, v1
+
+define v1 ("c0a13d8cc528a449967e83b7d0f4043787597e81~2".."c0a13d8cc528a449967e83b7d0f4043787597e81")
+define v2 "c0a13d8cc528a449967e83b7d0f4043787597e81"

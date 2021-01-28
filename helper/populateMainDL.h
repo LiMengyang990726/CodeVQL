@@ -20,6 +20,7 @@ void writeOutput();
 void writeRuleBegin();
 void writeRuleTermination();
 void writeParallelRule();
+void writeArithmethics(string var, string comparision, string value);
 void writeRule(string name, string field, string value);
 
 #endif

@@ -196,8 +196,11 @@ void translateFrom(struct ast *a)
     string typeStr = ((struct stringval *)type)->value;
     struct ast *name = a->children[1];
     string nameStr = ((struct stringval *)name)->value;
-    writeDecl(typeStr);
-    writeInput(typeStr);
+    if (!isTypeDeclared(typeStr)) {
+        writeDecl(typeStr);
+        writeInput(typeStr);
+        storeDeclaredType(typeStr);
+    }
     storeVarDeclarationTable(typeStr, nameStr);
 
     if (a->childrencount == 2)
@@ -416,16 +419,51 @@ void translateComparison(struct ast *a)
         {
             string nameStr = ((struct stringval *)l->children[0])->value;
             string fieldStr = ((struct stringval *)l->children[1])->value;
-            writeRule(nameStr, fieldStr, "");
-
-            // Create a reference
             string nextName = ((struct stringval *)r)->value;
-            storeRuleReferenceTable(fieldStr, nextName);
+            int nextNameLen = nextName.length();
+            if (nextNameLen >= 2 && nextName[0] == '\"' && nextName[nextName.length()-1] == '\"') {
+                writeRule(nameStr, fieldStr, nextName);
+            } else {
+                if (findVarFieldReferredName(nameStr, fieldStr) != "") {
+                    string referer = findVarFieldReferredName(nameStr, fieldStr);
+                    writeRule(nameStr, fieldStr, "");
+                    storeVarFieldReferenceTable(nextName,referer);
+                } else {
+                    storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr); // write to itself for rule writting later
+                    writeRule(nameStr, fieldStr, "");
+                    storeVarFieldReferenceTable(nextName,fieldStr);
+                }
+            }
+        } 
+        else if (l->nodetype == CALL_NODE && r->nodetype == CALL_NODE) 
+        {
+            string lNameStr = ((struct stringval *)l->children[0])->value;
+            string lFieldStr = ((struct stringval *)l->children[1])->value;
+            string rNameStr = ((struct stringval *)r->children[0])->value;
+            string rFieldStr = ((struct stringval *)r->children[1])->value;
+            storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, lFieldStr);
+            storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, lFieldStr);
+            writeRule(lNameStr, lFieldStr, "");
+            writeParallelRule();
+            writeRule(rNameStr, rNameStr, "");
         }
     }
-    else
+    else if (comparison == ">=" || comparison == "<=" || comparison == ">" || comparison == "<")
     {
-        // TODO: For other comparison types like >=, >, etc.
+        if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE)
+        {
+            string nameStr = ((struct stringval *)l->children[0])->value;
+            string fieldStr = ((struct stringval *)l->children[1])->value;
+            string value = ((struct stringval *)r)->value;
+            storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr);
+            writeRule(nameStr, fieldStr, "");
+            writeParallelRule();
+            writeArithmethics(fieldStr, comparison, value);
+        }
+    }
+    else 
+    {
+        // TODO: Handle when seen
     }
     return;
 }
@@ -445,7 +483,12 @@ void translateCall(struct ast *a)
     { // For direct translate call, it can be directly translate to a rule
         char *value = ((struct stringval *)a->children[2])->value;
         writeRule(nameStr, fieldStr, value);
-    } // For indirect translate call, it will be handled in comparison
+    } else if (a->childrencount == 2) {
+        // For indirect translate call, it is a boolean value
+        storeVarFieldReferenceTable(nameStr + "." + fieldStr, "\"true\"");
+        writeRule(nameStr, fieldStr, "");
+        // TODO: If there is a negate sign in front
+    }
     return;
 }
 

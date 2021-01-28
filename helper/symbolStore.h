@@ -25,8 +25,11 @@ unordered_set<string> getVersions();
 void storeVersionVarAssociationTable(string version, string name);
 string findVersionVarAssociation(string name);
 
-void storeRuleReferenceTable(string reference, string name);
-string findRuleReference(string name);
+void storeVarFieldReferenceTable(string referred, string referer);
+string findVarFieldReferredName(string name, string field);
+
+void storeDeclaredType(string type);
+bool isTypeDeclared(string type);
 
 void storeOutputVar(string output);
 unordered_set<string> getOutputVars();

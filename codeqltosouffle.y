@@ -19,7 +19,7 @@ extern int yylex();
         struct ast *a;
         char *strval;
         char *subtok;
-        int intval;
+        char *intval;
 }
 
 %token <strval> IMPORT
@@ -55,6 +55,7 @@ extern int yylex();
 %token <strval> EXISTS
 %token <strval> FORALL
 %token <strval> THAT
+%token <intval> INT_LITERAL
 
 %type <a> stmt import_stmt define_stmt select_stmt
 %type <a> version_selection_opts select_opts from_opts range_opts where_opts reason_opts
@@ -133,6 +134,7 @@ formula: LEFT_BRACKET formula RIGHT_BRACKET { $$ = $2; }
 
 primary: LOWER_ID { $$ = newstringval($1); }
   | STRING_LITERAL { $$ = newstringval($1); }
+  | INT_LITERAL { $$ = newstringval($1); }
   | call { $$ = $1; }
   ;
 call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET { $$ = newast(CALL_NODE, 2, newstringval($1), newstringval($3)); }

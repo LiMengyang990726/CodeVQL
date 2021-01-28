@@ -16,12 +16,16 @@ unordered_map<string, string> varDeclarationTable;
 unordered_set<string> versionDeclarationSet;
 unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, string> ruleReferenceTable;
+unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
+unordered_set<string> typeDeclarationSet;
 unordered_set<string> outputVars;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
    symbolTable["MethodAccess"] = "(fqn: String, getMethod: String, version: Version)";
-   symbolTable["Method"] = "(fqn: String, hasName: String, version: Version)";
+   symbolTable["Method"] = "(fqn: String, hasName: String, getNumberOfParams: number, hasReturn: String, isConstructor: String, hasClassName: String, version: Version)";
+   symbolTable["AbstractClass"] = "(fqn: String, version: Version)";
+   symbolTable["Reference"] = "(fqn: String, getReferee: String, version: Version)";
    symbolTable["Version"] = "(version: Version)";
    return;
 }
@@ -41,14 +45,16 @@ string QLObjToDLOutput(unordered_set<string> outputVars) {
       if (symbolTable.find(type) != symbolTable.end()) {
          string intermediateResult = symbolTable[type];
          vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+         // resultPairs.push_back(make_pair(fieldPairs.begin()->first, fieldPairs.begin()->second));
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
             if (it->first == "version") {
                if (type == "Version") {
                   resultPairs.push_back(make_pair(it->first, it->second));
                }
                continue;
+            } else if (it->first == "fqn") {
+               resultPairs.push_back(make_pair(it->first, it->second));
             }
-            resultPairs.push_back(make_pair(it->first, it->second));
          }
       }
    }
@@ -62,14 +68,16 @@ string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
       if (symbolTable.find(type) != symbolTable.end()) {
          string intermediateResult = symbolTable[type];
          vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+         // resultPairs.push_back(fieldPairs.begin()->first);
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
             if (it->first == "version") {
                if (type == "Version") {
                   resultPairs.push_back(*iter);
                }
                continue;
+            } else if (it->first == "fqn") {
+               resultPairs.push_back(it->first);
             }
-            resultPairs.push_back(it->first);
          }
       }
    }
@@ -115,20 +123,46 @@ string findVersionVarAssociation(string name) {
    return result;
 }
 
-/* APIs for Rule Reference Table */
-void storeRuleReferenceTable(string reference, string name) {
-   ruleReferenceTable[name] = reference;
+/* APIs for Which field of a variable is referred */
+void storeVarFieldReferenceTable(string referred, string referer) {
+   size_t pos = 0;
+   vector<string> tokens; 
+   while ((pos = referred.find(".")) != std::string::npos) {
+      tokens.push_back(referred.substr(0, pos));
+      referred.erase(0, pos + 1);
+   }
+   tokens.push_back(referred);
+
+   if (tokens.size() == 1) {
+      varFeildReferenceTable[tokens[0]]["fqn"] = referer;
+   } else if (tokens.size() == 2) {
+      varFeildReferenceTable[tokens[0]][tokens[1]] = referer;
+   } else {
+      yyerror("Invalid function call");
+   }
 }
 
-string findRuleReference(string name) {
-   string result = "";
-   if (ruleReferenceTable.find(name) != ruleReferenceTable.end()) {
-      result = ruleReferenceTable[name];
-   } 
-   return result;
+string findVarFieldReferredName(string name, string field) {
+   unordered_map<string, string> referredFieldName = varFeildReferenceTable[name];
+   if (referredFieldName.size() == 0) {
+      return "";
+   }
+   if (referredFieldName.find(field) == referredFieldName.end()) {
+      return "";
+   }
+   return referredFieldName[field];
 }
 
-// TODO: Currently only handle one output case
+/* APIs for avoiding redundant declaration */
+void storeDeclaredType(string type) {
+   typeDeclarationSet.insert(type);
+}
+
+bool isTypeDeclared(string type) {
+   return (typeDeclarationSet.find(type) != typeDeclarationSet.end());
+}
+
+/* APIs for handling output related things */
 void storeOutputVar(string output) {
     outputVars.insert(output);
 }

@@ -105,14 +105,20 @@ void writeParallelRule() {
     mainDLFile.close();
 }
 
+void writeArithmethics(string var, string comparision, string value) {
+    ofstream mainDLFile;
+    mainDLFile.open(mainDLFileName, ios_base::app);
+    mainDLFile << var << comparision << value;
+    mainDLFile.close();
+}
+
 void writeRule(string name, string field, string value) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
 
     string type = findVarDeclaration(name);
     string version = findVersionVarAssociation(name);
-    string ruleReference = findRuleReference(name);
-    bool isReferenced = !ruleReference.empty();
+
     string fields = QLObjToDLDecl(type);
     vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
 
@@ -136,14 +142,14 @@ void writeRule(string name, string field, string value) {
         string currFieldCharP = fieldPair.first.c_str();
         if (currFieldCharP == field) {
             if (value.empty()) {
-                result += field;
+                result += findVarFieldReferredName(name, currFieldCharP);
             } else {
                 result += value;
             }
+        } else if (findVarFieldReferredName(name, currFieldCharP) != "") {
+            result += findVarFieldReferredName(name, currFieldCharP);
         } else if (currFieldCharP == "version") {
             result += version; 
-        } else if (isReferenced) {
-            result += ruleReference;
         } else if (currFieldCharP == "fqn") {
             result += "fqn";
         } else {

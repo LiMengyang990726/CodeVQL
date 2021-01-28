@@ -47,6 +47,9 @@ that      { return THAT; }
 \"(\\.|\"\"|[^"\n])*\" { yylval.strval = strdup(yytext); return STRING_LITERAL; }
 \"(\\.|[^"\n])*$    { yyerror("Unterminated string "); }
 
+    /* numbers */
+-?[0-9]+ { yylval.intval = strdup(yytext); return INT_LITERAL; }    
+
     /* upper id */
 [A-Z][0-9a-zA-Z_$]* { yylval.strval = strdup(yytext); return UPPER_ID; }
 
