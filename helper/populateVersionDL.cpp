@@ -300,18 +300,22 @@ void writeVersionDLComp(string filename, string varName, string from, string bas
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
 
+    string fieldFrom = "";
     string ruleFrom = "";
+    string fieldBase = "";
     string ruleBase = "";
     if (!regex_match(from, regex(PLAIN_VERSION_REGEX)))
     {
         versionDL << ".decl SelectedVersion" << from << "(version: Version)" << endl;
         versionDL << ".input SelectedVersion" << from << endl << endl;
         ruleFrom = ", SelectedVersion" + from + "(" + from + ")";
+        fieldFrom = from;
     } 
     else 
     {
         versionDL << "#define target_from " << from << endl;
         versionDL << "Reachable(target_from, target_from)." << endl;
+        fieldFrom = "target_from";
     }
 
     if (!regex_match(base, regex(PLAIN_VERSION_REGEX)))
@@ -319,16 +323,21 @@ void writeVersionDLComp(string filename, string varName, string from, string bas
         versionDL << ".decl SelectedVersion" << base << "(version: Version)" << endl;
         versionDL << ".input SelectedVersion" << base << endl << endl;
         ruleBase = ", SelectedVersion" + base + "(" + base + ")";
+        fieldBase = base;
     }
     else 
     {
         versionDL << "#define target_base " << base << endl;
         versionDL << "Reachable(target_base, target_base)." << endl;
+        fieldBase = "target_base";
     }
 
     versionDL << "VersionInRange(x, target_from, target_base) :- Reachable(target_base, x), !Reachable(target_from, x)." << endl;
-    versionDL << VARNAME_PREFIX << varName << "(version) :- VersionInRange(version, " << from << ", " << base << ")"
-              << ruleFrom << ruleBase << "." << endl
+    versionDL << VARNAME_PREFIX << varName << "(version) :- Reachable(" << fieldFrom << ", version)"
+              << ", !Reachable(" << fieldBase << ", version)"
+              << ruleFrom 
+              << ruleBase
+              << "."
               << endl;
 
     versionDL.close();
@@ -351,11 +360,6 @@ void writeVersionDLTemplate(string filename, string varName)
     versionDL << "Reachable(a, x) :- Parent(a, b, _), Reachable(b, x)." << endl;
     versionDL << "Reachable(a, y) :- Parent(x, y, _), Reachable(a, x)." << endl;
     versionDL << "Reachable(a, a) :- Parent(a, _, _); Parent(_, a, _)." << endl
-              << endl;
-
-    versionDL << ".decl VersionInRange(x: Version, a:Version, b:Version)" << endl;
-    versionDL << "VersionInRange(x, a, b) :- Reachable(b, x), Parent(_,a,_), !Reachable(a, x)." << endl;
-    versionDL << "VersionInRange(x, a, b) :- Reachable(b, x), Parent(a,_,_), !Reachable(a, x)." << endl
               << endl;
 
     versionDL << ".decl " << VARNAME_PREFIX << varName << "(version: Version)" << endl
