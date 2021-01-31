@@ -332,7 +332,6 @@ void writeVersionDLComp(string filename, string varName, string from, string bas
         fieldBase = "target_base";
     }
 
-    versionDL << "VersionInRange(x, target_from, target_base) :- Reachable(target_base, x), !Reachable(target_from, x)." << endl;
     versionDL << VARNAME_PREFIX << varName << "(version) :- Reachable(" << fieldFrom << ", version)"
               << ", !Reachable(" << fieldBase << ", version)"
               << ruleFrom 
