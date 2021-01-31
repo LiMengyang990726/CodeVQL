@@ -23,7 +23,7 @@ unordered_set<string> outputVars;
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
    symbolTable["MethodAccess"] = "(fqn: String, getMethod: String, version: Version)";
-   symbolTable["Method"] = "(fqn: String, hasName: String, getNumberOfParams: number, hasReturn: String, isConstructor: String, hasClassName: String, version: Version)";
+   symbolTable["Method"] = "(fqn: String, hasName: String, hasClassName: String, getNumberOfParams: number, hasReturn: String, isConstructor: String, version: Version)";
    symbolTable["AbstractClass"] = "(fqn: String, version: Version)";
    symbolTable["Reference"] = "(fqn: String, getReferee: String, version: Version)";
    symbolTable["Version"] = "(version: Version)";
