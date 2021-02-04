@@ -1,9 +1,0 @@
-import java
-
-from MethodAccess call, Method method
-range call @ v1, method @ v2
-where exists call, method that call.getMethod()=method and method.hasName("getArea")
-select call
-
-define v1 ("4f7a988d5132e9f446bd9c46a58998761be751b9".."c0a13d8cc528a449967e83b7d0f4043787597e81")
-define v2 "c0a13d8cc528a449967e83b7d0f4043787597e81"

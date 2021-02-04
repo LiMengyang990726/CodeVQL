@@ -1,0 +1,8 @@
+import java
+
+from Method method
+range method @ v1
+where exists method that method.getNumberOfParams() > 1
+select method, v1
+
+define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~11")

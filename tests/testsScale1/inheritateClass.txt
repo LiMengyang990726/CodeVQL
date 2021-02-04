@@ -1,0 +1,8 @@
+import java
+
+from Reference ref, AbstractClass ac
+range ref @ v1, ac @ v1
+where exists ref that ref.getReferee("io.fabric8.maven.docker.wait.WaitChecker") and ac.fqn()="io.fabric8.maven.docker.wait.WaitChecker"
+select ref, v1
+
+define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~11")
