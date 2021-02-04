@@ -147,9 +147,14 @@ string findVarFieldReferredName(string name, string field) {
    if (referredFieldName.size() == 0) {
       return "";
    }
+
+   if (field == "") {
+      field = "fqn";
+   }
    if (referredFieldName.find(field) == referredFieldName.end()) {
       return "";
    }
+
    return referredFieldName[field];
 }
 
