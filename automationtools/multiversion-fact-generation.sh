@@ -54,12 +54,14 @@ souffle -F ${OUTPUT_PATH}${SLASH}${FACTS_OUTPUT_REL_PATH} ${VERSION_DL_FILE}
 
 # Step 2: Check out each of the unique commit
 cd ${REPO_PATH}
+ORIGINAL_COMMIT=$(git rev-parse HEAD)
 for commit in $(${CODEQLTOSOUFFLE_PATH}${SLASH}${GET_UNIQUE_COMMITS_FROM_FACTS_FILE_REL_PATH} ${OUTPUT_PATH}${SLASH}${FACTS_OUTPUT_REL_PATH}${SLASH}${VERSION_COMB_FACTS_FILE}); do
     echo ${commit}
     git checkout ${commit}
     ${CODEQLTOSOUFFLE_PATH}${SLASH}${FACT_GENERATION_REL_PATH} --repo_path ${REPO_PATH} --cslicer_path ${CSLICER_PATH} --output_path ${OUTPUT_PATH} --commit ${commit}
     wait $!
 done
+git checkout ${ORIGINAL_COMMIT}
 
 # Sample run
 # ./multiversion-fact-generation.sh --repo_path /Users/limengyang/Workspaces/FinalYearProject/docker-maven-plugin  --cslicer_path /Users/limengyang/Workspaces/FinalYearProject/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar --codeqltosouffle_path /Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle --output_path /Users/limengyang/Desktop/test

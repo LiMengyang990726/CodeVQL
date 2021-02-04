@@ -46,7 +46,7 @@ wait $!
 # Sample run
 # ./run.sh --repo_path /Users/limengyang/Workspaces/FinalYearProject/docker-maven-plugin \
 #          --gitfacts_path /Users/limengyang/Workspaces/FinalYearProject/ext-gitfacts \
-#          --output_path /Users/limengyang/Desktop/test \
-#          --query_file_path /Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle/automationtools/callQuery.txt \
+#          --output_path /Users/limengyang/Desktop/test5 \
+#          --query_file_path /Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle/tests/testsScale1/returnVoid.txt \
 #          --codeqltosouffle_path /Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle \
 #          --cslicer_path /Users/limengyang/Workspaces/FinalYearProject/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar
