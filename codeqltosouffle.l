@@ -40,6 +40,7 @@ range     { return RANGE; }
 exists    { return EXISTS; }
 forall    { return FORALL; }
 that      { return THAT; }
+any       { return ANY; }
 
     /* question: (\\.) in regular expression? */
 

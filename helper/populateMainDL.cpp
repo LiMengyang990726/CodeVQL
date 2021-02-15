@@ -98,10 +98,31 @@ void writeRuleTermination() {
     mainDLFile.close();
 }
 
+void writeNegationRule() {
+    ofstream mainDLFile;
+    mainDLFile.open(mainDLFileName, ios_base::app);
+    mainDLFile << "!";
+    mainDLFile.close(); 
+}
+
 void writeParallelRule() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << ", ";
+    mainDLFile.close();
+}
+
+void writeEquality(string a, string b) {
+    ofstream mainDLFile;
+    mainDLFile.open(mainDLFileName, ios_base::app);
+    mainDLFile << a << "=" << b;
+    mainDLFile.close();
+}
+
+void writeInequality(string a, string b) {
+    ofstream mainDLFile;
+    mainDLFile.open(mainDLFileName, ios_base::app);
+    mainDLFile << a << "!=" << b;
     mainDLFile.close();
 }
 
@@ -143,15 +164,15 @@ void writeRule(string name, string field, string value) {
         if (currFieldCharP == field) {
             if (value.empty()) {
                 result += findVarFieldReferredName(name, currFieldCharP);
-            } else {
+            } else if (value != "any") {
                 result += value;
+            } else if (value == "any") {
+                result += "_";
             }
         } else if (findVarFieldReferredName(name, currFieldCharP) != "") {
             result += findVarFieldReferredName(name, currFieldCharP);
         } else if (currFieldCharP == "version") {
             result += version; 
-        } else if (currFieldCharP == "fqn") {
-            result += "fqn";
         } else {
             result += "_";
         }

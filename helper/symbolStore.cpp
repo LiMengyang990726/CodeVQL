@@ -70,13 +70,10 @@ string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
          vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
          // resultPairs.push_back(fieldPairs.begin()->first);
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-            if (it->first == "version") {
-               if (type == "Version") {
-                  resultPairs.push_back(*iter);
-               }
-               continue;
-            } else if (it->first == "fqn") {
-               resultPairs.push_back(it->first);
+            if (findVarFieldReferredName(*iter, "fqn") != "") {
+               resultPairs.push_back(findVarFieldReferredName(*iter, "fqn"));
+            } else if (it->first == "version" && type == "Version") {
+               resultPairs.push_back(*iter);
             }
          }
       }
@@ -133,9 +130,7 @@ void storeVarFieldReferenceTable(string referred, string referer) {
    }
    tokens.push_back(referred);
 
-   if (tokens.size() == 1) {
-      varFeildReferenceTable[tokens[0]]["fqn"] = referer;
-   } else if (tokens.size() == 2) {
+   if (tokens.size() == 2) {
       varFeildReferenceTable[tokens[0]][tokens[1]] = referer;
    } else {
       yyerror("Invalid function call");
@@ -148,9 +143,6 @@ string findVarFieldReferredName(string name, string field) {
       return "";
    }
 
-   if (field == "") {
-      field = "fqn";
-   }
    if (referredFieldName.find(field) == referredFieldName.end()) {
       return "";
    }

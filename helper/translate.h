@@ -9,8 +9,8 @@ void translateRange(struct ast *);
 void translateWhere(struct ast *);
 void translateSelect(struct ast *);
 
-void translateFormula(struct ast *);
-void translateCall(struct ast *);
+void translateFormula(struct ast *, bool negated = false);
+void translateCall(struct ast *, bool negated = false);
 void translateComparison(struct ast *);
 
 void eval(struct ast *);

@@ -318,6 +318,9 @@ void translateSelect(struct ast *a)
     struct ast *name = a->children[0];
     string nameStr = ((struct stringval *)name)->value;
     storeOutputVar(nameStr);
+    if (findVarDeclaration(nameStr) != "Version") {
+        storeVarFieldReferenceTable(nameStr + ".fqn", "fqn" + nameStr);
+    }
 
     if (a->childrencount == 1)
     {
@@ -330,7 +333,7 @@ void translateSelect(struct ast *a)
     }
 }
 
-void translateFormula(struct ast *a)
+void translateFormula(struct ast *a, bool negated)
 {
     // No where opts, accept
     if (!a)
@@ -378,8 +381,7 @@ void translateFormula(struct ast *a)
             yyerror("error in WHERE node (NOT) in AST construction");
             return;
         }
-        /* TODO */
-        translateFormula(a->children[0]);
+        translateFormula(a->children[0], true);
         break;
     case COMPARISON_FORMULA_NODE:
         if (a->childrencount != 3)
@@ -395,7 +397,7 @@ void translateFormula(struct ast *a)
             yyerror("error in WHERE node (CALL) in AST construction");
             return;
         }
-        translateCall(a);
+        translateCall(a, negated);
         break;
     }
 }
@@ -413,7 +415,7 @@ void translateComparison(struct ast *a)
     struct ast *l = a->children[0];
     struct ast *r = a->children[2];
 
-    if (comparison == "=")
+    if (comparison == "=" || comparison == "!=")
     {
         if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE)
         {
@@ -421,17 +423,27 @@ void translateComparison(struct ast *a)
             string fieldStr = ((struct stringval *)l->children[1])->value;
             string nextName = ((struct stringval *)r)->value;
             int nextNameLen = nextName.length();
+            if (comparison == "!=") {
+                writeNegationRule();
+            }
             if (nextNameLen >= 2 && nextName[0] == '\"' && nextName[nextName.length()-1] == '\"') {
                 writeRule(nameStr, fieldStr, nextName);
             } else {
-                if (findVarFieldReferredName(nameStr, fieldStr) != "") {
-                    string referer = findVarFieldReferredName(nameStr, fieldStr);
-                    writeRule(nameStr, fieldStr, "");
-                    storeVarFieldReferenceTable(nextName,referer);
+                if (findVarFieldReferredName(nextName, "fqn") != "") {
+                    if (findVarFieldReferredName(nameStr, fieldStr) != "") {
+                        yyerror("The parser currently don't support this grammar");
+                    } else {
+                        string referer = findVarFieldReferredName(nextName, "fqn");
+                        storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
+                        writeRule(nameStr, fieldStr, referer);
+                    }
+                } else if (findVarFieldReferredName(nameStr, fieldStr) != "") {
+                    writeRule(nameStr, fieldStr, findVarFieldReferredName(nameStr, fieldStr));
+                    storeVarFieldReferenceTable(nextName + ".fqn", findVarFieldReferredName(nameStr, fieldStr));
                 } else {
-                    storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr); // write to itself for rule writting later
+                    storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr);
                     writeRule(nameStr, fieldStr, "");
-                    storeVarFieldReferenceTable(nextName,fieldStr);
+                    storeVarFieldReferenceTable(nextName + ".fqn", fieldStr);
                 }
             }
         } 
@@ -446,6 +458,21 @@ void translateComparison(struct ast *a)
             writeRule(lNameStr, lFieldStr, "");
             writeParallelRule();
             writeRule(rNameStr, rNameStr, "");
+        } 
+        else if (l->nodetype == STRING_NODE && r->nodetype == STRING_NODE) 
+        {
+            string lStr = ((struct stringval *)l)->value;
+            string rStr = ((struct stringval *)r)->value;
+            // Assume l and r are two LOWER_ID. For other cases: TODO
+            storeVarFieldReferenceTable(lStr + ".fqn", "fqn" + lStr);
+            storeVarFieldReferenceTable(rStr + ".fqn", "fqn" + rStr);
+            if (comparison == "=")
+            {
+                writeEquality("fqn" + lStr, "fqn" + rStr);
+            } else 
+            {
+                writeInequality("fqn" + lStr, "fqn" + rStr);
+            }
         }
     }
     else if (comparison == ">=" || comparison == "<=" || comparison == ">" || comparison == "<")
@@ -455,20 +482,20 @@ void translateComparison(struct ast *a)
             string nameStr = ((struct stringval *)l->children[0])->value;
             string fieldStr = ((struct stringval *)l->children[1])->value;
             string value = ((struct stringval *)r)->value;
-            storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr);
+            storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr + nameStr);
             writeRule(nameStr, fieldStr, "");
             writeParallelRule();
-            writeArithmethics(fieldStr, comparison, value);
+            writeArithmethics(fieldStr + nameStr, comparison, value);
         }
     }
     else 
     {
-        // TODO: Handle when seen
+        // TODO: Handle other types of comparisons when seen
     }
     return;
 }
 
-void translateCall(struct ast *a)
+void translateCall(struct ast *a, bool negated)
 {
     // No select opts
     if (!a || a->childrencount < 2 || a->childrencount > 3)
@@ -482,12 +509,15 @@ void translateCall(struct ast *a)
     if (a->childrencount == 3)
     { // For direct translate call, it can be directly translate to a rule
         char *value = ((struct stringval *)a->children[2])->value;
+        if (negated)
+        {
+            writeNegationRule();
+        }
         writeRule(nameStr, fieldStr, value);
     } else if (a->childrencount == 2) {
         // For indirect translate call, it is a boolean value
         storeVarFieldReferenceTable(nameStr + "." + fieldStr, "\"true\"");
         writeRule(nameStr, fieldStr, "");
-        // TODO: If there is a negate sign in front
     }
     return;
 }

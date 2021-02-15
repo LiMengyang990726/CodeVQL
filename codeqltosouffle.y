@@ -55,6 +55,7 @@ extern int yylex();
 %token <strval> EXISTS
 %token <strval> FORALL
 %token <strval> THAT
+%token <strval> ANY
 %token <intval> INT_LITERAL
 
 %type <a> stmt import_stmt define_stmt select_stmt
@@ -138,6 +139,7 @@ primary: LOWER_ID { $$ = newstringval($1); }
   | call { $$ = $1; }
   ;
 call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET { $$ = newast(CALL_NODE, 2, newstringval($1), newstringval($3)); }
+  | LOWER_ID DOT LOWER_ID LEFT_BRACKET ANY RIGHT_BRACKET { $$ = newast(CALL_NODE, 2, newstringval($1), newstringval("any")); }
   | LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET { $$ = newast(CALL_NODE, 3, newstringval($1), newstringval($3), newstringval($5)); }
   ;
 expr: UNDERSCORE { $$ = newstringval($1); }

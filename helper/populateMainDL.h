@@ -19,7 +19,10 @@ void writeInput(string type);
 void writeOutput();
 void writeRuleBegin();
 void writeRuleTermination();
+void writeNegationRule();
 void writeParallelRule();
+void writeEquality(string a, string b);
+void writeInequality(string a, string b);
 void writeArithmethics(string var, string comparision, string value);
 void writeRule(string name, string field, string value);
 
