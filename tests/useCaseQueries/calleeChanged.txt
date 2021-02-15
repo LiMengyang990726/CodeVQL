@@ -7,7 +7,7 @@ import java
 
 from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
-where exists old, new that 
+where exists old, new, method that 
 old != new and
 old.getMethod()=method and method.hasName("getAuth") and method.hasClassName("io.fabric8.maven.docker.access.AuthConfig") and
 new.getMethod()=method and method.hasName("getAuth") and method.hasClassName("io.fabric8.maven.docker.access.AuthConfig")
