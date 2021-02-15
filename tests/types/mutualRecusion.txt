@@ -1,9 +1,0 @@
-import java
-
-from MethodAccess methodAAccess, MethodAccess methodBAccess
-range methodAAccess @ v1, methodBAccess @v2
-where exists methodAAccess, methodBAccess that methodAAccess.getMethod()=methodBAccess and methodBAccess.getMethod()=methodAAccess
-select methodAAccess
-
-define v1 ("c0a13d8cc528a449967e83b7d0f4043787597e81~2".."c0a13d8cc528a449967e83b7d0f4043787597e81")
-define v2 "c0a13d8cc528a449967e83b7d0f4043787597e81"

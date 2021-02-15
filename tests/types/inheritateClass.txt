@@ -1,8 +1,0 @@
-import java
-
-from Reference ref, AbstractClass ac
-range ref @ v1, ac @ v1
-where exists ref that ref.getReferee("Shape") and ac.fqn()="Shape"
-select ref, v1
-
-define v1 ("c0a13d8cc528a449967e83b7d0f4043787597e81~2".."c0a13d8cc528a449967e83b7d0f4043787597e81")

@@ -1,0 +1,18 @@
+/*
+    Check all calls to a method appears in v2 but did not appear in v1
+    Alternatively, it can also 
+    Check all calls to a constructor appears in v2 but did not appear in v1
+*/
+import java
+
+from MethodAccess old, MethodAccess new, Method method
+range old @ v1, new @ v2, method @ v3
+where exists old, new that 
+old != new and
+old.getMethod()=method and method.hasName("getAuth") and method.hasClassName("io.fabric8.maven.docker.access.AuthConfig") and
+new.getMethod()=method and method.hasName("getAuth") and method.hasClassName("io.fabric8.maven.docker.access.AuthConfig")
+select new, v1
+
+define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e~1".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~11")
+define v2 "e7fefdaddd99294d5842ef8c5b16070ce230d29e"
+define v3 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~11")
