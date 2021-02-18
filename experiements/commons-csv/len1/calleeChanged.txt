@@ -1,0 +1,18 @@
+/*
+    Check all calls to a method appears in v2 but did not appear in v1
+    Alternatively, it can also 
+    Check all calls to a constructor appears in v2 but did not appear in v1
+*/
+import java
+
+from MethodAccess old, MethodAccess new, Method method
+range old @ v1, new @ v2, method @ v3
+where exists old, new, method that 
+old != new and
+old.getMethod()=method and method.hasName("next") and method.hasClassName("org.apache.commons.csv.CSVParser") and
+new.getMethod()=method and method.hasName("next") and method.hasClassName("org.apache.commons.csv.CSVParser")
+select new, v1
+
+define v1 ("bf2f8093a49a3432be62e9fdae073e82ac78bd04~1".."bf2f8093a49a3432be62e9fdae073e82ac78bd04~10")
+define v2 "bf2f8093a49a3432be62e9fdae073e82ac78bd04"
+define v3 ("bf2f8093a49a3432be62e9fdae073e82ac78bd04".."bf2f8093a49a3432be62e9fdae073e82ac78bd04~10")

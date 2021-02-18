@@ -1,0 +1,17 @@
+/*
+    Check for all calls to any method that is called in v1 but not in v2
+    Alternatively, it can also
+    Check for all calls to any method constructors that is called in v1 but not in v2
+*/
+import java
+
+from MethodAccess accessV1, MethodAccess accessV2, Method method
+range accessV1 @ v1, accessV2 @ v2, method @ v3
+where exists accessV1, accessV2, method that 
+accessV1.getMethod()=method and method.hasName(any) and 
+accessV2.getMethod()!=method and method.hasName(any)
+select method, v3
+
+define v1 ("bf2f8093a49a3432be62e9fdae073e82ac78bd04~1".."bf2f8093a49a3432be62e9fdae073e82ac78bd04~60")
+define v2 "bf2f8093a49a3432be62e9fdae073e82ac78bd04"
+define v3 ("bf2f8093a49a3432be62e9fdae073e82ac78bd04".."bf2f8093a49a3432be62e9fdae073e82ac78bd04~60")

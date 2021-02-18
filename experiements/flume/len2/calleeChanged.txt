@@ -1,0 +1,18 @@
+/*
+    Check all calls to a method appears in v2 but did not appear in v1
+    Alternatively, it can also 
+    Check all calls to a constructor appears in v2 but did not appear in v1
+*/
+import java
+
+from MethodAccess old, MethodAccess new, Method method
+range old @ v1, new @ v2, method @ v3
+where exists old, new, method that 
+old != new and
+old.getMethod()=method and method.hasName("getBatchSize") and method.hasClassName("org.apache.flume.api.RpcClient") and
+new.getMethod()=method and method.hasName("getBatchSize") and method.hasClassName("org.apache.flume.api.RpcClient")
+select new, v1
+
+define v1 ("c8eefbe403409c198b0eb55ab27bf90585299326~1".."c8eefbe403409c198b0eb55ab27bf90585299326~30")
+define v2 "c8eefbe403409c198b0eb55ab27bf90585299326"
+define v3 ("c8eefbe403409c198b0eb55ab27bf90585299326".."c8eefbe403409c198b0eb55ab27bf90585299326~30")

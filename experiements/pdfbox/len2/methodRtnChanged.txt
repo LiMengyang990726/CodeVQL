@@ -1,0 +1,12 @@
+/*
+    Check all methods who originally has void return type in v1 now is not return void type in v2
+*/
+import java
+
+from Method old, Method new
+range old @ v1, new @ v2
+where exists old, new that old=new and old.hasReturn("void") and not new.hasReturn("void")
+select new, v2
+
+define v1 ("6457864c2de606cb17c63fc6dde50c8295517497~1".."6457864c2de606cb17c63fc6dde50c8295517497~30")
+define v2 "6457864c2de606cb17c63fc6dde50c8295517497"

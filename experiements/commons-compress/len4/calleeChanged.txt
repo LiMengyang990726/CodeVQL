@@ -1,0 +1,18 @@
+/*
+    Check all calls to a method appears in v2 but did not appear in v1
+    Alternatively, it can also 
+    Check all calls to a constructor appears in v2 but did not appear in v1
+*/
+import java
+
+from MethodAccess old, MethodAccess new, Method method
+range old @ v1, new @ v2, method @ v3
+where exists old, new, method that 
+old != new and
+old.getMethod()=method and method.hasName("isBrotliCompressionAvailable") and method.hasClassName("org.apache.commons.compress.compressors.brotli.BrotliUtils") and
+new.getMethod()=method and method.hasName("isBrotliCompressionAvailable") and method.hasClassName("org.apache.commons.compress.compressors.brotli.BrotliUtils")
+select new, v1
+
+define v1 ("1b7528fbd6295a3958daf1b1114621ee5e40e83c~1".."1b7528fbd6295a3958daf1b1114621ee5e40e83c~90")
+define v2 "1b7528fbd6295a3958daf1b1114621ee5e40e83c"
+define v3 ("1b7528fbd6295a3958daf1b1114621ee5e40e83c".."1b7528fbd6295a3958daf1b1114621ee5e40e83c~90")
