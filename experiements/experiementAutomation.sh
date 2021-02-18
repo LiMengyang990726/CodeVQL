@@ -1,8 +1,8 @@
-QUERY_FILE_PATH_PREFIX=$PWD
 RUN_COMMAND_PATH="/Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle/automationtools/run.sh"
 GITFACTS_PATH="/Users/limengyang/Workspaces/FinalYearProject/ext-gitfacts"
 CODEQLTOSOUFFLE_PATH="/Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle"
 
+QUERY_FILE_PATH_PREFIX=$PWD
 OUTPUT_PATH_PREFIX="/Users/limengyang/Workspaces/FinalYearProject/experiementResult"
 REPO_PATH_PREFIX="/Users/limengyang/Workspaces/FinalYearProject"
 
@@ -17,6 +17,7 @@ for f in $(find . -name '*.txt'); do
     REPO_PATH="$REPO_PATH_PREFIX$SLASH$REPO_NAME" # third last param done
     OUTPUT_PATH="$OUTPUT_PATH_PREFIX$SLASH$REPO_NAME$SLASH$DIR_NAME" # second last param done
     QUERY_FILE_PATH="$QUERY_FILE_PATH_PREFIX${f:1}" # last param done
+    LOG_FILE="$OUTPUT_PATH.txt"
 
     RUN_COMMAND="/usr/bin/time -lp $RUN_COMMAND_PATH \ 
         --gitfacts_path $GITFACTS_PATH \ 
@@ -24,6 +25,6 @@ for f in $(find . -name '*.txt'); do
         --repo_path $REPO_PATH \ 
         --output_path $OUTPUT_PATH \ 
         --query_file_path $QUERY_FILE_PATH"
-    echo "$RUN_COMMAND\n"
+    eval $RUN_COMMAND > LOG_FILE
     wait $!
 done
