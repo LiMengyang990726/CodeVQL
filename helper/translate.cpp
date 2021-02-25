@@ -482,6 +482,10 @@ void translateComparison(struct ast *a)
             } else {
                 writeInequality(lFieldStr + lNameStr, rFieldStr + rNameStr);
             }
+            writeParallelRule();
+            writeRule(lNameStr, lFieldStr, "");
+            writeParallelRule();
+            writeRule(rNameStr, rFieldStr, "");
         } 
         else if (l->nodetype == STRING_NODE && r->nodetype == STRING_NODE) 
         {
