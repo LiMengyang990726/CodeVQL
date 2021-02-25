@@ -156,6 +156,11 @@ void writeRule(string name, string field, string value) {
         result += "), ";
         isVersionCombWritten = true;
     } 
+
+    if (isVariableSpecifiedInNotExist(name)) {
+        result += "!";
+    }
+    
     result += type;
 
     result += "(";

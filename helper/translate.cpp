@@ -214,7 +214,7 @@ void translateFrom(struct ast *a)
     }
 }
 
-void translateRange(struct ast *a)
+void translateRange(struct ast *a, vector<string>& versions)
 {
     // No range opts, accept
     if (!a)
@@ -234,26 +234,26 @@ void translateRange(struct ast *a)
         return;
     }
     storeVersionVarAssociationTable(versionNameStr, varNameStr);
+    versions.push_back(versionNameStr);
 
     if (a->childrencount == 2)
     {
+        writeVersionsCombination(versions);
         return;
     }
     else
     {
-        translateRange(a->children[2]);
+        translateRange(a->children[2], versions);
         return;
     }
 }
 
-vector<string> translateReasonOpts(struct ast *a, vector<string> &prev)
+void translateReasonOpts(struct ast *a, vector<string>& reasonOpts)
 {
     // No opts multiple selections, reject
     if (!a || (a->childrencount < 1) || (a->childrencount > 2))
-
     {
         yyerror("Error in reasoning opts");
-        return prev;
     }
 
     struct ast *varName = a->children[0];
@@ -261,18 +261,17 @@ vector<string> translateReasonOpts(struct ast *a, vector<string> &prev)
     string versionNameStr = findVersionVarAssociation(varNameStr);
     if (versionNameStr == "") {
         yyerror("The current variable has not declared its selected versions");
-        return prev;
     }
-    prev.push_back(versionNameStr);
+    reasonOpts.push_back(varNameStr);
 
     if (a->childrencount == 1)
     {
-        return prev;
+        return;
     }
     else
     {
-        translateReasonOpts(a->children[1], prev);
-        return prev;
+        translateReasonOpts(a->children[1], reasonOpts);
+        return;
     }
 }
 
@@ -282,21 +281,35 @@ void translateWhere(struct ast *a)
     if (!a)
     {
         return;
-    } else if (a->childrencount != 3) {
-        yyerror("error in WHERE statement");
+    } else if (a->childrencount < 3) {
+        yyerror("error in WHERE statement: incorrect number of child when parsing WHERE to an abstract syntax tree");
         return;
     }
 
     struct ast* reason = a->children[0];
     string reasonStr = ((struct stringval *)reason)->value;
+    vector<string> reasonOpts;
+    translateReasonOpts(a->children[1], reasonOpts); // check if all versions used here are definied & get them
     if (reasonStr == "exists") {
-        vector<string> varNames;
-        writeVersionsCombination(translateReasonOpts(a->children[1], varNames));
+        translateFormula(a->children[2]);
+    } else if (reasonStr == "not exist") {
+        for (string reasonOpt : reasonOpts) {
+            storeNotExistSpecifiedVariable(reasonOpt);
+        }
         translateFormula(a->children[2]);
     } else if (reasonStr == "forall") {
         translateFormula(a->children[2]);
     } else {
-        yyerror("error in WHERE reasoning statement");
+        yyerror("error in WHERE reasoning statement: no such reasoning keyword defined");
+        return;
+    }
+
+    if (a->childrencount == 3) {
+        return;
+    } else {
+        writeParallelRule(); // between where clauses, can only be "AND" for now
+        clearNotExistSpecifiedVariable();
+        translateWhere(a->children[3]);
         return;
     }
 }
@@ -423,6 +436,14 @@ void translateComparison(struct ast *a)
             string fieldStr = ((struct stringval *)l->children[1])->value;
             string nextName = ((struct stringval *)r)->value;
             int nextNameLen = nextName.length();
+            if (fieldStr == "getNumberOfParams") {
+                // the only case doing arithmatics under == and != 
+                storeVarFieldReferenceTable(nameStr + "." + fieldStr, fieldStr + nameStr);
+                writeRule(nameStr, fieldStr, "");
+                writeParallelRule();
+                writeArithmethics(fieldStr + nameStr, comparison, nextName);
+                return;
+            }
             if (comparison == "!=") {
                 writeNegationRule();
             }
@@ -453,11 +474,14 @@ void translateComparison(struct ast *a)
             string lFieldStr = ((struct stringval *)l->children[1])->value;
             string rNameStr = ((struct stringval *)r->children[0])->value;
             string rFieldStr = ((struct stringval *)r->children[1])->value;
-            storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, lFieldStr);
-            storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, lFieldStr);
-            writeRule(lNameStr, lFieldStr, "");
-            writeParallelRule();
-            writeRule(rNameStr, rNameStr, "");
+            storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, lFieldStr + lNameStr);
+            storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, rFieldStr + rNameStr);
+            if (comparison == "=")
+            {
+                writeEquality(lFieldStr + lNameStr, rFieldStr + rNameStr);
+            } else {
+                writeInequality(lFieldStr + lNameStr, rFieldStr + rNameStr);
+            }
         } 
         else if (l->nodetype == STRING_NODE && r->nodetype == STRING_NODE) 
         {
@@ -532,6 +556,7 @@ void eval(struct ast *a)
 
     writeAllRelDLs();
     writeTemplate();
+    vector<string> versions;
     switch (a->nodetype)
     {
     /* import statement */
@@ -562,7 +587,7 @@ void eval(struct ast *a)
             break;
         case 4:
             translateFrom(a->children[0]);
-            translateRange(a->children[1]);
+            translateRange(a->children[1], versions);
             translateSelect(a->children[3]);
             writeOutputDecl();
             writeRuleBegin();

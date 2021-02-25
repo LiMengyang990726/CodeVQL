@@ -53,6 +53,7 @@ extern int yylex();
 %token <strval> RANGE
 %token <strval> AT
 %token <strval> EXISTS
+%token <strval> EXIST
 %token <strval> FORALL
 %token <strval> THAT
 %token <strval> ANY
@@ -117,7 +118,10 @@ range_opts: LOWER_ID AT LOWER_ID { $$ = newast(RANGE_OPTS_NODE, 2, newstringval(
   | LOWER_ID AT LOWER_ID COMMA range_opts { $$ = newast(RANGE_OPTS_NODE, 3, newstringval($1), newstringval($3), $5); }
   ;
 
-where_opts: EXISTS reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("exists"), $2, $4); }
+where_opts: EXISTS LEFT_BRACKET reason_opts THAT formula RIGHT_BRACKET { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("exists"), $3, $5); }
+  | EXISTS LEFT_BRACKET reason_opts THAT formula RIGHT_BRACKET AND where_opts { $$ = newast(WHERE_OPTS_NODE, 4, newstringval("exists"), $3, $5, $8); }
+  | NOT EXIST LEFT_BRACKET reason_opts THAT formula RIGHT_BRACKET { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("not exist"), $4, $6); }
+  | NOT EXIST LEFT_BRACKET reason_opts THAT formula RIGHT_BRACKET AND where_opts { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("not exist"), $4, $6, $9); }
   | FORALL reason_opts THAT formula { $$ = newast(WHERE_OPTS_NODE, 3, newstringval("forall"), $2, $4); }
   ;
 reason_opts: LOWER_ID { $$ = newast(REASON_OPTS_NODE, 1, newstringval($1)); }

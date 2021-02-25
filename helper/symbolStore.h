@@ -34,4 +34,8 @@ bool isTypeDeclared(string type);
 void storeOutputVar(string output);
 unordered_set<string> getOutputVars();
 
+void storeNotExistSpecifiedVariable(string name);
+void clearNotExistSpecifiedVariable();
+bool isVariableSpecifiedInNotExist(string name);
+
 #endif

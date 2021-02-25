@@ -19,6 +19,7 @@ unordered_map<string, string> ruleReferenceTable;
 unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
 unordered_set<string> typeDeclarationSet;
 unordered_set<string> outputVars;
+unordered_set<string> notExistSpecifiedVariable;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
@@ -166,4 +167,17 @@ void storeOutputVar(string output) {
 
 unordered_set<string> getOutputVars() {
    return outputVars;
+}
+
+/* APIs for storing and searching in NOT EXIST reasoning opts in WHERE clause */
+void storeNotExistSpecifiedVariable(string name) {
+   notExistSpecifiedVariable.insert(name);
+}
+
+void clearNotExistSpecifiedVariable() {
+   notExistSpecifiedVariable.clear();
+}
+
+bool isVariableSpecifiedInNotExist(string name) {
+   return (notExistSpecifiedVariable.find(name) != notExistSpecifiedVariable.end());
 }

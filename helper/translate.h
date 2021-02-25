@@ -7,6 +7,7 @@ void translateDefineOpts(struct ast *a);
 void translateFrom(struct ast *);
 void translateRange(struct ast *);
 void translateWhere(struct ast *);
+void translateReasonOpts(struct ast *);
 void translateSelect(struct ast *);
 
 void translateFormula(struct ast *, bool negated = false);

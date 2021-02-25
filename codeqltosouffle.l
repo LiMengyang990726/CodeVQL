@@ -38,9 +38,10 @@ as        { return AS; }
 range     { return RANGE; }
 @         { return AT; }
 exists    { return EXISTS; }
+exist     { return EXIST; }
 forall    { return FORALL; }
 that      { return THAT; }
-any       { return ANY; }
+\*        { return ANY; }
 
     /* question: (\\.) in regular expression? */
 
