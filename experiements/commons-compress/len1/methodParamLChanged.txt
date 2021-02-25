@@ -1,11 +1,11 @@
 /*
-    Check all methods who originally has (>=, >, <, <=) n parameters in v1 now has (>=, >, <, <=) m parameters in v2
+    Check all methods who originally has (>=, >, <, <=, =, !=) n parameters in v1 now has (>=, >, <, <=, =, !=) m parameters in v2
 */
 import java
 
 from Method old, Method new
 range old @ v1, new @ v2
-where exists old, new that old=new and old.getNumberOfParams() > 5 and new.getNumberOfParams() > 6
+where exists (old, new that old.fqn()=new.fqn() and old.getNumberOfParams() != new.getNumberOfParams())
 select new, v2
 
 define v1 ("1b7528fbd6295a3958daf1b1114621ee5e40e83c~1".."1b7528fbd6295a3958daf1b1114621ee5e40e83c~10")
