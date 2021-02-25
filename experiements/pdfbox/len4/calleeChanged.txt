@@ -1,16 +1,16 @@
 /*
-    Check all calls to a method appears in v2 but did not appear in v1
+    Check all differnt calls to a method in v2 comparing with v1
     Alternatively, it can also 
-    Check all calls to a constructor appears in v2 but did not appear in v1
+    Check all differnt calls to a constructor in v2 comparing with v1
 */
 import java
 
 from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
-where exists old, new, method that 
-old != new and
+where exists (old, new, method that 
+old.fqn() != new.fqn() and
 old.getMethod()=method and method.hasName("parse") and method.hasClassName("org.apache.fontbox.afm.AFMParser") and
-new.getMethod()=method and method.hasName("parse") and method.hasClassName("org.apache.fontbox.afm.AFMParser")
+new.getMethod()=method and method.hasName("parse") and method.hasClassName("org.apache.fontbox.afm.AFMParser"))
 select new, v1
 
 define v1 ("6457864c2de606cb17c63fc6dde50c8295517497~1".."6457864c2de606cb17c63fc6dde50c8295517497~90")
