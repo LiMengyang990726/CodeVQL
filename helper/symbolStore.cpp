@@ -23,12 +23,20 @@ unordered_set<string> notExistSpecifiedVariable;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
-   symbolTable["MethodAccess"] = "(fqn: String, getMethod: String, version: Version)";
-   symbolTable["Method"] = "(fqn: String, hasName: String, hasClassName: String, getNumberOfParams: number, hasReturn: String, isConstructor: String, version: Version)";
+   symbolTable["MethodAccess"] = "(caller: String, getMethod: String, version: Version)";
+   symbolTable["Method"] = "(method: String, getName: String, getClassName: String, getNumberOfParams: number, getReturn: String, isConstructor: String, version: Version)";
    symbolTable["AbstractClass"] = "(fqn: String, version: Version)";
-   symbolTable["Reference"] = "(fqn: String, getReferee: String, version: Version)";
+   symbolTable["Reference"] = "(referer: String, getReferee: String, version: Version)";
    symbolTable["Version"] = "(version: Version)";
    return;
+}
+
+string getIdName(string type) {
+   vector<pair<string, string> > fieldPairs = destructDLDecl(symbolTable[type]);
+   if (fieldPairs.size() == 0 || fieldPairs[0].second != "String") {
+      yyerror("There is something wrong during the translation process: type does not have id field");
+   }
+   return fieldPairs[0].first;
 }
 
 string QLObjToDLDecl(string key) {
@@ -53,7 +61,7 @@ string QLObjToDLOutput(unordered_set<string> outputVars) {
                   resultPairs.push_back(make_pair(it->first, it->second));
                }
                continue;
-            } else if (it->first == "fqn") {
+            } else if (it->first == getIdName(type)) {
                resultPairs.push_back(make_pair(it->first, it->second));
             }
          }
@@ -71,8 +79,8 @@ string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
          vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
          // resultPairs.push_back(fieldPairs.begin()->first);
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-            if (findVarFieldReferredName(*iter, "fqn") != "") {
-               resultPairs.push_back(findVarFieldReferredName(*iter, "fqn"));
+            if (findVarFieldReferredName(*iter, fieldPairs[0].first) != "") {
+               resultPairs.push_back(findVarFieldReferredName(*iter, getIdName(type)));
             } else if (it->first == "version" && type == "Version") {
                resultPairs.push_back(*iter);
             }

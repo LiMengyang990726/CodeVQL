@@ -332,7 +332,9 @@ void translateSelect(struct ast *a)
     string nameStr = ((struct stringval *)name)->value;
     storeOutputVar(nameStr);
     if (findVarDeclaration(nameStr) != "Version") {
-        storeVarFieldReferenceTable(nameStr + ".fqn", "fqn" + nameStr);
+        string type = findVarDeclaration(nameStr);
+        string idName = getIdName(type);
+        storeVarFieldReferenceTable(nameStr + "." + idName, idName + nameStr);
     }
 
     if (a->childrencount == 1)
@@ -448,23 +450,28 @@ void translateComparison(struct ast *a)
                 writeNegationRule();
             }
             if (nextNameLen >= 2 && nextName[0] == '\"' && nextName[nextName.length()-1] == '\"') {
-                writeRule(nameStr, fieldStr, nextName);
+                if (nextNameLen == 3 && nextName[1] == '*') {
+                    writeRule(nameStr, fieldStr, "_");
+                } else {
+                    writeRule(nameStr, fieldStr, nextName);
+                }
             } else {
-                if (findVarFieldReferredName(nextName, "fqn") != "") {
+                string nextNameIdName = getIdName(findVarDeclaration(nextName));
+                if (findVarFieldReferredName(nextName, nextNameIdName) != "") {
                     if (findVarFieldReferredName(nameStr, fieldStr) != "") {
                         yyerror("The parser currently don't support this grammar");
                     } else {
-                        string referer = findVarFieldReferredName(nextName, "fqn");
+                        string referer = findVarFieldReferredName(nextName, nextNameIdName);
                         storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
                         writeRule(nameStr, fieldStr, referer);
                     }
                 } else if (findVarFieldReferredName(nameStr, fieldStr) != "") {
                     writeRule(nameStr, fieldStr, findVarFieldReferredName(nameStr, fieldStr));
-                    storeVarFieldReferenceTable(nextName + ".fqn", findVarFieldReferredName(nameStr, fieldStr));
+                    storeVarFieldReferenceTable(nextName + "." + nextNameIdName, findVarFieldReferredName(nameStr, fieldStr));
                 } else {
                     storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr);
                     writeRule(nameStr, fieldStr, "");
-                    storeVarFieldReferenceTable(nextName + ".fqn", fieldStr);
+                    storeVarFieldReferenceTable(nextName + "." + nextNameIdName, fieldStr);
                 }
             }
         } 

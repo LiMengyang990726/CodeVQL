@@ -11,6 +11,7 @@
 using namespace std;
 
 void initializeSymbolTable();
+string getIdName(string type);
 string QLObjToDLDecl(string key);
 string QLObjToDLOutput(unordered_set<string> outputVars);
 string QLObjToDLRuleBegin(unordered_set<string> outputVars);
