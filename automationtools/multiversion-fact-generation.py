@@ -67,6 +67,7 @@ os.chdir(os.path.join(output_path, "rules"))
 for file_name in result_sequence:
     command = "souffle -F " + os.path.join(os.path.join(output_path, ".facts"), "20-deps") + " " + file_name
     os.system(command)
+    os.remove(file_name)
 
 # Step 2: Check out each of the unique commit
 os.chdir(repo_path)
