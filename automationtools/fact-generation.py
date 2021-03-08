@@ -1,0 +1,73 @@
+import argparse
+import os
+import resource
+import sys
+import subprocess
+import shutil
+
+def validatePath(path):
+    if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
+        print('The path or file ' + path + ' specified does not exist')
+        sys.exit()
+
+# Create the parser
+runner = argparse.ArgumentParser(description='This script automate the process of generating program fact at specified version.')
+
+# Add the arguments
+runner.add_argument('--repo_path',
+                    type=str,
+                    help='the path to the program to be analyzed upon')
+runner.add_argument('--output_path',
+                    type=str,
+                    help='the path to the analysis output')   
+runner.add_argument('--cslicer_path',
+                    type=str,
+                    help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')            
+runner.add_argument('--commit',
+                    type=str,
+                    help='the commit id to generate fact upon')
+
+# Get all the input arguments and validate
+args = runner.parse_args()
+
+repo_path = args.repo_path
+validatePath(repo_path)
+
+output_path = args.output_path
+validatePath(output_path)
+
+cslicer_path = args.cslicer_path
+validatePath(cslicer_path)
+
+commit = args.commit
+
+# Execute
+# Step 1: Compile maven project
+os.chdir(repo_path)
+os.system('mvn compile')
+
+# Step 2: Create cslicer properties file
+os.system('touch cslicer.properties')
+os.system('echo "repoPath = %s/.git" >> cslicer.properties' % (repo_path))
+os.system('echo "classRoot = %s/target" >> cslicer.properties' % (repo_path))
+os.system('echo "endCommit = %s" >> cslicer.properties' % (commit))
+
+# Step 3: Run CSlicer to get fact files
+os.system('java -jar %s -c %s/cslicer.properties -e dl --ext dep' % (cslicer_path, repo_path))
+
+# Step 4: Append version to get versionised fact file
+for f in os.listdir(os.path.join(repo_path, ".facts/20-deps")):
+    file_name = os.path.join(os.path.join(repo_path, ".facts/20-deps"), f)
+    if os.path.isfile(file_name):
+        with open(file_name, 'r') as fr:
+            file_lines = [''.join([x.strip(), '\t' + commit, '\n']) for x in fr.readlines()]
+        with open(file_name, 'w') as fw:
+            fw.writelines(file_lines)
+        os.rename(file_name, os.path.join(os.path.join(output_path, ".facts/20-deps"), f))
+
+# Step 5: Remove intermediate files
+os.remove(os.path.join(repo_path, "cslicer.properties"))
+shutil.rmtree(os.path.join(repo_path, ".facts/20-deps"))
+
+usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+print(usage)

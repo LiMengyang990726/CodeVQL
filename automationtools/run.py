@@ -3,7 +3,6 @@ import os
 import sys
 import subprocess
 from subprocess import check_output
-import psutil
 from pyfiglet import Figlet
 
 def validatePath(path):
@@ -70,20 +69,16 @@ validatePath(cslicer_path)
 # Step 1: Generate Git Facts
 process = subprocess.Popen(
     'echo Step 1: Start generating git facts && \
-    %s/automationtools/gitfact-generation.sh --repo_path %s --gitfacts_path %s --output_path %s && \
+    python3.7 %s/automationtools/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
     echo Step 1 is done!' % (codeqltosouffle_path, repo_path, gitfacts_path, output_path), 
     shell=True
 )
-# subprocess.Popen(
-#     '[TODO]' % process.pid,
-#     shell=True
-# )
 process.wait()
 
 # Step 2: Translate CodeVQL to Souffle
 process = subprocess.Popen(
     'echo Step 2: Start translating CodeVQL to Souffle && \
-    %s/automationtools/translate.sh --query_file_path %s --codeqltosouffle_path %s --output_path %s && \
+    python3.7 %s/automationtools/translate.py --query_file_path %s --codeqltosouffle_path %s --output_path %s && \
     echo Step 2 is done!' % (codeqltosouffle_path, query_file_path, codeqltosouffle_path, output_path),
     shell=True
 )
@@ -92,7 +87,7 @@ process.wait()
 # Step 3: Get multiversion facts
 process = subprocess.Popen(
     'echo Step 3: Start Generating program facts in selected version && \
-    %s/automationtools/multiversion-fact-generation.sh --repo_path %s --cslicer_path %s --codeqltosouffle_path %s --output_path %s > /dev/null 2>&1 && \
+    python3.7 %s/automationtools/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codeqltosouffle_path %s --output_path %s > /dev/null 2>&1 && \
     echo Step 3 is done!' % (codeqltosouffle_path, repo_path, cslicer_path, codeqltosouffle_path, output_path),
     shell=True
 )
@@ -106,10 +101,3 @@ process = subprocess.Popen(
     shell=True
 )
 process.wait()
-
-# python3.7 run.py --repo_path /Users/limengyang/Workspaces/FinalYearProject/docker-maven-plugin \
-#          --gitfacts_path /Users/limengyang/Workspaces/FinalYearProject/ext-gitfacts \
-#          --output_path /Users/limengyang/Desktop/test4 \
-#          --query_file_path /Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle/tests/useCaseQueries/methodUnused.txt \
-#          --codeqltosouffle_path /Users/limengyang/Workspaces/FinalYearProject/codeqltosouffle \
-#          --cslicer_path /Users/limengyang/Workspaces/FinalYearProject/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar

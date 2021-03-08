@@ -1,6 +1,72 @@
 # CodeQLToSouffle
+## Install Prelimilaries
+In this manual, we assume that you are using a Linux system. Particular to this manual, it is run on a Ubuntu system.
 
-## To Compile the Code
-1. Run `make`. Then you will be able to see the executable file `codeqltosouffle`
-2. Create `/rules` folder under the root where the produced datalog files will be stored. If the folder already exists, **remember to empty the folder** as the result will be append to existing files.
-2. Run `./codeqltosouffle` to enter the interactive mode; or run `./codeqltosouffle input_file_name` to interprete a file (there are sample test files under `/tests/`).
+### Git Facts Generator (Please skip this if you already have it installed)
+1. Clone this [repo](https://github.com/uxhg/ext-gitfacts)
+2. Run the following command
+    ```
+    cd ext-gitfacts
+    cargo build --release
+    ```
+3. (Optional) You may need to install OpenSSL for cargo build to be successful. For Ubuntu system, run `sudo apt-get install libssl-dev`
+4. Verify if the build is successful, run `target/release/gitfacts -h`
+`
+### Program Facts Generator (Please skip this if you already have it installed)
+1. Install JDK 1.8, run `sudo apt-get install openjdk-8-jdk`
+2. Verify if the build is successful, run `java -version`
+3. (Optional) If you have multiple jdk versions, you can set JDK 1.8 to the default one, run `sudo update-alternatives --set java /usr/lib/jvm/<jdk_name>/bin/java`
+4. Install Maven, run `sudo apt install maven`
+5. Verify if maven is installed successfully, run `mvn -version` 
+6. Set environment variables, run `sudo nano /etc/profile.d/maven.sh`, and input the following
+```
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+export M2_HOME=/usr/share/maven
+export MAVEN_HOME=/usr/share/maven
+export PATH=${M2_HOME}/bin:${PATH}
+```
+7. Activate environment variables, run 
+```
+sudo chmod +x /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+```
+8. Clone gitslice, run `git clone git@bitbucket.org:liyistc/gitslice.git`
+9. Run the following commands
+```
+cd gitslice
+git checkout facts-dl4ql
+mvn clean install -DskipTests
+```
+
+## Start Using CodeVQL
+### CodeVQL Translator (Please skip this if you already have it installed)
+1. Install Python3.7, run `sudo apt install python3.7`
+2. Verify the installation is successful, run `python3.7 --version`
+3. Clone codeVQL, run `git clone git@github.com:LiMengyang990726/codeqltosouffle.git`
+4. Run the following commands
+```
+sudo apt-get install bison flex
+cd codeqltosouffle
+make
+```
+5. Install souffle, run 
+```
+echo "deb https://dl.bintray.com/souffle-lang/deb-unstable bionic main" | sudo tee -a /etc/apt/sources.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
+sudo apt-get update
+```
+If you are in a different operating system, please refer [here](https://souffle-lang.github.io/install) for more information.
+
+### Try out test case
+1. Install any repository you like and write a corresponding query file
+2. Run the following commands
+```
+cd automationtools
+python3.7 run.py --repo_path /home/mengyang/FYP/docker-maven-plugin \
+         --gitfacts_path /home/mengyang/FYP/ext-gitfacts \
+         --output_path /home/mengyang/test1 \
+         --query_file_path /home/mengyang/FYP/codeqltosouffle/tests/useCaseQueries/methodUnused.txt \
+         --codeqltosouffle_path /home/mengyang/FYP/codeqltosouffle \
+         --cslicer_path /home/mengyang/FYP/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar
+```
+
