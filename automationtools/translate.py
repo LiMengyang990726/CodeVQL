@@ -1,5 +1,6 @@
 import argparse
 import os
+import resource
 import sys
 import subprocess
 
@@ -46,3 +47,6 @@ process = subprocess.Popen(
     shell=True
 )
 process.wait()
+
+usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+print(usage)

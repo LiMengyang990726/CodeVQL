@@ -67,37 +67,29 @@ cslicer_path = args.cslicer_path
 validatePath(cslicer_path)
 
 # Step 1: Generate Git Facts
-process = subprocess.Popen(
+os.system(
     'echo Step 1: Start generating git facts && \
     python3.7 %s/automationtools/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
-    echo Step 1 is done!' % (codeqltosouffle_path, repo_path, gitfacts_path, output_path), 
-    shell=True
+    echo Step 1 is done!' % (codeqltosouffle_path, repo_path, gitfacts_path, output_path)
 )
-process.wait()
 
 # Step 2: Translate CodeVQL to Souffle
-process = subprocess.Popen(
+os.system(
     'echo Step 2: Start translating CodeVQL to Souffle && \
     python3.7 %s/automationtools/translate.py --query_file_path %s --codeqltosouffle_path %s --output_path %s && \
-    echo Step 2 is done!' % (codeqltosouffle_path, query_file_path, codeqltosouffle_path, output_path),
-    shell=True
+    echo Step 2 is done!' % (codeqltosouffle_path, query_file_path, codeqltosouffle_path, output_path)
 )
-process.wait()
 
 # Step 3: Get multiversion facts
-process = subprocess.Popen(
+os.system(
     'echo Step 3: Start Generating program facts in selected version && \
-    python3.7 %s/automationtools/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codeqltosouffle_path %s --output_path %s > /dev/null 2>&1 && \
-    echo Step 3 is done!' % (codeqltosouffle_path, repo_path, cslicer_path, codeqltosouffle_path, output_path),
-    shell=True
+    python3.7 %s/automationtools/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codeqltosouffle_path %s --output_path %s && \
+    echo Step 3 is done!' % (codeqltosouffle_path, repo_path, cslicer_path, codeqltosouffle_path, output_path)
 )
-process.wait()
 
 # Step 4: Analyze to get the result
-process = subprocess.Popen(
+os.system(
     'echo Step 4: Start analyzing the query && \
     mkdir %s/output && souffle -F %s/.facts/20-deps/ -D %s/output %s/rules/main.dl && \
-    echo Step 4 is done and program finished!' % (output_path, output_path, output_path, output_path),
-    shell=True
+    echo Step 4 is done and program finished!' % (output_path, output_path, output_path, output_path)
 )
-process.wait()
