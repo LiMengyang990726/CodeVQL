@@ -100,6 +100,6 @@ os.system(command)
 
 time_usage = end_time - start_time
 for subprocess_usage in subprocesses_usage:
-    time_usage += int(subprocess_usage.split("\t")[1])
+    time_usage += float(subprocess_usage.split("\t")[0])
 mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 print(str(time_usage) + "\t" + str(mem_usage))
