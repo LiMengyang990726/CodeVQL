@@ -53,4 +53,4 @@ end_time = time.time()
 
 time_usage = end_time - start_time
 mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(time_usage + "\t" + mem_usage)
+print(str(time_usage) + "\t" + str(mem_usage))
