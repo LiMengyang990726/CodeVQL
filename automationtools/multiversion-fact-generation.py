@@ -1,9 +1,10 @@
 import argparse
 import os
-import resource
 import sys
 import subprocess
 import re
+import resource
+import time
 
 def validatePath(path):
     if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
@@ -43,6 +44,7 @@ cslicer_path = args.cslicer_path
 validatePath(cslicer_path)
 
 # Step 1: Execute version related souffle files to generate facts in the required sequence
+start_time = time.time()
 result_sequence = []
 regex_from = re.compile('SelectedVersion[\w]+from\.dl')
 for f in os.listdir(os.path.join(output_path, "rules")):
@@ -81,6 +83,7 @@ with open(os.path.join(output_path, ".facts/20-deps/VersionComb.facts")) as fp:
     for i, line in enumerate(fp):
         commits.append(line.strip().split("\t")[0])
 commits = set(commits)
+end_time = time.time()
 
 subprocesses_usage = []
 for commit in commits:
@@ -89,12 +92,14 @@ for commit in commits:
         " --cslicer_path " + cslicer_path + \
         " --output_path " + output_path + \
         " --commit " + commit
-    usage = subprocess.check_output(command, shell=True)
+    usage = subprocess.check_output(command, shell=True).strip().decode("utf-8")
     subprocesses_usage.append(usage)
 
 command = "git checkout " + original_commit + "> /dev/null 2>&1"
 os.system(command)
 
-print(subprocesses_usage)
+time_usage = end_time - start_time
+for subprocess_usage in subprocesses_usage:
+    time_usage += int(subprocess_usage.split("\t")[1])
 mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(mem_usage)
+print(str(time_usage) + "\t" + str(mem_usage))
