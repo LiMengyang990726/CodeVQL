@@ -87,7 +87,7 @@ end_time = time.time()
 
 subprocesses_usage = []
 for commit in commits:
-    command = "python3.7 " + os.path.join(codeqltosouffle_path, "automationtools/fact-generation.py") + \
+    command = "python3.7 " + os.path.join(codeqltosouffle_path, "automationtools_py/fact-generation.py") + \
         " --repo_path " + repo_path + \
         " --cslicer_path " + cslicer_path + \
         " --output_path " + output_path + \

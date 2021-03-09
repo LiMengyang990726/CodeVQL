@@ -69,21 +69,21 @@ validatePath(cslicer_path)
 # Step 1: Generate Git Facts
 os.system(
     'echo Step 1: Start generating git facts && \
-    python3.7 %s/automationtools/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
+    python3.7 %s/automationtools_py/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
     echo Step 1 is done!' % (codeqltosouffle_path, repo_path, gitfacts_path, output_path)
 )
 
 # Step 2: Translate CodeVQL to Souffle
 os.system(
     'echo Step 2: Start translating CodeVQL to Souffle && \
-    python3.7 %s/automationtools/translate.py --query_file_path %s --codeqltosouffle_path %s --output_path %s && \
+    python3.7 %s/automationtools_py/translate.py --query_file_path %s --codeqltosouffle_path %s --output_path %s && \
     echo Step 2 is done!' % (codeqltosouffle_path, query_file_path, codeqltosouffle_path, output_path)
 )
 
 # Step 3: Get multiversion facts
 os.system(
     'echo Step 3: Start Generating program facts in selected version && \
-    python3.7 %s/automationtools/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codeqltosouffle_path %s --output_path %s && \
+    python3.7 %s/automationtools_py/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codeqltosouffle_path %s --output_path %s && \
     echo Step 3 is done!' % (codeqltosouffle_path, repo_path, cslicer_path, codeqltosouffle_path, output_path)
 )
 
