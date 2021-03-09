@@ -1,8 +1,9 @@
 import argparse
 import os
-import resource
 import sys
 import subprocess
+import resource
+import time
 
 def validatePath(path):
     if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
@@ -36,6 +37,7 @@ codeqltosouffle_path = args.codeqltosouffle_path
 validatePath(codeqltosouffle_path)
 
 # Execute
+start_time = time.time()
 process = subprocess.Popen(
     'cd %s && mkdir -p rules && ./codeqltosouffle %s' % (codeqltosouffle_path, query_file_path), 
     shell=True
@@ -47,6 +49,8 @@ process = subprocess.Popen(
     shell=True
 )
 process.wait()
+end_time = time.time()
 
-usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(usage)
+time_usage = end_time - start_time
+mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+print(time_usage + "\t" + mem_usage)

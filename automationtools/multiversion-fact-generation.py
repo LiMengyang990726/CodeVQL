@@ -67,7 +67,10 @@ os.chdir(os.path.join(output_path, "rules"))
 for file_name in result_sequence:
     command = "souffle -F " + os.path.join(os.path.join(output_path, ".facts"), "20-deps") + " " + file_name
     os.system(command)
-    os.remove(file_name)
+for file_name in result_sequence:
+    f = os.path.join(os.path.join(output_path, "rules"),file_name)
+    if os.path.isfile(f):
+        os.remove(f)
 
 # Step 2: Check out each of the unique commit
 os.chdir(repo_path)
@@ -79,16 +82,19 @@ with open(os.path.join(output_path, ".facts/20-deps/VersionComb.facts")) as fp:
         commits.append(line.strip().split("\t")[0])
 commits = set(commits)
 
+subprocesses_usage = []
 for commit in commits:
     command = "python3.7 " + os.path.join(codeqltosouffle_path, "automationtools/fact-generation.py") + \
         " --repo_path " + repo_path + \
         " --cslicer_path " + cslicer_path + \
         " --output_path " + output_path + \
         " --commit " + commit
-    os.system(command)
+    usage = subprocess.check_output(command, shell=True)
+    subprocesses_usage.append(usage)
 
-command = "git checkout " + original_commit
+command = "git checkout " + original_commit + "> /dev/null 2>&1"
 os.system(command)
 
-usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(usage)
+print(subprocesses_usage)
+mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+print(mem_usage)

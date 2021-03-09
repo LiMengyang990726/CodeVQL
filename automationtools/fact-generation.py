@@ -1,9 +1,10 @@
 import argparse
 import os
-import resource
 import sys
 import subprocess
 import shutil
+import resource
+import time
 
 def validatePath(path):
     if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
@@ -44,7 +45,7 @@ commit = args.commit
 # Execute
 # Step 1: Compile maven project
 os.chdir(repo_path)
-os.system('mvn compile')
+os.system('mvn compile > /dev/null 2>&1')
 
 # Step 2: Create cslicer properties file
 os.system('touch cslicer.properties')
@@ -53,7 +54,9 @@ os.system('echo "classRoot = %s/target" >> cslicer.properties' % (repo_path))
 os.system('echo "endCommit = %s" >> cslicer.properties' % (commit))
 
 # Step 3: Run CSlicer to get fact files
-os.system('java -jar %s -c %s/cslicer.properties -e dl --ext dep' % (cslicer_path, repo_path))
+start_time = time.time()
+os.system('java -jar %s -c %s/cslicer.properties -e dl --ext dep > /dev/null 2>&1' % (cslicer_path, repo_path))
+end_time = time.time()
 
 # Step 4: Append version to get versionised fact file
 for f in os.listdir(os.path.join(repo_path, ".facts/20-deps")):
@@ -69,5 +72,6 @@ for f in os.listdir(os.path.join(repo_path, ".facts/20-deps")):
 os.remove(os.path.join(repo_path, "cslicer.properties"))
 shutil.rmtree(os.path.join(repo_path, ".facts/20-deps"))
 
-usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(usage)
+time_usage = end_time - start_time
+mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+print(time_usage + "\t" + mem_usage)
