@@ -13,6 +13,6 @@ old.getMethod() = method.method() and method.getName() = "getBatchSize" and meth
 new.getMethod() = method.method() and method.getName() = "getBatchSize" and method.getClassName() = "org.apache.flume.api.RpcClient")
 select new, v1
 
-define v1 ("c8eefbe403409c198b0eb55ab27bf90585299326~1".."c8eefbe403409c198b0eb55ab27bf90585299326~30")
-define v2 "c8eefbe403409c198b0eb55ab27bf90585299326"
-define v3 ("c8eefbe403409c198b0eb55ab27bf90585299326".."c8eefbe403409c198b0eb55ab27bf90585299326~30")
+define v1 ("adc7d81b1a154f009e94e4600e543806a61c7c36~1".."adc7d81b1a154f009e94e4600e543806a61c7c36~30")
+define v2 "adc7d81b1a154f009e94e4600e543806a61c7c36"
+define v3 ("adc7d81b1a154f009e94e4600e543806a61c7c36".."adc7d81b1a154f009e94e4600e543806a61c7c36~30")

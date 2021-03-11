@@ -8,5 +8,5 @@ range old @ v1, new @ v2
 where exists (old, new that old.method()=new.method() and old.getReturn() = "void" and new.getReturn() != "void")
 select new, v2
 
-define v1 ("c8eefbe403409c198b0eb55ab27bf90585299326~1".."c8eefbe403409c198b0eb55ab27bf90585299326~10")
-define v2 "c8eefbe403409c198b0eb55ab27bf90585299326"
+define v1 ("adc7d81b1a154f009e94e4600e543806a61c7c36~1".."adc7d81b1a154f009e94e4600e543806a61c7c36~10")
+define v2 "adc7d81b1a154f009e94e4600e543806a61c7c36"
