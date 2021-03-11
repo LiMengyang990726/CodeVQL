@@ -5,7 +5,7 @@ import java
 
 from Method old, Method new
 range old @ v1, new @ v2
-where exists (old, new that old.fqn()=new.fqn() and old.hasReturn("void") and not new.hasReturn("void"))
+where exists (old, new that old.method()=new.method() and old.getReturn() = "void" and new.getReturn() != "void")
 select new, v2
 
 define v1 ("c8eefbe403409c198b0eb55ab27bf90585299326~1".."c8eefbe403409c198b0eb55ab27bf90585299326~10")
