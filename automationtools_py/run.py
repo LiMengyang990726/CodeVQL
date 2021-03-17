@@ -2,6 +2,8 @@ import argparse
 import os
 import sys
 import subprocess
+import resource
+import time
 from subprocess import check_output
 from pyfiglet import Figlet
 
@@ -90,6 +92,5 @@ os.system(
 # Step 4: Analyze to get the result
 os.system(
     'echo Step 4: Start analyzing the query && \
-    mkdir %s/output && souffle -F %s/.facts/20-deps/ -D %s/output %s/rules/main.dl && \
-    echo Step 4 is done and program finished!' % (output_path, output_path, output_path, output_path)
-)
+    python3.7 %s/automationtools_py/query-analysis.py --output_path %s && \
+    echo Step 4 is done and program finished!' % (codeqltosouffle_path, output_path))
