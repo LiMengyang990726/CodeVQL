@@ -3,6 +3,7 @@
 #include <string>
 #include <regex>
 #include <unordered_map>
+#include <unordered_set>
 #include "populateVersionDL.h"
 #include "constants.h"
 #include "utils.h"
@@ -19,7 +20,7 @@
 using namespace std;
 
 int numVersions = 1;
-bool isCommitDistDeclared = false;
+unordered_set<string> commitDistDeclaredForFile;
 
 void writeVersionsCombination(vector<string> inputs)
 {
@@ -141,7 +142,6 @@ void writeVersionDL(string varName, int type, vector<string> versions)
                 int n = 0;
                 ss >> n;
                 writeVersionDLNthAncestor(filename, varName, commitId, n);
-                isCommitDistDeclared = true;
             }
             else if (regex_match(version, regex(NTH_PARENT_REGEX)))
             {
@@ -270,12 +270,13 @@ void writeVersionDLNthAncestor(string filename, string varName, string commitId,
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
 
-    if (!isCommitDistDeclared)
+    if (commitDistDeclaredForFile.find(filename) == commitDistDeclaredForFile.end())
     {
         versionDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
         versionDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), Parent(y, x, 0)." << endl
                   << endl;
         versionDL << "CommitDist(" << commitId << ", " << commitId << ", 0)." << endl;
+        commitDistDeclaredForFile.insert(filename);
     }
 
     versionDL << VARNAME_PREFIX << varName << "(version) :- CommitDist(" << commitId << ", version, " << n << ")." << endl

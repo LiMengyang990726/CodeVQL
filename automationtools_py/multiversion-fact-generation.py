@@ -81,8 +81,9 @@ original_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().
 commits = []
 with open(os.path.join(output_path, ".facts/20-deps/VersionComb.facts")) as fp:
     for i, line in enumerate(fp):
-        commits.append(line.strip().split("\t")[0])
+        commits.extend(line.strip().split("\t"))
 commits = set(commits)
+print(",".join(map(str, commits)))
 end_time = time.time()
 
 subprocesses_usage = []

@@ -44,6 +44,7 @@ commit = args.commit
 
 # Execute
 # Step 1: Compile maven project
+os.system("git checkout " + commit + "> /dev/null 2>&1")
 os.chdir(repo_path)
 os.system('mvn compile > /dev/null 2>&1')
 
@@ -66,7 +67,11 @@ for f in os.listdir(os.path.join(repo_path, ".facts/20-deps")):
             file_lines = [''.join([x.strip(), '\t' + commit, '\n']) for x in fr.readlines()]
         with open(file_name, 'w') as fw:
             fw.writelines(file_lines)
-        os.rename(file_name, os.path.join(os.path.join(output_path, ".facts/20-deps"), f))
+        original_file = open(file_name, 'r')
+        new_location_file = open(os.path.join(os.path.join(output_path, ".facts/20-deps"), f), 'a+')
+        new_location_file.write(original_file.read())
+        original_file.close()
+        new_location_file.close()
 
 # Step 5: Remove intermediate files
 os.remove(os.path.join(repo_path, "cslicer.properties"))
