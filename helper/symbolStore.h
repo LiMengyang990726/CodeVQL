@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <cstring>
@@ -21,7 +22,7 @@ string findVarDeclaration(string name);
 
 void storeVersionDeclarationTable(string name);
 bool findVersionDeclaration(string name);
-unordered_set<string> getVersions();
+vector<string> getVersions();
 
 void storeVersionVarAssociationTable(string version, string name);
 string findVersionVarAssociation(string name);

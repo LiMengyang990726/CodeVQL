@@ -481,15 +481,14 @@ void translateComparison(struct ast *a)
             string lFieldStr = ((struct stringval *)l->children[1])->value;
             string rNameStr = ((struct stringval *)r->children[0])->value;
             string rFieldStr = ((struct stringval *)r->children[1])->value;
-            storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, lFieldStr + lNameStr);
-            storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, rFieldStr + rNameStr);
-            if (comparison == "=")
-            {
-                writeEquality(lFieldStr + lNameStr, rFieldStr + rNameStr);
+            // left is assigned to right
+            if (comparison == "=") {
+                storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, rFieldStr + rNameStr);
+                storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, rFieldStr + rNameStr);  
             } else {
-                writeInequality(lFieldStr + lNameStr, rFieldStr + rNameStr);
+                storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, "!" + rFieldStr + rNameStr);
+                storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, rFieldStr + rNameStr);
             }
-            writeParallelRule();
             writeRule(lNameStr, lFieldStr, "");
             writeParallelRule();
             writeRule(rNameStr, rFieldStr, "");

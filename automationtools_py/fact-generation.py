@@ -44,15 +44,14 @@ commit = args.commit
 
 # Execute
 # Step 1: Compile maven project
-os.system("git checkout " + commit + "> /dev/null 2>&1")
 os.chdir(repo_path)
+os.system("git checkout " + commit + "> /dev/null 2>&1")
 os.system('mvn compile > /dev/null 2>&1')
 
 # Step 2: Create cslicer properties file
 os.system('touch cslicer.properties')
 os.system('echo "repoPath = %s/.git" >> cslicer.properties' % (repo_path))
 os.system('echo "classRoot = %s/target" >> cslicer.properties' % (repo_path))
-os.system('echo "endCommit = %s" >> cslicer.properties' % (commit))
 
 # Step 3: Run CSlicer to get fact files
 start_time = time.time()

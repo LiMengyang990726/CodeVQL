@@ -43,8 +43,8 @@ void writeVersionComb() {
     mainDLFile << ".decl VersionComb(";  
 
     string result = "";
-    unordered_set<string> versions = getVersions(); 
-    for (auto it = versions.begin(); it != versions.end(); it++) {
+    vector<string> versions = getVersions(); 
+    for (auto it = versions.rbegin(); it != versions.rend(); it++) {
         result += *it;
         result += ": Version, ";
     }
@@ -147,8 +147,8 @@ void writeRule(string name, string field, string value) {
 
     if (!isVersionCombWritten) {
         result += "VersionComb(";
-        unordered_set<string> versions = getVersions(); 
-        for (auto it = versions.begin(); it != versions.end(); it++) {
+        vector<string> versions = getVersions(); 
+        for (auto it = versions.rbegin(); it != versions.rend(); it++) {
             result += *it;
             result += ", ";
         }
@@ -160,23 +160,41 @@ void writeRule(string name, string field, string value) {
     if (isVariableSpecifiedInNotExist(name)) {
         result += "!";
     }
+
+    for (pair<string, string> fieldPair : fieldsVector) {
+        string currField = fieldPair.first.c_str();
+        string referedName = findVarFieldReferredName(name, currField);
+        if (referedName != "" && referedName[0] == '!') {
+            result += "!";
+        }
+    }
     
     result += type;
 
     result += "(";
     for (pair<string, string> fieldPair : fieldsVector) {
-        string currFieldCharP = fieldPair.first.c_str();
-        if (currFieldCharP == field) {
+        string currField = fieldPair.first.c_str();
+        if (currField == field) {
             if (value.empty()) {
-                result += findVarFieldReferredName(name, currFieldCharP);
+                string referedName = findVarFieldReferredName(name, currField);
+                if (referedName[0] == '!') {
+                    result += referedName.substr(1,referedName.length()-1);
+                } else {
+                    result += referedName;
+                }
             } else if (value != "any") {
                 result += value;
             } else if (value == "any") {
                 result += "_";
             }
-        } else if (findVarFieldReferredName(name, currFieldCharP) != "") {
-            result += findVarFieldReferredName(name, currFieldCharP);
-        } else if (currFieldCharP == "version") {
+        } else if (findVarFieldReferredName(name, currField) != "") {
+            string referedName = findVarFieldReferredName(name, currField);
+            if (referedName[0] == '!') {
+                result += referedName.substr(1,referedName.length()-1);
+            } else {
+                result += referedName;
+            }
+        } else if (currField == "version") {
             result += version; 
         } else {
             result += "_";

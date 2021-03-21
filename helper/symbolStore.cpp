@@ -13,7 +13,7 @@ using namespace std;
 
 unordered_map<string, string> symbolTable;
 unordered_map<string, string> varDeclarationTable;
-unordered_set<string> versionDeclarationSet;
+vector<string> versionDeclarationVec;
 unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, string> ruleReferenceTable;
 unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
@@ -105,15 +105,20 @@ string findVarDeclaration(string name) {
 
 /* APIs for Version Declaration Table */
 void storeVersionDeclarationTable(string name) {
-   versionDeclarationSet.insert(name);
+   versionDeclarationVec.push_back(name);
 }
 
 bool findVersionDeclaration(string name) {
-   return versionDeclarationSet.find(name) != versionDeclarationSet.end();
+   for (int i = 0; i < versionDeclarationVec.size(); i++) {
+      if (versionDeclarationVec[i] == name) {
+         return true;
+      }
+   }
+   return false;
 }
 
-unordered_set<string> getVersions() {
-   return versionDeclarationSet;
+vector<string> getVersions() {
+   return versionDeclarationVec;
 }
 
 /* APIs for Version Variable Association Table */
