@@ -5,7 +5,7 @@ import java
 
 from Method old, Method new
 range old @ v1, new @ v2
-where exists (old, new that old.method()=new.method() and old.getNumberOfParams() != new.getNumberOfParams())
+where exists (old, new that old.getName()=new.getName() and old.getClassName()=new.getClassName() and old.getNumberOfParams() != new.getNumberOfParams())
 select new, v2
 
 define v1 ("bf2f8093a49a3432be62e9fdae073e82ac78bd04~1".."bf2f8093a49a3432be62e9fdae073e82ac78bd04~30")
