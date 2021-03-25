@@ -19,7 +19,7 @@ void yyerror(char *s, ...) {
   fprintf(stderr, "\n");
 }
 
-vector<pair<string, string> > destructDLDecl(string fields) {
+vector<pair<string, string> > destructSouffleDecl(string fields) {
     fields = fields.substr(1, fields.length()-1);
     vector<pair<string, string> > result;
     stringstream ss(fields);
@@ -37,7 +37,7 @@ vector<pair<string, string> > destructDLDecl(string fields) {
     return result;
 }
 
-string constructDLDecl(vector<pair<string, string> > fieldPairs) {
+string constructSouffleDecl(vector<pair<string, string> > fieldPairs) {
     string result = "(";
     unordered_set<string> seenFields;
     for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
@@ -52,7 +52,7 @@ string constructDLDecl(vector<pair<string, string> > fieldPairs) {
     return result;
 }
 
-string constructDLRuleBegin(vector<string> fields) {
+string constructSouffleRuleBegin(vector<string> fields) {
     string result = "(";
     unordered_set<string> seenFields;
     for (string field : fields) {

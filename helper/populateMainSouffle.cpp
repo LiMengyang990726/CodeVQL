@@ -5,7 +5,7 @@
 #include <cstring>
 #include <vector>
 #include <sstream>
-#include "populateMainDL.h"
+#include "populateMainSouffle.h"
 #include "constants.h"
 #include "symbolStore.h"
 #include "utils.h"
@@ -59,14 +59,14 @@ void writeVersionComb() {
 void writeDecl(string type) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl " << type << QLObjToDLDecl(type) << endl;
+    mainDLFile << ".decl " << type << CodeVQLObjToSouffleDecl(type) << endl;
     mainDLFile.close();
 }
 
 void writeOutputDecl() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl " << OUTPUT_NAME << QLObjToDLOutput(getOutputVars()) << endl;
+    mainDLFile << ".decl " << OUTPUT_NAME << CodeVQLObjToSouffleOutput(getoutputVarsSet()) << endl;
     mainDLFile.close();
 }
 
@@ -87,7 +87,7 @@ void writeOutput() {
 void writeRuleBegin() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << OUTPUT_NAME << QLObjToDLRuleBegin(getOutputVars()) << ":- ";
+    mainDLFile << OUTPUT_NAME << CodeVQLObjToSouffleRuleBegin(getoutputVarsSet()) << ":- ";
     mainDLFile.close();
 }
 
@@ -140,8 +140,8 @@ void writeRule(string name, string field, string value) {
     string type = findVarDeclaration(name);
     string version = findVersionVarAssociation(name);
 
-    string fields = QLObjToDLDecl(type);
-    vector<pair<string, string> > fieldsVector = destructDLDecl(fields);
+    string fields = CodeVQLObjToSouffleDecl(type);
+    vector<pair<string, string> > fieldsVector = destructSouffleDecl(fields);
 
     string result = "";
 

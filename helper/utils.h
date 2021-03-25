@@ -11,8 +11,8 @@
 using namespace std;
 
 void yyerror(char *s, ...);
-vector<pair<string, string> > destructDLDecl(string fields);
-string constructDLDecl(vector<pair<string, string> > fieldPairs);
-string constructDLRuleBegin(vector<string> fields);
+vector<pair<string, string> > destructSouffleDecl(string fields);
+string constructSouffleDecl(vector<pair<string, string> > fieldPairs);
+string constructSouffleRuleBegin(vector<string> fields);
 
 #endif

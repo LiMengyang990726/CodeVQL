@@ -7,7 +7,7 @@
 #include <vector>
 #include <sstream>
 #include "symbolStore.h"
-#include "populateMainDL.h"
+#include "populateMainSouffle.h"
 #include "utils.h"
 using namespace std;
 
@@ -15,11 +15,10 @@ unordered_map<string, string> symbolTable;
 unordered_map<string, string> varDeclarationTable;
 vector<string> versionDeclarationVec;
 unordered_map<string, string> versionVarAssocTable;
-unordered_map<string, string> ruleReferenceTable;
 unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
 unordered_set<string> typeDeclarationSet;
-unordered_set<string> outputVars;
-unordered_set<string> notExistSpecifiedVariable;
+unordered_set<string> outputVarsSet;
+unordered_set<string> notExistSpecifiedVarsSet;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
@@ -32,28 +31,28 @@ void initializeSymbolTable() {
 }
 
 string getIdName(string type) {
-   vector<pair<string, string> > fieldPairs = destructDLDecl(symbolTable[type]);
+   vector<pair<string, string> > fieldPairs = destructSouffleDecl(symbolTable[type]);
    if (fieldPairs.size() == 0 || fieldPairs[0].second != "String") {
       yyerror("There is something wrong during the translation process: type does not have id field");
    }
    return fieldPairs[0].first;
 }
 
-string QLObjToDLDecl(string key) {
+string CodeVQLObjToSouffleDecl(string type) {
    string result = "";
-   if (symbolTable.find(key) != symbolTable.end()) {
-      result = symbolTable[key];
+   if (symbolTable.find(type) != symbolTable.end()) {
+      result = symbolTable[type];
    } 
    return result;
 }
 
-string QLObjToDLOutput(unordered_set<string> outputVars) {
+string CodeVQLObjToSouffleOutput(unordered_set<string> outputVarsSet) {
    vector<pair<string, string> > resultPairs;
-   for (auto iter = outputVars.begin(); iter != outputVars.end(); iter++) {
+   for (auto iter = outputVarsSet.begin(); iter != outputVarsSet.end(); iter++) {
       string type = findVarDeclaration(*iter);
       if (symbolTable.find(type) != symbolTable.end()) {
          string intermediateResult = symbolTable[type];
-         vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+         vector<pair<string, string> > fieldPairs = destructSouffleDecl(intermediateResult);
          // resultPairs.push_back(make_pair(fieldPairs.begin()->first, fieldPairs.begin()->second));
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
             if (it->first == "version") {
@@ -67,16 +66,16 @@ string QLObjToDLOutput(unordered_set<string> outputVars) {
          }
       }
    }
-   return constructDLDecl(resultPairs);
+   return constructSouffleDecl(resultPairs);
 }
 
-string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
+string CodeVQLObjToSouffleRuleBegin(unordered_set<string> outputVarsSet) {
    vector<string> resultPairs;
-   for (auto iter = outputVars.begin(); iter != outputVars.end(); iter++) {
+   for (auto iter = outputVarsSet.begin(); iter != outputVarsSet.end(); iter++) {
       string type = findVarDeclaration(*iter);
       if (symbolTable.find(type) != symbolTable.end()) {
          string intermediateResult = symbolTable[type];
-         vector<pair<string, string> > fieldPairs = destructDLDecl(intermediateResult);
+         vector<pair<string, string> > fieldPairs = destructSouffleDecl(intermediateResult);
          // resultPairs.push_back(fieldPairs.begin()->first);
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
             if (findVarFieldReferredName(*iter, fieldPairs[0].first) != "") {
@@ -87,7 +86,7 @@ string QLObjToDLRuleBegin(unordered_set<string> outputVars) {
          }
       }
    }
-   return constructDLRuleBegin(resultPairs);
+   return constructSouffleRuleBegin(resultPairs);
 }
 
 /* APIs for Var Declaration Table */
@@ -108,7 +107,7 @@ void storeVersionDeclarationTable(string name) {
    versionDeclarationVec.push_back(name);
 }
 
-bool findVersionDeclaration(string name) {
+bool isVersionDeclared(string name) {
    for (int i = 0; i < versionDeclarationVec.size(); i++) {
       if (versionDeclarationVec[i] == name) {
          return true;
@@ -175,22 +174,22 @@ bool isTypeDeclared(string type) {
 
 /* APIs for handling output related things */
 void storeOutputVar(string output) {
-    outputVars.insert(output);
+    outputVarsSet.insert(output);
 }
 
-unordered_set<string> getOutputVars() {
-   return outputVars;
+unordered_set<string> getoutputVarsSet() {
+   return outputVarsSet;
 }
 
 /* APIs for storing and searching in NOT EXIST reasoning opts in WHERE clause */
-void storeNotExistSpecifiedVariable(string name) {
-   notExistSpecifiedVariable.insert(name);
+void storenotExistSpecifiedVarsSet(string name) {
+   notExistSpecifiedVarsSet.insert(name);
 }
 
-void clearNotExistSpecifiedVariable() {
-   notExistSpecifiedVariable.clear();
+void clearnotExistSpecifiedVarsSet() {
+   notExistSpecifiedVarsSet.clear();
 }
 
 bool isVariableSpecifiedInNotExist(string name) {
-   return (notExistSpecifiedVariable.find(name) != notExistSpecifiedVariable.end());
+   return (notExistSpecifiedVarsSet.find(name) != notExistSpecifiedVarsSet.end());
 }

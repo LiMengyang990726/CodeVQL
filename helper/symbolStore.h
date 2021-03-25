@@ -13,15 +13,15 @@ using namespace std;
 
 void initializeSymbolTable();
 string getIdName(string type);
-string QLObjToDLDecl(string key);
-string QLObjToDLOutput(unordered_set<string> outputVars);
-string QLObjToDLRuleBegin(unordered_set<string> outputVars);
+string CodeVQLObjToSouffleDecl(string type);
+string CodeVQLObjToSouffleOutput(unordered_set<string> outputVarsSet);
+string CodeVQLObjToSouffleRuleBegin(unordered_set<string> outputVarsSet);
 
 void storeVarDeclarationTable(string type, string name);
 string findVarDeclaration(string name);
 
 void storeVersionDeclarationTable(string name);
-bool findVersionDeclaration(string name);
+bool isVersionDeclared(string name);
 vector<string> getVersions();
 
 void storeVersionVarAssociationTable(string version, string name);
@@ -34,10 +34,10 @@ void storeDeclaredType(string type);
 bool isTypeDeclared(string type);
 
 void storeOutputVar(string output);
-unordered_set<string> getOutputVars();
+unordered_set<string> getoutputVarsSet();
 
-void storeNotExistSpecifiedVariable(string name);
-void clearNotExistSpecifiedVariable();
+void storenotExistSpecifiedVarsSet(string name);
+void clearnotExistSpecifiedVarsSet();
 bool isVariableSpecifiedInNotExist(string name);
 
 #endif

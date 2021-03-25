@@ -6,9 +6,9 @@
 #include "constants.h"
 #include "nodetype.h"
 #include "symbolStore.h"
-#include "populateMainDL.h"
-#include "populateRelDL.h"
-#include "populateVersionDL.h"
+#include "populateMainSouffle.h"
+#include "populateRelSouffle.h"
+#include "populateVersionSouffle.h"
 #include "utils.h"
 #include "ASTNode.h"
 #include "translate.h"
@@ -229,7 +229,7 @@ void translateRange(struct ast *a, vector<string>& versions)
     string varNameStr = ((struct stringval *)varName)->value;
     struct ast *versionName = a->children[1];
     string versionNameStr = ((struct stringval *)versionName)->value;
-    if (!findVersionDeclaration(versionNameStr)) {
+    if (!isVersionDeclared(versionNameStr)) {
         yyerror("version is not defined");
         return;
     }
@@ -294,7 +294,7 @@ void translateWhere(struct ast *a)
         translateFormula(a->children[2]);
     } else if (reasonStr == "not exist") {
         for (string reasonOpt : reasonOpts) {
-            storeNotExistSpecifiedVariable(reasonOpt);
+            storenotExistSpecifiedVarsSet(reasonOpt);
         }
         translateFormula(a->children[2]);
     } else if (reasonStr == "forall") {
@@ -308,7 +308,7 @@ void translateWhere(struct ast *a)
         return;
     } else {
         writeParallelRule(); // between where clauses, can only be "AND" for now
-        clearNotExistSpecifiedVariable();
+        clearnotExistSpecifiedVarsSet();
         translateWhere(a->children[3]);
         return;
     }

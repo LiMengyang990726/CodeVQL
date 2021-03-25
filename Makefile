@@ -28,13 +28,13 @@ ${HELPER}/ASTNode.o: ${HELPER}/ASTNode.cpp
 ${HELPER}/translate.o: ${HELPER}/translate.cpp
 	${CC} $< -o $@ -c
 
-${HELPER}/populateMainDL.o: ${HELPER}/populateMainDL.cpp
+${HELPER}/populateMainSouffle.o: ${HELPER}/populateMainSouffle.cpp
 	${CC} $< -o $@ -c
 
-${HELPER}/populateRelDL.o: ${HELPER}/populateRelDL.cpp
+${HELPER}/populateRelSouffle.o: ${HELPER}/populateRelSouffle.cpp
 	${CC} $< -o $@ -c
 
-${HELPER}/populateVersionDL.o: ${HELPER}/populateVersionDL.cpp
+${HELPER}/populateVersionSouffle.o: ${HELPER}/populateVersionSouffle.cpp
 	${CC} $< -o $@ -c
 
 ${HELPER}/symbolStore.o: ${HELPER}/symbolStore.cpp
@@ -48,9 +48,9 @@ ${PROGRAM}: ${PROGRAM}.tab.o \
 			lex.yy.o \
 			${HELPER}/ASTNode.o \
 			${HELPER}/translate.o \
-			${HELPER}/populateMainDL.o \
-			${HELPER}/populateRelDL.o \
-			${HELPER}/populateVersionDL.o \
+			${HELPER}/populateMainSouffle.o \
+			${HELPER}/populateRelSouffle.o \
+			${HELPER}/populateVersionSouffle.o \
 			${HELPER}/symbolStore.o \
 			${HELPER}/utils.o 
 	${CC} -o $@ $^
@@ -64,8 +64,8 @@ clean:
 		  lex.yy.o \
 		  ${HELPER}/ASTNode.o \
 		  ${HELPER}/translate.o \
-		  ${HELPER}/populateMainDL.o \
-		  ${HELPER}/populateRelDL.o \
-		  ${HELPER}/populateVersionDL.o \
+		  ${HELPER}/populateMainSouffle.o \
+		  ${HELPER}/populateRelSouffle.o \
+		  ${HELPER}/populateVersionSouffle.o \
 		  ${HELPER}/symbolStore.o \
 		  ${HELPER}/utils.o 
