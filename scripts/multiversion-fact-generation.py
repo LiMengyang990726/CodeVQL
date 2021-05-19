@@ -21,9 +21,9 @@ runner.add_argument('--repo_path',
 runner.add_argument('--output_path',
                     type=str,
                     help='the path to the analysis output')   
-runner.add_argument('--codeqltosouffle_path',
+runner.add_argument('--translator_path',
                     type=str,
-                    help='the path to the translator from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/codeqltosouffle/)')
+                    help='the path to the translator from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/translator/)')
 runner.add_argument('--cslicer_path',
                     type=str,
                     help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')            
@@ -37,8 +37,8 @@ validatePath(repo_path)
 output_path = args.output_path
 validatePath(output_path)
 
-codeqltosouffle_path = args.codeqltosouffle_path
-validatePath(codeqltosouffle_path)
+translator_path = args.translator_path
+validatePath(translator_path)
 
 cslicer_path = args.cslicer_path
 validatePath(cslicer_path)
@@ -87,7 +87,7 @@ end_time = time.time()
 
 subprocesses_usage = []
 for commit in commits:
-    command = "python3.7 " + os.path.join(codeqltosouffle_path, "automationtools_py/fact-generation.py") + \
+    command = "python3.7 " + os.path.join(translator_path, "scripts/fact-generation.py") + \
         " --repo_path " + repo_path + \
         " --cslicer_path " + cslicer_path + \
         " --output_path " + output_path + \

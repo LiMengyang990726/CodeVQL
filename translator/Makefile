@@ -3,7 +3,7 @@ BISONFLAGS = d
 FLEX = flex
 CC = g++
 
-PROGRAM = codeqltosouffle
+PROGRAM = translator
 HELPER = helper
 
 .PHONY : clean

@@ -50,3 +50,7 @@ dkms.conf
 
 .DS_Store
 .vscode
+translator
+translator.tab.c
+translator.tab.h
+lex.yy.c

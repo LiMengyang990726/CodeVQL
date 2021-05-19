@@ -1,4 +1,4 @@
-# CodeQLToSouffle
+# Get Started With CodeVQL
 ## Install Prelimilaries
 In this manual, we assume that you are using a Linux system. Particular to this manual, it is run on a Ubuntu system.
 
@@ -37,19 +37,7 @@ cd gitslice
 git checkout facts-dl4ql
 mvn clean install -DskipTests
 ```
-
-## Start Using CodeVQL
-### CodeVQL Translator (Please skip this if you already have it installed)
-1. Install Python3.7, run `sudo apt install python3.7`
-2. Verify the installation is successful, run `python3.7 --version`
-3. Clone codeVQL, run `git clone git@github.com:LiMengyang990726/codeqltosouffle.git`
-4. Run the following commands
-```
-sudo apt-get install bison flex
-cd codeqltosouffle
-make
-```
-5. Install souffle, run 
+### Soufflé
 ```
 echo "deb https://dl.bintray.com/souffle-lang/deb-unstable bionic main" | sudo tee -a /etc/apt/sources.list
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
@@ -57,16 +45,20 @@ sudo apt-get update
 ```
 If you are in a different operating system, please refer [here](https://souffle-lang.github.io/install) for more information.
 
-### Try out test case
+### CodeVQL Translator
+Please refer to this ![guide]().
+## Try out now!
+### Command-line interface
 1. Install any repository you like and write a corresponding query file
 2. Run the following commands
 ```
-cd automationtools
+cd scripts
 python3.7 run.py --repo_path /home/mengyang/FYP/docker-maven-plugin \
          --gitfacts_path /home/mengyang/FYP/ext-gitfacts \
          --output_path /home/mengyang/test1 \
          --query_file_path /home/mengyang/FYP/codeqltosouffle/tests/useCaseQueries/methodUnused.txt \
-         --codeqltosouffle_path /home/mengyang/FYP/codeqltosouffle \
+         --translator_path /home/mengyang/FYP/codeqltosouffle \
          --cslicer_path /home/mengyang/FYP/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar
 ```
-
+### Web interface
+Upcoming!

@@ -20,9 +20,9 @@ runner.add_argument('--output_path',
 runner.add_argument('--query_file_path',
                     type=str,
                     help='the path to the input query file')
-runner.add_argument('--codeqltosouffle_path',
+runner.add_argument('--translator_path',
                     type=str,
-                    help='the path to the translator from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/codeqltosouffle/)') 
+                    help='the path to the translator from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/translator/)') 
 
 # Get all the input arguments and validate
 args = runner.parse_args()
@@ -33,19 +33,19 @@ validatePath(output_path)
 query_file_path = args.query_file_path
 validatePath(query_file_path)
 
-codeqltosouffle_path = args.codeqltosouffle_path
-validatePath(codeqltosouffle_path)
+translator_path = args.translator_path
+validatePath(translator_path)
 
 # Execute
 start_time = time.time()
 process = subprocess.Popen(
-    'cd %s && mkdir -p rules && ./codeqltosouffle %s' % (codeqltosouffle_path, query_file_path), 
+    'cd %s && mkdir -p rules && ./translator %s' % (translator_path, query_file_path), 
     shell=True
 )
 process.wait()
 
 process = subprocess.Popen(
-    'mv %s/rules %s/rules' % (codeqltosouffle_path, output_path), 
+    'mv %s/rules %s/rules' % (translator_path, output_path), 
     shell=True
 )
 process.wait()

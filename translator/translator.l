@@ -3,7 +3,7 @@
 %option noyywrap nodefault yylineno case-sensitive batch
 
 %{
-#include "codeqltosouffle.tab.h"
+#include "translator.tab.h"
 #include "helper/utils.h"
 #include <stdarg.h>
 #include <string.h>
