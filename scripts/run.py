@@ -38,9 +38,9 @@ runner.add_argument('--output_path',
 runner.add_argument('--query_file_path',
                     type=str,
                     help='the path to the input query file')
-runner.add_argument('--translator_path',
+runner.add_argument('--codevql_path',
                     type=str,
-                    help='the path to the translator from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/translator/)')
+                    help='the path to the codevql from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/codevql/)')
 runner.add_argument('--cslicer_path',
                     type=str,
                     help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')            
@@ -62,8 +62,8 @@ validatePath(output_path)
 query_file_path = args.query_file_path
 validatePath(query_file_path)
 
-translator_path = args.translator_path
-validatePath(translator_path)
+codevql_path = args.codevql_path
+validatePath(codevql_path)
 
 cslicer_path = args.cslicer_path
 validatePath(cslicer_path)
@@ -72,25 +72,25 @@ validatePath(cslicer_path)
 os.system(
     'echo Step 1: Start generating git facts && \
     python3.7 %s/scripts/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
-    echo Step 1 is done!' % (translator_path, repo_path, gitfacts_path, output_path)
+    echo Step 1 is done!' % (codevql_path, repo_path, gitfacts_path, output_path)
 )
 
 # Step 2: Translate CodeVQL to Souffle
 os.system(
     'echo Step 2: Start translating CodeVQL to Souffle && \
-    python3.7 %s/scripts/translate.py --query_file_path %s --translator_path %s --output_path %s && \
-    echo Step 2 is done!' % (translator_path, query_file_path, translator_path, output_path)
+    python3.7 %s/scripts/translate.py --query_file_path %s --codevql_path %s --output_path %s && \
+    echo Step 2 is done!' % (codevql_path, query_file_path, codevql_path, output_path)
 )
 
 # Step 3: Get multiversion facts
 os.system(
     'echo Step 3: Start Generating program facts in selected version && \
-    python3.7 %s/scripts/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --translator_path %s --output_path %s && \
-    echo Step 3 is done!' % (translator_path, repo_path, cslicer_path, translator_path, output_path)
+    python3.7 %s/scripts/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codevql_path %s --output_path %s && \
+    echo Step 3 is done!' % (codevql_path, repo_path, cslicer_path, codevql_path, output_path)
 )
 
 # Step 4: Analyze to get the result
 os.system(
     'echo Step 4: Start analyzing the query && \
     python3.7 %s/scripts/query-analysis.py --output_path %s && \
-    echo Step 4 is done and program finished!' % (translator_path, output_path))
+    echo Step 4 is done and program finished!' % (codevql_path, output_path))

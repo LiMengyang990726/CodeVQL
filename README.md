@@ -53,12 +53,12 @@ Please refer to this [guide](https://github.com/LiMengyang990726/codeqltosouffle
 2. Run the following commands
 ```
 cd scripts
-python3.7 run.py --repo_path /home/mengyang/FYP/docker-maven-plugin \
-         --gitfacts_path /home/mengyang/FYP/ext-gitfacts \
-         --output_path /home/mengyang/test1 \
-         --query_file_path /home/mengyang/FYP/codeqltosouffle/tests/useCaseQueries/methodUnused.txt \
-         --translator_path /home/mengyang/FYP/codeqltosouffle \
-         --cslicer_path /home/mengyang/FYP/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar
+python3.7 run.py --repo_path <todo> \
+         --gitfacts_path <todo> \
+         --output_path <todo> \
+         --query_file_path <todo> \
+         --codevql_path <todo> \
+         --cslicer_path <todo>
 ```
 ### Web interface
 Upcoming!

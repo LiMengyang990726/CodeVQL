@@ -20,9 +20,9 @@ runner.add_argument('--output_path',
 runner.add_argument('--query_file_path',
                     type=str,
                     help='the path to the input query file')
-runner.add_argument('--translator_path',
+runner.add_argument('--codevql_path',
                     type=str,
-                    help='the path to the translator from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/translator/)') 
+                    help='the path to the codevql from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/codevql/)') 
 
 # Get all the input arguments and validate
 args = runner.parse_args()
@@ -33,19 +33,19 @@ validatePath(output_path)
 query_file_path = args.query_file_path
 validatePath(query_file_path)
 
-translator_path = args.translator_path
-validatePath(translator_path)
+codevql_path = args.codevql_path
+validatePath(codevql_path)
 
 # Execute
 start_time = time.time()
 process = subprocess.Popen(
-    'cd %s && mkdir -p rules && ./translator %s' % (translator_path, query_file_path), 
+    'cd %s/translator && mkdir -p rules && ./translator %s' % (codevql_path, query_file_path), 
     shell=True
 )
 process.wait()
 
 process = subprocess.Popen(
-    'mv %s/rules %s/rules' % (translator_path, output_path), 
+    'mv %s/translator/rules %s/rules' % (codevql_path, output_path), 
     shell=True
 )
 process.wait()

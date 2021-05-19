@@ -20,7 +20,6 @@
 using namespace std;
 
 int numVersions = 1;
-unordered_set<string> commitDistDeclaredForFile;
 
 void writeVersionsCombination(vector<string> inputs)
 {
@@ -270,15 +269,7 @@ void writeVersionDLNthAncestor(string filename, string varName, string commitId,
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
 
-    if (commitDistDeclaredForFile.find(filename) == commitDistDeclaredForFile.end())
-    {
-        versionDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
-        versionDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), History(y, x, 0)." << endl
-                  << endl;
-        versionDL << "CommitDist(" << commitId << ", " << commitId << ", 0)." << endl;
-        commitDistDeclaredForFile.insert(filename);
-    }
-
+    versionDL << "CommitDist(" << commitId << ", " << commitId << ", 0)." << endl;
     versionDL << VARNAME_PREFIX << varName << "(version) :- CommitDist(" << commitId << ", version, " << n << ")." << endl
               << endl;
 
@@ -350,16 +341,6 @@ void writeVersionDLTemplate(string filename, string varName)
 
     versionDL << "#include \""<< BASE_TYPES_DL_FILE_NAME << "\"" << endl;
     versionDL << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl 
-              << endl;
-
-    versionDL << ".decl History(child: Version, parent: Version, index: Int)" << endl
-              << endl;
-
-    versionDL << ".decl Reachable(a:Version, b:Version)" << endl;
-    versionDL << "Reachable(a, b) :- History(a, b, _)." << endl;
-    versionDL << "Reachable(a, x) :- History(a, b, _), Reachable(b, x)." << endl;
-    versionDL << "Reachable(a, y) :- History(x, y, _), Reachable(a, x)." << endl;
-    versionDL << "Reachable(a, a) :- History(a, _, _); History(_, a, _)." << endl
               << endl;
 
     versionDL << ".decl " << VARNAME_PREFIX << varName << "(version: Version)" << endl

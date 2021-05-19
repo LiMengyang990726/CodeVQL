@@ -425,7 +425,7 @@ void translateComparison(struct ast *a)
     struct ast *l = a->children[0];
     struct ast *r = a->children[2];
 
-    if (comparison == "=")
+    if (comparison == "=" || comparison == "!=")
     {
         if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE)
         {

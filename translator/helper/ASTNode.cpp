@@ -14,9 +14,10 @@ struct ast *newast(int nodetype, int childrencount, ...) {
   a->childrencount = childrencount;
   va_list ap;
   va_start(ap, childrencount);
+  a->children.resize(childrencount);
   for (int i = 0; i < childrencount; i++) {
     struct ast* temp = va_arg(ap, struct ast *);
-    a->children.push_back(temp);
+    a->children[i] = temp;
   }
   va_end(ap);
   return a;

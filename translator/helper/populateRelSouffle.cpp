@@ -17,7 +17,7 @@ void writeFactTypesDL() {
     factTypesDL << ".input AbstractClass(filename=\"AbstractClass.facts\")" << endl << endl;
 
     factTypesDL << ".decl Method" << CodeVQLObjToSouffleDecl("Method") << endl;
-    factTypesDL << ".input Method(filename=\"Method.facts\")" << endl << endl;
+    factTypesDL << ".input Method(filename=\"IsMethod.facts\")" << endl << endl;
 
     factTypesDL << ".decl Update" << CodeVQLObjToSouffleDecl("Update") << endl;
     factTypesDL << ".input Update(filename=\"UPDATE.facts\")" << endl << endl;
@@ -44,15 +44,28 @@ void writeFactTypesDL() {
     factTypesDL << ".input History(filename=\"history.facts\")" << endl << endl;
 
     // Step 2: CodeVQL unique relations
-    //         Type 1: getClosure()
+    //      Type 1: Reachable
+    factTypesDL << ".decl Reachable(a:Version, b:Version)" << endl;
+    factTypesDL << "Reachable(a, b) :- History(a, b, _)." << endl;
+    factTypesDL << "Reachable(a, x) :- History(a, b, _), Reachable(b, x)." << endl;
+    factTypesDL << "Reachable(a, y) :- History(x, y, _), Reachable(a, x)." << endl;
+    factTypesDL << "Reachable(a, a) :- History(a, _, _); History(_, a, _)." << endl
+                << endl;
+    //      Type 2: CommitDist
+    factTypesDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
+    factTypesDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), History(y, x, 0)." << endl
+                << endl;
+    //       Type 3: DependOn()
     factTypesDL << ".decl DependOn(a: String, b: String)" << endl;
     factTypesDL << "DependOn(x, y) :- MethodAccess(x, y, _)." << endl;
     factTypesDL << "DependOn(x, y) :- Containment(x, y, _)." << endl;
     factTypesDL << "DependOn(x, y) :- Reference(x, y, _)." << endl;
-    factTypesDL << "DependOn(x, y) :- Inheritance(x, y, _)" << endl;
-    factTypesDL << "Closure(x, y) :- DependOn(x, y)." << endl;
-    factTypesDL << "Closure(x, y) :- DependOn(x, m), DependOn(m, y)." << endl << endl;
-    //         TODO: get other closures
+    factTypesDL << "DependOn(x, y) :- Inheritance(x, y, _)." << endl
+                << endl;
+    //        Type 4: DependOnClosure()
+    factTypesDL << ".decl DependOnClosure(a: String, b: String)" << endl;
+    factTypesDL << "DependOnClosure(x, y) :- DependOn(x, y)." << endl;
+    factTypesDL << "DependOnClosure(x, y) :- DependOn(x, m), DependOn(m, y)." << endl << endl;
 
     factTypesDL.close();
 }

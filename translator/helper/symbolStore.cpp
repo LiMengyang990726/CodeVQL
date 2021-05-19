@@ -34,6 +34,7 @@ void initializeSymbolTable() {
    symbolTable["Reference"] = "(getReferer: String, getReferee: String, version: Version)";
    symbolTable["Inheritance"] = "(getSubClass: String, getSuperClass: String, version: Version)";
    
+   symbolTable["History"] = "(child: Version, parent: Version, index: Int)";
    symbolTable["Version"] = "(version: Version)";
    return;
 }
@@ -104,10 +105,9 @@ bool isDirectFieldExtraction(string name, string field) {
    for(auto iter = fieldsVector.begin(); iter != fieldsVector.end(); iter++) {
       if(iter->first == field) {
          return true;
-      } else {
-         return false;
       }
    }
+   return false;
 }
 
 bool isClosureMethod(string name, string field) {
