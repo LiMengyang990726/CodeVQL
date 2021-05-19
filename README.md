@@ -46,7 +46,7 @@ sudo apt-get update
 If you are in a different operating system, please refer [here](https://souffle-lang.github.io/install) for more information.
 
 ### CodeVQL Translator
-Please refer to this ![guide](https://github.com/LiMengyang990726/codeqltosouffle/tree/master/translator#translator-installation).
+Please refer to this [guide](https://github.com/LiMengyang990726/codeqltosouffle/tree/master/translator#translator-installation).
 ## Try out now!
 ### Command-line interface
 1. Install any repository you like and write a corresponding query file
