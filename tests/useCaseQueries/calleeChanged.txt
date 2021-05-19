@@ -8,9 +8,9 @@ import java
 from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
 where exists (old, new, method that 
-old.caller() != new.caller() and
-old.getMethod() = method.method() and method.getName() = "getAuth" and method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig" and
-new.getMethod() = method.method() and method.getName() = "getAuth" and method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig")
+old.getCaller() != new.getCaller() and
+old.getCallee() = method.fqn() and method.getName() = "getAuth" and method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig" and
+new.getCallee() = method.fqn() and method.getName() = "getAuth" and method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig")
 select new, v1
 
 define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e~1".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~11")

@@ -16,16 +16,24 @@ unordered_map<string, string> varDeclarationTable;
 vector<string> versionDeclarationVec;
 unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
-unordered_set<string> typeDeclarationSet;
 unordered_set<string> outputVarsSet;
 unordered_set<string> notExistSpecifiedVarsSet;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
-   symbolTable["MethodAccess"] = "(caller: String, getMethod: String, version: Version)";
-   symbolTable["Method"] = "(method: String, getName: String, getClassName: String, getNumberOfParams: number, getReturn: String, isConstructor: String, version: Version)";
+   symbolTable["TestClass"] = "(fqn: String, version: Version)";
    symbolTable["AbstractClass"] = "(fqn: String, version: Version)";
-   symbolTable["Reference"] = "(referer: String, getReferee: String, version: Version)";
+   symbolTable["Method"] = "(fqn: String, getName: String, getClassName: String, getNumberOfParams: number, getReturn: String, isConstructor: String, version: Version)";
+
+   symbolTable["Update"] = "(fqn: String, parent: Version, commit: Version)"; 
+   symbolTable["Insert"] = "(fqn: String, parent: Version, commit: Version)";
+   symbolTable["Delete"] = "(fqn: String, parent: Version, commit: Version)";
+   
+   symbolTable["MethodAccess"] = "(getCaller: String, getCallee: String, version: Version)";
+   symbolTable["Containment"] = "(getContainer: String, getContainee: String, version: Version)";
+   symbolTable["Reference"] = "(getReferer: String, getReferee: String, version: Version)";
+   symbolTable["Inheritance"] = "(getSubClass: String, getSuperClass: String, version: Version)";
+   
    symbolTable["Version"] = "(version: Version)";
    return;
 }
@@ -87,6 +95,24 @@ string CodeVQLObjToSouffleRuleBegin(unordered_set<string> outputVarsSet) {
       }
    }
    return constructSouffleRuleBegin(resultPairs);
+}
+
+bool isDirectFieldExtraction(string name, string field) {
+   string type = findVarDeclaration(name);
+   string fields = CodeVQLObjToSouffleDecl(type);
+   vector<pair<string, string> > fieldsVector = destructSouffleDecl(fields);
+   for(auto iter = fieldsVector.begin(); iter != fieldsVector.end(); iter++) {
+      if(iter->first == field) {
+         return true;
+      } else {
+         return false;
+      }
+   }
+}
+
+bool isClosureMethod(string name, string field) {
+   // TODO: Support other types of closures
+   return field == "getClosure";
 }
 
 /* APIs for Var Declaration Table */
@@ -161,15 +187,6 @@ string findVarFieldReferredName(string name, string field) {
    }
 
    return referredFieldName[field];
-}
-
-/* APIs for avoiding redundant declaration */
-void storeDeclaredType(string type) {
-   typeDeclarationSet.insert(type);
-}
-
-bool isTypeDeclared(string type) {
-   return (typeDeclarationSet.find(type) != typeDeclarationSet.end());
 }
 
 /* APIs for handling output related things */

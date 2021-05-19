@@ -24,8 +24,9 @@ void writeTemplate() {
     isTemplateWritten = true;
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << "#include \"types.dl\"" << endl;
-    mainDLFile << "#include \"objectMapping.dl\"" << endl << endl;
+    mainDLFile << "#include \""<< BASE_TYPES_DL_FILE_NAME << "\"" << endl;
+    mainDLFile << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl
+               << endl;
     mainDLFile.close();
 }
 
@@ -56,24 +57,10 @@ void writeVersionComb() {
     mainDLFile.close();
 }
 
-void writeDecl(string type) {
-    ofstream mainDLFile;
-    mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl " << type << CodeVQLObjToSouffleDecl(type) << endl;
-    mainDLFile.close();
-}
-
 void writeOutputDecl() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << ".decl " << OUTPUT_NAME << CodeVQLObjToSouffleOutput(getoutputVarsSet()) << endl;
-    mainDLFile.close();
-}
-
-void writeInput(string type) {
-    ofstream mainDLFile;
-    mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".input " << type << endl << endl;
     mainDLFile.close();
 }
 
@@ -136,15 +123,15 @@ void writeArithmethics(string var, string comparision, string value) {
 void writeRule(string name, string field, string value) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-
+ 
     string type = findVarDeclaration(name);
-    string version = findVersionVarAssociation(name);
-
     string fields = CodeVQLObjToSouffleDecl(type);
     vector<pair<string, string> > fieldsVector = destructSouffleDecl(fields);
+    string version = findVersionVarAssociation(name);
 
     string result = "";
 
+    // Check 1: The whole rule contains exactly one "VersionComb(v1, ...)"
     if (!isVersionCombWritten) {
         result += "VersionComb(";
         vector<string> versions = getVersions(); 
@@ -157,42 +144,39 @@ void writeRule(string name, string field, string value) {
         isVersionCombWritten = true;
     } 
 
+    // Check 2: This part of rule is enclosed in "WHERE NOT EXIST (...)"
     if (isVariableSpecifiedInNotExist(name)) {
         result += "!";
     }
 
+    // Check 3: This part of rule is enclosed in "WHERE ... (... SUCH THAT NOT ...)"
     for (pair<string, string> fieldPair : fieldsVector) {
         string currField = fieldPair.first.c_str();
-        string referedName = findVarFieldReferredName(name, currField);
-        if (referedName != "" && referedName[0] == '!') {
+        string referer = findVarFieldReferredName(name, currField);
+        if (referer != "" && referer[0] == '!') {
             result += "!";
         }
     }
-    
+ 
+    // Step 1: Write the TYPE of this part of rule
     result += type;
-
     result += "(";
+
+    // Step 2: Write this part of rule with references shown
     for (pair<string, string> fieldPair : fieldsVector) {
         string currField = fieldPair.first.c_str();
         if (currField == field) {
-            if (value.empty()) {
-                string referedName = findVarFieldReferredName(name, currField);
-                if (referedName[0] == '!') {
-                    result += referedName.substr(1,referedName.length()-1);
-                } else {
-                    result += referedName;
-                }
-            } else if (value != "any") {
+            if (value != "" && value[0] == '!') {
+                result += value.substr(1,value.length()-1);
+            } else {
                 result += value;
-            } else if (value == "any") {
-                result += "_";
             }
         } else if (findVarFieldReferredName(name, currField) != "") {
-            string referedName = findVarFieldReferredName(name, currField);
-            if (referedName[0] == '!') {
-                result += referedName.substr(1,referedName.length()-1);
+            string referer = findVarFieldReferredName(name, currField);
+            if (referer[0] == '!') {
+                result += referer.substr(1,referer.length()-1);
             } else {
-                result += referedName;
+                result += referer;
             }
         } else if (currField == "version") {
             result += version; 
@@ -201,6 +185,8 @@ void writeRule(string name, string field, string value) {
         }
         result += ",";
     }
+
+    // Step 3: Enclose this part of rule
     result[result.length()-1] = ')';
     result += ("," + VERSION_DECL_PREFIX + version + "(" + version + ")");
     mainDLFile << result;

@@ -14,5 +14,6 @@ void yyerror(char *s, ...);
 vector<pair<string, string> > destructSouffleDecl(string fields);
 string constructSouffleDecl(vector<pair<string, string> > fieldPairs);
 string constructSouffleRuleBegin(vector<string> fields);
+bool isNumber(string s);
 
 #endif

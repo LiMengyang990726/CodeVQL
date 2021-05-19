@@ -16,6 +16,8 @@ string getIdName(string type);
 string CodeVQLObjToSouffleDecl(string type);
 string CodeVQLObjToSouffleOutput(unordered_set<string> outputVarsSet);
 string CodeVQLObjToSouffleRuleBegin(unordered_set<string> outputVarsSet);
+bool isDirectFieldExtraction(string name, string field);
+bool isClosureMethod(string name, string field);
 
 void storeVarDeclarationTable(string type, string name);
 string findVarDeclaration(string name);
@@ -29,9 +31,6 @@ string findVersionVarAssociation(string name);
 
 void storeVarFieldReferenceTable(string referred, string referer);
 string findVarFieldReferredName(string name, string field);
-
-void storeDeclaredType(string type);
-bool isTypeDeclared(string type);
 
 void storeOutputVar(string output);
 unordered_set<string> getoutputVarsSet();

@@ -196,11 +196,6 @@ void translateFrom(struct ast *a)
     string typeStr = ((struct stringval *)type)->value;
     struct ast *name = a->children[1];
     string nameStr = ((struct stringval *)name)->value;
-    if (!isTypeDeclared(typeStr)) {
-        writeDecl(typeStr);
-        writeInput(typeStr);
-        storeDeclaredType(typeStr);
-    }
     storeVarDeclarationTable(typeStr, nameStr);
 
     if (a->childrencount == 2)
@@ -430,7 +425,7 @@ void translateComparison(struct ast *a)
     struct ast *l = a->children[0];
     struct ast *r = a->children[2];
 
-    if (comparison == "=" || comparison == "!=")
+    if (comparison == "=")
     {
         if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE)
         {
@@ -438,40 +433,67 @@ void translateComparison(struct ast *a)
             string fieldStr = ((struct stringval *)l->children[1])->value;
             string nextName = ((struct stringval *)r)->value;
             int nextNameLen = nextName.length();
-            if (fieldStr == "getNumberOfParams") {
-                // the only case doing arithmatics under == and != 
-                storeVarFieldReferenceTable(nameStr + "." + fieldStr, fieldStr + nameStr);
-                writeRule(nameStr, fieldStr, "");
-                writeParallelRule();
-                writeArithmethics(fieldStr + nameStr, comparison, nextName);
-                return;
-            }
-            if (comparison == "!=") {
-                writeNegationRule();
-            }
             if (nextNameLen >= 2 && nextName[0] == '\"' && nextName[nextName.length()-1] == '\"') {
+                // Case 1: xxx.xx() = "..."
+                if (comparison == "!=") {
+                    writeNegationRule();
+                }
                 if (nextNameLen == 3 && nextName[1] == '*') {
+                    // Case 1.1: Handle "..." is wildcard
                     writeRule(nameStr, fieldStr, "_");
                 } else {
                     writeRule(nameStr, fieldStr, nextName);
                 }
+            } else if (isNumber(nextName)) {
+                // Case 2: xxx.xx() = number
+                string referer = fieldStr + nameStr;
+                storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
+                writeRule(nameStr, fieldStr, referer);
+                writeParallelRule();
+                writeArithmethics(referer, comparison, nextName);
             } else {
+                // Case 3: xxx.xx() = lower_id
                 string nextNameIdName = getIdName(findVarDeclaration(nextName));
                 if (findVarFieldReferredName(nextName, nextNameIdName) != "") {
+                    // Case 3.1: lower_id has been referred before
+                    string referer = findVarFieldReferredName(nextName, nextNameIdName);
                     if (findVarFieldReferredName(nameStr, fieldStr) != "") {
-                        yyerror("The parser currently don't support this grammar");
+                        // Case 3.1.1: xxx.xx() also have been referred before
+                        string prevReferer = findVarFieldReferredName(nameStr, fieldStr);
+                        if (comparison == "!=") {
+                            writeInequality(prevReferer, referer);
+                        } else {
+                            writeEquality(prevReferer, referer);
+                        }
                     } else {
-                        string referer = findVarFieldReferredName(nextName, nextNameIdName);
+                        // Case 3.1.2: xxx.xx() is not referer before
                         storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
+                        if (comparison == "!=") {
+                            writeNegationRule();
+                        }
                         writeRule(nameStr, fieldStr, referer);
                     }
                 } else if (findVarFieldReferredName(nameStr, fieldStr) != "") {
-                    writeRule(nameStr, fieldStr, findVarFieldReferredName(nameStr, fieldStr));
-                    storeVarFieldReferenceTable(nextName + "." + nextNameIdName, findVarFieldReferredName(nameStr, fieldStr));
+                    // Case 3.2: lower_id has NOT been referred before, xxx.xx() has been referred before
+                    string prevReferer = findVarFieldReferredName(nameStr, fieldStr);
+                    storeVarFieldReferenceTable(nextName + "." + nextNameIdName, prevReferer);
+                    if (comparison == "!=") {
+                        writeNegationRule();
+                    }
+                    writeRule(nameStr, fieldStr, prevReferer);
                 } else {
-                    storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr);
-                    writeRule(nameStr, fieldStr, "");
-                    storeVarFieldReferenceTable(nextName + "." + nextNameIdName, fieldStr);
+                    // Case 3.3: lower_id and xxx.xx() have NOT been referrer before
+                    string referer = fieldStr + nameStr;
+                    storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
+                    writeRule(nameStr, fieldStr, referer);
+                    writeParallelRule();
+                    if (comparison == "!=") {
+                        storeVarFieldReferenceTable(nextName + "." + nextNameIdName, "!" + referer); 
+                        writeRule(nextName, nextNameIdName, "!" + referer);
+                    } else {
+                        storeVarFieldReferenceTable(nextName + "." + nextNameIdName, referer);
+                        writeRule(nextName, nextNameIdName, referer);
+                    }
                 }
             }
         } 
@@ -481,31 +503,39 @@ void translateComparison(struct ast *a)
             string lFieldStr = ((struct stringval *)l->children[1])->value;
             string rNameStr = ((struct stringval *)r->children[0])->value;
             string rFieldStr = ((struct stringval *)r->children[1])->value;
-            // left is assigned to right
-            if (comparison == "=") {
-                storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, rFieldStr + rNameStr);
-                storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, rFieldStr + rNameStr);  
+            if (isDirectFieldExtraction(lNameStr, lFieldStr) && isDirectFieldExtraction(rNameStr, rFieldStr)) {
+                // Case 1: Field comparison
+                string referer = rFieldStr + rNameStr; // Set the referer to the right side
+                storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, referer);
+                writeRule(rNameStr, rFieldStr, referer);
+                writeParallelRule();
+                if (comparison == "!=") { 
+                    storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, "!" + referer); 
+                    writeRule(lNameStr, lFieldStr, "!" + referer);  
+                } else {
+                    storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, referer);
+                    writeRule(lNameStr, lFieldStr, referer);
+                }
             } else {
-                storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, "!" + rFieldStr + rNameStr);
-                storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, rFieldStr + rNameStr);
+                // Case 2: CodeVQL unique object methods
+                if (isClosureMethod(lNameStr, lFieldStr) && isClosureMethod(rNameStr, rFieldStr)) {
+                    // Case 2.1: Both sides are closure
+                }
             }
-            writeRule(lNameStr, lFieldStr, "");
-            writeParallelRule();
-            writeRule(rNameStr, rFieldStr, "");
         } 
         else if (l->nodetype == STRING_NODE && r->nodetype == STRING_NODE) 
         {
+            // Assume l and r are two LOWER_ID. TODO: For other cases
             string lStr = ((struct stringval *)l)->value;
             string rStr = ((struct stringval *)r)->value;
-            // Assume l and r are two LOWER_ID. For other cases: TODO
-            storeVarFieldReferenceTable(lStr + ".fqn", "fqn" + lStr);
-            storeVarFieldReferenceTable(rStr + ".fqn", "fqn" + rStr);
-            if (comparison == "=")
-            {
-                writeEquality("fqn" + lStr, "fqn" + rStr);
-            } else 
-            {
-                writeInequality("fqn" + lStr, "fqn" + rStr);
+            string lTypeId = getIdName(findVarDeclaration(lStr));
+            string rTypeId = getIdName(findVarDeclaration(rStr));
+            storeVarFieldReferenceTable(lStr + "." + lTypeId, lTypeId + lStr);
+            storeVarFieldReferenceTable(rStr + "." + rTypeId, rTypeId + rStr);
+            if (comparison != "=") {
+                writeInequality(lTypeId + lStr, rTypeId + rStr);
+            } else {
+                writeEquality(lTypeId + lStr, rTypeId + rStr);
             }
         }
     }
@@ -513,14 +543,17 @@ void translateComparison(struct ast *a)
     {
         if (l->nodetype == CALL_NODE && r->nodetype == STRING_NODE)
         {
+            // Hanle only the case: xxx.xx() comp number
             string nameStr = ((struct stringval *)l->children[0])->value;
             string fieldStr = ((struct stringval *)l->children[1])->value;
             string value = ((struct stringval *)r)->value;
-            storeVarFieldReferenceTable(nameStr + "." + fieldStr,fieldStr + nameStr);
-            writeRule(nameStr, fieldStr, "");
+            string referer = fieldStr + nameStr;
+            storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
+            writeRule(nameStr, fieldStr, referer);
             writeParallelRule();
-            writeArithmethics(fieldStr + nameStr, comparison, value);
+            writeArithmethics(referer, comparison, value);
         }
+        // TODO: Handle these comparisons for other types of l & r nodes
     }
     else 
     {
@@ -541,7 +574,8 @@ void translateCall(struct ast *a, bool negated)
     string nameStr = ((struct stringval *)a->children[0])->value;
     string fieldStr = ((struct stringval *)a->children[1])->value;
     if (a->childrencount == 3)
-    { // For direct translate call, it can be directly translate to a rule
+    { 
+        // For direct translate call, it can be directly translate to a rule
         char *value = ((struct stringval *)a->children[2])->value;
         if (negated)
         {
@@ -550,8 +584,7 @@ void translateCall(struct ast *a, bool negated)
         writeRule(nameStr, fieldStr, value);
     } else if (a->childrencount == 2) {
         // For indirect translate call, it is a boolean value
-        storeVarFieldReferenceTable(nameStr + "." + fieldStr, "\"true\"");
-        writeRule(nameStr, fieldStr, "");
+        writeRule(nameStr, fieldStr, "\"true\"");
     }
     return;
 }

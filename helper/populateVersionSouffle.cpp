@@ -27,7 +27,7 @@ void writeVersionsCombination(vector<string> inputs)
     string filename = VERSION_DL;
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
-    versionDL << "#include \"types.dl\"" << endl
+    versionDL << "#include \"" << BASE_TYPES_DL_FILE_NAME << "\"" << endl
               << endl;
 
     for (string input : inputs)
@@ -273,7 +273,7 @@ void writeVersionDLNthAncestor(string filename, string varName, string commitId,
     if (commitDistDeclaredForFile.find(filename) == commitDistDeclaredForFile.end())
     {
         versionDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
-        versionDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), Parent(y, x, 0)." << endl
+        versionDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), History(y, x, 0)." << endl
                   << endl;
         versionDL << "CommitDist(" << commitId << ", " << commitId << ", 0)." << endl;
         commitDistDeclaredForFile.insert(filename);
@@ -290,7 +290,7 @@ void writeVersionDLNthParent(string filename, string varName, string commitId, i
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
 
-    versionDL << VARNAME_PREFIX << varName << "(version) :- Parent(" << commitId << ", version, " << (n - 1) << "), InputVersion" << numVersions << "(" << commitId << ")." << endl
+    versionDL << VARNAME_PREFIX << varName << "(version) :- History(" << commitId << ", version, " << (n - 1) << "), InputVersion" << numVersions << "(" << commitId << ")." << endl
               << endl;
 
     versionDL.close();
@@ -348,18 +348,18 @@ void writeVersionDLTemplate(string filename, string varName)
     ofstream versionDL;
     versionDL.open(filename, ios_base::app);
 
-    versionDL << "#include \"types.dl\"" << endl;
-    versionDL << "#include \"objectMapping.dl\"" << endl;
+    versionDL << "#include \""<< BASE_TYPES_DL_FILE_NAME << "\"" << endl;
+    versionDL << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl 
+              << endl;
 
-    versionDL << ".decl Parent(child: Version, parent: Version, index: Int)" << endl;
-    versionDL << ".input Parent" << endl
+    versionDL << ".decl History(child: Version, parent: Version, index: Int)" << endl
               << endl;
 
     versionDL << ".decl Reachable(a:Version, b:Version)" << endl;
-    versionDL << "Reachable(a, b) :- Parent(a, b, _)." << endl;
-    versionDL << "Reachable(a, x) :- Parent(a, b, _), Reachable(b, x)." << endl;
-    versionDL << "Reachable(a, y) :- Parent(x, y, _), Reachable(a, x)." << endl;
-    versionDL << "Reachable(a, a) :- Parent(a, _, _); Parent(_, a, _)." << endl
+    versionDL << "Reachable(a, b) :- History(a, b, _)." << endl;
+    versionDL << "Reachable(a, x) :- History(a, b, _), Reachable(b, x)." << endl;
+    versionDL << "Reachable(a, y) :- History(x, y, _), Reachable(a, x)." << endl;
+    versionDL << "Reachable(a, a) :- History(a, _, _); History(_, a, _)." << endl
               << endl;
 
     versionDL << ".decl " << VARNAME_PREFIX << varName << "(version: Version)" << endl
