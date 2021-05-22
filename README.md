@@ -62,3 +62,42 @@ python3.7 run.py --repo_path <todo> \
 ```
 ### Web interface
 Upcoming!
+
+## Language Specification (Working Version)
+```
+stmt_list :- stmt (stmt_list)? 
+
+stmt :- "import java" 
+        | "define" version_selection_opts 
+        | select_stmt 
+
+version_selection_opts :- lower_id string_literal ("," version_selection_opts)? 
+                        | lower_id "(" multiple_versions_selection_opts ")" ("," version_selection_opts)? 
+                        | lower_id "(" string_literal ".." string_literal ")" ("," version_selection_opts)?
+
+multiple_versions_selection_opts :- string_literal ("," multiple_ versions_selection_opts)? 
+
+select_stmt :- ("from" from_opts)? ("range" range_opts)? ("where" where_opts)? "select" select_opts
+
+select_opts :- expr ("as" lower_id)? (select_opts)?
+
+from_opts :- upper_id lower_id ("," from_opts)?
+
+range_opts :- lower_id "@" lower_id ("," range_opts)
+
+where_opts :- ("exists" | "not exist" | "forall") "(" reason_opts "that" formula ")" ("and" whereopts)?
+
+reason_opts :- lower_id ("," reason_opts)
+
+formula :- "(" formula ")" 
+        | formula "and" formula 
+        | "not" formula 
+        | primary (">=" | ">" | "=" | "!=" | "<" | "<=" | "=") primary 
+        | call
+
+primary :- lower_id | string_literal | int_literal | call
+
+call :- lower_id "." lower_id "(" (string_literal)? ")"
+
+expr :- "_" | primary
+```
