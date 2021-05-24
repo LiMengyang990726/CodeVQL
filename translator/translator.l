@@ -56,7 +56,7 @@ that      { return THAT; }
 [A-Z][0-9a-zA-Z_$]* { yylval.strval = strdup(yytext); return UPPER_ID; }
 
     /* lower id */
-[a-z][0-9a-zA-Z_$]+ { yylval.strval = strdup(yytext); return LOWER_ID; }
+[a-z][0-9a-zA-Z_$]* { yylval.strval = strdup(yytext); return LOWER_ID; }
 
     /* operators */
 "=" { yylval.subtok = "="; return COMPARISON; }
@@ -81,6 +81,6 @@ that      { return THAT; }
 [ \t\n]         ;
 
     /* everything else */
-.   { yyerror("mystery character "); }
+.   { yyerror("mystery character: %s", yytext); }
 
 %%
