@@ -1,0 +1,43 @@
+//#include "../types.dl"
+
+#define target "c0a13d8cc528a449967e83b7d0f4043787597e81"
+#define version_a "6c9d06a658d87c01fb02d1efce15bf6b74eb7aab"
+#define version_b "419a052c6842192e78f747d9f5af619c2ca56e78"
+
+.decl Parent(a:Version, b:Version, n: number)
+.input Parent(filename="history.facts")
+
+.decl VersionInRange(x: Version, a:Version, b:Version)
+.decl Reachable(a:Version, b:Version)  // b is reachable from a
+.decl CommitDist(a: Version, b:Version, n: number)
+
+// interpret a~n
+// to make the query a~n efficient, we only care about the CommitDist(target, x)
+CommitDist(target,target,0).
+// Non-concrete expression is possible but will be more expensive
+// CommitDist(x, x, 0) :- Parent(x, _, _).
+// CommitDist(x, x, 0) :- Parent(_, x, _).
+CommitDist(a, x, n+1) :- CommitDist(a, y, n), Parent(y, x, 0).
+
+
+// interpret  a..  and  a..b
+// to make the query a..b efficient, we only care about the Reachable situation
+// of a and b
+Reachable(version_a, version_a).
+Reachable(version_b, version_b).
+// Non-concrete expression is possible but Reachable() for all of the commits
+// will be computed
+// Reachable(x, x) :- Parent(x, _, _).
+// Reachable(x, x) :- Parent(_, x, _).
+Reachable(a, y) :- Reachable(a, x), Parent(x, y, _).
+VersionInRange(x, version_a, version_b) :- Reachable(version_b, x), !Reachable(version_a, x).
+//VersionInRange(x, old, new) :- Reachable(new, x), Parent(_, old, _), !Reachable(old, x).
+
+.decl testReachable(x: Version)
+ testReachable(x) :- Reachable(version_a, x).
+.output testReachable
+
+.decl testRange(x: Version)
+ testRange(x) :- VersionInRange(x, version_a, version_b).
+.output testRange
+

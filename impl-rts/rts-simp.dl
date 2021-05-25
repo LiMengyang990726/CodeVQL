@@ -1,0 +1,65 @@
+/* Example Datalog code for RTS used with CSlicer extractors */
+
+#include "def.dl"
+#include "git-rev.dl"
+
+// .decl AllChanges(e: FQN, old: Version, new: Version)
+// AllChanges(e, a, b) :- Update(e, a, b).
+// AllChanges(e, a, b) :- Delete(e, _, a, b).
+// AllChanges(e, a, b) :- Insert(e, _, a, b).
+
+// .decl DependOn(a: FQN, b: FQN, v: Version)
+// DependOn(x, y, v) :- MethodAccess(x, y, v).
+// DependOn(x, y, v) :- Containment(x, y, v).
+// DependOn(x, y, v) :- Ref(x, y, v).
+
+// .decl DependOnClosure(a: FQN, b: FQN, v: Version)
+// DependOnClosure(x, y, v) :- DependOn(x, y, v).
+// DependOnClosure(x, y, v) :- DependOn(x, m, v), DependOn(m, y, v).
+
+.decl MethodAccessClosure(a: FQN, b: FQN, v: Version)
+MethodAccessClosure(x, y, v) :- MethodAccess(x, y, v).
+MethodAccessClosure(x, y, v) :- MethodAccess(x, m, v), MethodAccess(m, y, v).
+
+.decl ContainmentClosure(a: FQN, b: FQN, v: Version)
+ContainmentClosure(x, y, v) :- Containment(x, y, v).
+ContainmentClosure(x, y, v) :- Containment(x, m, v), Containment(m, y, v).
+
+.decl AffectedTestClass(clazz: ClassFQN)
+AffectedTestClass(x) :-
+    (Update(e, _, v, _); Insert(e, _, v, _)),
+    MethodAccessClosure(m, e, version_b),
+    ContainmentClosure(c, m, version_b),
+    VersionInRange(v, version_a, version_b),
+    Clazz(c, _, _, _, x, "true", _).
+.output AffectedTestClass
+
+/*
+.decl SelectedTestClass(clazz: ClassFQN)
+SelectedTestClass(x) :- AffectedTestClass(x, _, _), !IsAbstractClass(x).
+
+.decl InheritClosure(sub: ClassFQN, super: ClassFQN)
+InheritClosure(x, y) :- Inherit(x, y).
+InheritClosure(x, y) :- Inherit(x, m), Inherit(m, y).
+SelectedTestClass(x) :- AffectedTestClass(a, _, _), InheritClosure(x, a).
+
+.output AffectedProgramEntity
+.output SelectedTestClass
+*/
+
+
+
+/*
+from MethodAccess call, Containment c, Ref r
+where (d.getL() = call.getCaller() and d.getR() == call.getCallee) ||
+select
+
+// exist call, c satisfy
+from MethodAccess call, Changed c
+where call.getCallee+() = c.getFQN()
+select call
+
+
+CallClosure(x, y) :- Inherit(x, y).
+CallClosure(x, y) :- Inherit(x, m), Inherit(m, y).
+*/

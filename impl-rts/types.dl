@@ -1,0 +1,7 @@
+.type String <: symbol
+.type Version <: symbol
+.type Boolean <: symbol
+.type MethodFQN <: symbol
+.type ClassFQN <: symbol
+.type OtherFQN <: symbol
+.type FQN = MethodFQN | ClassFQN | OtherFQN

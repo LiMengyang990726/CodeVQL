@@ -1,0 +1,34 @@
+#include "types.dl"
+.decl Method(fqn: MethodFQN, name: String, version: Version)
+.input Method(filename="IsMethod.facts")
+
+.decl MethodAccess(caller: MethodFQN, callee: MethodFQN, version: Version)
+.input MethodAccess(filename="Call.facts")
+
+.decl Clazz(fqn: ClassFQN, isAbstract: Boolean, superClass: ClassFQN, isNested: Boolean, outer: ClassFQN, isTestClass: Boolean, version: Version)
+.input Clazz(filename="IsClass.facts")
+
+.decl Containment(er: FQN, ee: FQN, version: Version)
+.input Containment(filename="Contain.facts")
+
+.decl Ref(er: FQN, ee: FQN, version: Version)
+.input Ref(filename="Reference.facts")
+
+.decl Update(fqn: FQN, pos: FQN, parent: Version, commit: Version)
+.input Update(filename="UPDATE.facts")
+
+.decl Insert(fqn: FQN, pos: FQN, parent: Version, commit: Version)
+.input Insert(filename="INSERT.facts")
+
+.decl Delete(fqn: FQN, pos: FQN, parent: Version, commit: Version)
+.input Delete(filename="DELETE.facts")
+
+.decl IsTestClass(clazz: ClassFQN)
+.input IsTestClass(filename="TestClass.facts")
+
+.decl IsAbstractClass(clazz: ClassFQN)
+.input IsAbstractClass(filename="AbstractClass.facts")
+
+.decl Inherit(sub: ClassFQN, super: ClassFQN)
+.input Inherit(filename="Inherit.facts")
+
