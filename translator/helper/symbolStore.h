@@ -13,11 +13,13 @@ using namespace std;
 
 void initializeSymbolTable();
 string getIdName(string type);
+int getFieldLen(string type);
 string CodeVQLObjToSouffleDecl(string type);
-string CodeVQLObjToSouffleOutput(unordered_set<string> outputVarsSet);
-string CodeVQLObjToSouffleRuleBegin(unordered_set<string> outputVarsSet);
+string CodeVQLObjToSouffleOutput(unordered_map<string, string> outputVarFieldTable);
+string CodeVQLObjToSouffleRuleBegin(unordered_map<string, string> outputVarFieldTable);
 bool isDirectFieldExtraction(string name, string field);
-bool isClosureMethod(string name, string field);
+bool isTypeValidClosure(string type);
+bool isClosureMethod(string field);
 
 void storeVarDeclarationTable(string type, string name);
 string findVarDeclaration(string name);
@@ -32,8 +34,8 @@ string findVersionVarAssociation(string name);
 void storeVarFieldReferenceTable(string referred, string referer);
 string findVarFieldReferredName(string name, string field);
 
-void storeOutputVar(string output);
-unordered_set<string> getoutputVarsSet();
+void storeOutputVarField(string output, string field);
+unordered_map<string, string> getOutputVarFieldTable();
 
 void storenotExistSpecifiedVarsSet(string name);
 void clearnotExistSpecifiedVarsSet();

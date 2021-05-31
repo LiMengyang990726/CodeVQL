@@ -9,7 +9,7 @@ from MethodAccess accessV1, MethodAccess accessV2, Method method
 range accessV1 @ v1, accessV2 @ v2, method @ v3
 where exists (accessV1 that accessV1.getCaller()=method.fqn() and method.getName() = "*")
 and not exist (accessV2 that accessV2.getCaller()=method.fqn() and method.getName() = "*")
-select method, v3
+select method
 
 define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e~1".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~5")
 define v2 "e7fefdaddd99294d5842ef8c5b16070ce230d29e"

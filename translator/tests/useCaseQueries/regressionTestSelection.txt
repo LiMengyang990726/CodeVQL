@@ -1,0 +1,14 @@
+import java
+
+from Insert ins, Update upd, MethodAccess ma, Containment ct, Method m, Class cl
+range ins @ vChange, upd @ vChange, ma @ vNew, ct @ vNew, m @ vNew, cl @ vNew
+where exists (ins, upd, ma, ct, m, cl that 
+(ma.getCallee+() = upd or ma.getCallee+() = ins)
+and ct.getContainee+() = ma.getCaller+()
+and ma.getCaller() = m
+and ct.getContainer() = cl
+and cl.isTestClass())
+select cl.getOuterClass()
+
+define vNew ("e7fefdaddd99294d5842ef8c5b16070ce230d29e")
+define vChange ("e7fefdaddd99294d5842ef8c5b16070ce230d29e~2".."e7fefdaddd99294d5842ef8c5b16070ce230d29e")

@@ -57,6 +57,7 @@ extern int yylex();
 %token <strval> FORALL
 %token <strval> THAT
 %token <strval> ANY
+%token <strval> PLUS
 %token <intval> INT_LITERAL
 
 %type <a> stmt import_stmt define_stmt select_stmt
@@ -127,14 +128,14 @@ where_opts: EXISTS LEFT_BRACKET reason_opts THAT formula RIGHT_BRACKET { $$ = ne
 reason_opts: LOWER_ID { $$ = newast(REASON_OPTS_NODE, 1, newstringval($1)); }
   | LOWER_ID COMMA reason_opts { $$ = newast(REASON_OPTS_NODE, 2, newstringval($1), $3); }
   ;
-formula: LEFT_BRACKET formula RIGHT_BRACKET { $$ = $2; }
-  |   formula OR formula { $$ = newast(OR_FORMULA_NODE, 2, $1, $3); }
+formula: formula OR formula { $$ = newast(OR_FORMULA_NODE, 2, $1, $3); }
   |   formula AND formula { $$ = newast(AND_FORMULA_NODE, 2, $1, $3); }
   |   formula IMPLIES formula { $$ = newast(IMPLIES_FORMULA_NODE, 2, $1, $3); }
   |   IF formula THEN formula ELSE formula { $$ = newast(IF_FORMULA_NODE, 3, $2, $4, $6); }
   |   NOT formula { $$ = newast(NOT_FORMULA_NODE, 1, $2); }
   |   primary COMPARISON primary { $$ = newast(COMPARISON_FORMULA_NODE, 3, $1, newstringval($2), $3); }
   |   call { $$ = $1; }
+  |   LEFT_BRACKET formula RIGHT_BRACKET { $$ = newast(PRECEDANCE_FORMULA_NODE, 1, $2); }
   ;
 
 primary: LOWER_ID { $$ = newstringval($1); }
@@ -143,7 +144,7 @@ primary: LOWER_ID { $$ = newstringval($1); }
   | call { $$ = $1; }
   ;
 call: LOWER_ID DOT LOWER_ID LEFT_BRACKET RIGHT_BRACKET { $$ = newast(CALL_NODE, 2, newstringval($1), newstringval($3)); }
-  | LOWER_ID DOT LOWER_ID LEFT_BRACKET ANY RIGHT_BRACKET { $$ = newast(CALL_NODE, 2, newstringval($1), newstringval("any")); }
+  | LOWER_ID DOT LOWER_ID PLUS LEFT_BRACKET RIGHT_BRACKET { $$ = newast(CALL_NODE, 2, newstringval($1), newstringval(strcat($3, "+"))); }
   | LOWER_ID DOT LOWER_ID LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET { $$ = newast(CALL_NODE, 3, newstringval($1), newstringval($3), newstringval($5)); }
   ;
 expr: UNDERSCORE { $$ = newstringval($1); }

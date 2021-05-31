@@ -2,6 +2,7 @@
 #include <fstream>
 #include "symbolStore.h"
 #include "constants.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -15,6 +16,9 @@ void writeFactTypesDL() {
 
     factTypesDL << ".decl AbstractClass" << CodeVQLObjToSouffleDecl("AbstractClass") << endl;
     factTypesDL << ".input AbstractClass(filename=\"AbstractClass.facts\")" << endl << endl;
+
+    factTypesDL << ".decl Class" << CodeVQLObjToSouffleDecl("Class") << endl;
+    factTypesDL << ".input Class(filename=\"IsClass.facts\")" << endl << endl;
 
     factTypesDL << ".decl Method" << CodeVQLObjToSouffleDecl("Method") << endl;
     factTypesDL << ".input Method(filename=\"IsMethod.facts\")" << endl << endl;
@@ -55,17 +59,6 @@ void writeFactTypesDL() {
     factTypesDL << ".decl CommitDist(child: Version, parent: Version, index: Int)" << endl;
     factTypesDL << "CommitDist(a, x, n+1) :- CommitDist(a, y, n), History(y, x, 0)." << endl
                 << endl;
-    //       Type 3: DependOn()
-    factTypesDL << ".decl DependOn(a: String, b: String)" << endl;
-    factTypesDL << "DependOn(x, y) :- MethodAccess(x, y, _)." << endl;
-    factTypesDL << "DependOn(x, y) :- Containment(x, y, _)." << endl;
-    factTypesDL << "DependOn(x, y) :- Reference(x, y, _)." << endl;
-    factTypesDL << "DependOn(x, y) :- Inheritance(x, y, _)." << endl
-                << endl;
-    //        Type 4: DependOnClosure()
-    factTypesDL << ".decl DependOnClosure(a: String, b: String)" << endl;
-    factTypesDL << "DependOnClosure(x, y) :- DependOn(x, y)." << endl;
-    factTypesDL << "DependOnClosure(x, y) :- DependOn(x, m), DependOn(m, y)." << endl << endl;
 
     factTypesDL.close();
 }

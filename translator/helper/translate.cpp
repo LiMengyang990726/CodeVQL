@@ -325,11 +325,19 @@ void translateSelect(struct ast *a)
 
     struct ast *name = a->children[0];
     string nameStr = ((struct stringval *)name)->value;
-    storeOutputVar(nameStr);
     if (findVarDeclaration(nameStr) != "Version") {
-        string type = findVarDeclaration(nameStr);
-        string idName = getIdName(type);
-        storeVarFieldReferenceTable(nameStr + "." + idName, idName + nameStr);
+        string fieldStr;
+        if (name->nodetype == CALL_NODE) {
+            // Select result is CALL
+            nameStr = ((struct stringval *)name->children[0])->value;
+            fieldStr = ((struct stringval *)name->children[1])->value;
+        } else {
+            // Select result is LOWER_ID
+            string type = findVarDeclaration(nameStr);
+            fieldStr = getIdName(type);
+        }
+        storeVarFieldReferenceTable(nameStr + "." + fieldStr, fieldStr + nameStr);
+        storeOutputVarField(nameStr, fieldStr);
     }
 
     if (a->childrencount == 1)
@@ -354,10 +362,19 @@ void translateFormula(struct ast *a, bool negated)
     switch (a->nodetype)
     {
     case OR_FORMULA_NODE:
+        if (a->childrencount != 2)
+        {
+            yyerror("error in WHERE node (OR) in AST construction");
+            return;
+        }
+        translateFormula(a->children[0]);
+        writeOrRule();
+        translateFormula(a->children[1]);
+        break;
     case IMPLIES_FORMULA_NODE:
         if (a->childrencount != 2)
         {
-            yyerror("error in WHERE node (OR/IMPLIES) in AST construction");
+            yyerror("error in WHERE node (IMPLIES) in AST construction");
             return;
         }
         /* TODO */
@@ -409,6 +426,16 @@ void translateFormula(struct ast *a, bool negated)
         }
         translateCall(a, negated);
         break;
+    case PRECEDANCE_FORMULA_NODE:
+        if (a->childrencount != 1)
+        {
+            yyerror("error in WHERE node (PRECEDANCE) in AST construction");
+            return;
+        }
+        writeLeftBracket();
+        translateFormula(a->children[0]);
+        writeRightBracket();
+        break;
     }
 }
 
@@ -453,6 +480,15 @@ void translateComparison(struct ast *a)
                 writeArithmethics(referer, comparison, nextName);
             } else {
                 // Case 3: xxx.xx() = lower_id
+                // Check 1: If left side is closure
+                if (isClosureMethod(fieldStr)) {
+                    string type = findVarDeclaration(nameStr);
+                    if (!isTypeValidClosure(type)) {
+                        yyerror("Invalid type for writing closure");
+                        return;
+                    }
+                    writeClosure(type);
+                }
                 string nextNameIdName = getIdName(findVarDeclaration(nextName));
                 if (findVarFieldReferredName(nextName, nextNameIdName) != "") {
                     // Case 3.1: lower_id has been referred before
@@ -472,6 +508,7 @@ void translateComparison(struct ast *a)
                             writeNegationRule();
                         }
                         writeRule(nameStr, fieldStr, referer);
+                        writeRule(nextName, nextNameIdName, referer);
                     }
                 } else if (findVarFieldReferredName(nameStr, fieldStr) != "") {
                     // Case 3.2: lower_id has NOT been referred before, xxx.xx() has been referred before
@@ -481,9 +518,15 @@ void translateComparison(struct ast *a)
                         writeNegationRule();
                     }
                     writeRule(nameStr, fieldStr, prevReferer);
+                    writeRule(nextName, nextNameIdName, prevReferer);
                 } else {
                     // Case 3.3: lower_id and xxx.xx() have NOT been referrer before
-                    string referer = fieldStr + nameStr;
+                    string referer = "";
+                    if (isClosureMethod(fieldStr)) {
+                        referer = fieldStr.substr(0, fieldStr.length()-1) + nameStr;
+                    } else {
+                        referer = fieldStr + nameStr;
+                    }
                     storeVarFieldReferenceTable(nameStr + "." + fieldStr, referer);
                     writeRule(nameStr, fieldStr, referer);
                     writeParallelRule();
@@ -518,8 +561,31 @@ void translateComparison(struct ast *a)
                 }
             } else {
                 // Case 2: CodeVQL unique object methods
-                if (isClosureMethod(lNameStr, lFieldStr) && isClosureMethod(rNameStr, rFieldStr)) {
+                if (isClosureMethod(lFieldStr) && isClosureMethod(rFieldStr)) {
                     // Case 2.1: Both sides are closure
+                    if (!isTypeValidClosure(findVarDeclaration(lNameStr)) || !isTypeValidClosure(findVarDeclaration(rNameStr))) {
+                        yyerror("Invalid type for writing closure");
+                        return;
+                    }
+                    writeClosure(findVarDeclaration(lNameStr));
+                    writeClosure(findVarDeclaration(rNameStr));
+                    string referer = rFieldStr.substr(0, rFieldStr.length()-1) + rNameStr; // Remove special char
+                    storeVarFieldReferenceTable(rNameStr + "." + rFieldStr, referer);
+                    writeRule(rNameStr, rFieldStr, referer); // Need special one for writing the closure
+                    writeParallelRule();
+                    if (comparison == "!=") {
+                        storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, "!" + referer);
+                        writeRule(lNameStr, lFieldStr, referer);
+                    } else {
+                        storeVarFieldReferenceTable(lNameStr + "." + lFieldStr, referer);
+                        writeRule(lNameStr, lFieldStr, referer);            
+                    }
+                } else if (isClosureMethod(lFieldStr)) {
+                    // Case 2.2: Left side is closure, right side is a normal call
+                    // TODO
+                } else if (isClosureMethod(rFieldStr)) {
+                    // Case 2.3 Right side is closure, left side is a normal call
+                    // TODO 
                 }
             }
         } 
@@ -635,6 +701,8 @@ void eval(struct ast *a)
             writeOutputDecl();
             writeRuleBegin();
             translateWhere(a->children[2]);
+            writeParallelRule();
+            writeVersionCombInRule();
             writeRuleTermination();
             writeVersionComb();
             break;

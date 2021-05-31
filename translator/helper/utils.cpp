@@ -8,6 +8,7 @@
 #include <vector>
 #include <sstream>
 #include "utils.h"
+#include "constants.h"
 
 /* Utility for flex */
 void yyerror(char *s, ...) {
@@ -33,7 +34,6 @@ vector<pair<string, string> > destructSouffleDecl(string fields) {
         }
         
     }
-
     return result;
 }
 
@@ -65,6 +65,23 @@ string constructSouffleRuleBegin(vector<string> fields) {
     result = result.substr(0, result.length()-2);
     result += ")";
     return result;
+}
+
+string repeatString(string s, int times) {
+    string result = "";
+    while (times) {
+        result += s;
+        times--;
+    }
+    return result;
+}
+
+bool hasEnding(string const &fullString, string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
 }
 
 bool isNumber(string s) {

@@ -6,7 +6,7 @@ where exists (call, method that
 call.getCaller()=method.fqn() and 
 method.getName() = "getAuth" and 
 method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig")
-select call, v1
+select call
 
 define v1 ("e7fefdaddd99294d5842ef8c5b16070ce230d29e".."e7fefdaddd99294d5842ef8c5b16070ce230d29e~11")
 define v2 "e7fefdaddd99294d5842ef8c5b16070ce230d29e"

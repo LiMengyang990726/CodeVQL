@@ -42,6 +42,7 @@ exist     { return EXIST; }
 forall    { return FORALL; }
 that      { return THAT; }
 \*        { return ANY; }
+\+         { return PLUS; }
 
     /* question: (\\.) in regular expression? */
 

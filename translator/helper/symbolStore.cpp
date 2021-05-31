@@ -9,6 +9,7 @@
 #include "symbolStore.h"
 #include "populateMainSouffle.h"
 #include "utils.h"
+#include "constants.h"
 using namespace std;
 
 unordered_map<string, string> symbolTable;
@@ -16,23 +17,24 @@ unordered_map<string, string> varDeclarationTable;
 vector<string> versionDeclarationVec;
 unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
-unordered_set<string> outputVarsSet;
+unordered_map<string, string> outputVarFieldTable;
 unordered_set<string> notExistSpecifiedVarsSet;
 
 /* APIs for Symbol Table */
 void initializeSymbolTable() {
    symbolTable["TestClass"] = "(fqn: String, version: Version)";
    symbolTable["AbstractClass"] = "(fqn: String, version: Version)";
+   symbolTable["Class"] = "(fqn: String, isTestClass: String, getOuterClass: String, version: Version)";
    symbolTable["Method"] = "(fqn: String, getName: String, getClassName: String, getNumberOfParams: number, getReturn: String, isConstructor: String, version: Version)";
 
-   symbolTable["Update"] = "(fqn: String, parent: Version, commit: Version)"; 
-   symbolTable["Insert"] = "(fqn: String, parent: Version, commit: Version)";
-   symbolTable["Delete"] = "(fqn: String, parent: Version, commit: Version)";
+   symbolTable["Update"] = "(fqn: String, parent: Version, version: Version)"; 
+   symbolTable["Insert"] = "(fqn: String, parent: Version, version: Version)";
+   symbolTable["Delete"] = "(fqn: String, parent: Version, version: Version)";
    
    symbolTable["MethodAccess"] = "(getCaller: String, getCallee: String, version: Version)";
    symbolTable["Containment"] = "(getContainer: String, getContainee: String, version: Version)";
    symbolTable["Reference"] = "(getReferer: String, getReferee: String, version: Version)";
-   symbolTable["Inheritance"] = "(getSubClass: String, getSuperClass: String, version: Version)";
+   symbolTable["Inheritance"] = "(getInheritater: String, getInheritatee: String, version: Version)";
    
    symbolTable["History"] = "(child: Version, parent: Version, index: Int)";
    symbolTable["Version"] = "(version: Version)";
@@ -47,6 +49,10 @@ string getIdName(string type) {
    return fieldPairs[0].first;
 }
 
+int getFieldLen(string type) {
+   return destructSouffleDecl(symbolTable[type]).size();
+}
+
 string CodeVQLObjToSouffleDecl(string type) {
    string result = "";
    if (symbolTable.find(type) != symbolTable.end()) {
@@ -55,22 +61,20 @@ string CodeVQLObjToSouffleDecl(string type) {
    return result;
 }
 
-string CodeVQLObjToSouffleOutput(unordered_set<string> outputVarsSet) {
+string CodeVQLObjToSouffleOutput(unordered_map<string, string> outputVarFieldTable) {
    vector<pair<string, string> > resultPairs;
-   for (auto iter = outputVarsSet.begin(); iter != outputVarsSet.end(); iter++) {
-      string type = findVarDeclaration(*iter);
+   for (auto iter = outputVarFieldTable.begin(); iter != outputVarFieldTable.end(); iter++) {
+      string name = iter->first;
+      string field = iter->second;
+      string type = findVarDeclaration(name);
       if (symbolTable.find(type) != symbolTable.end()) {
-         string intermediateResult = symbolTable[type];
-         vector<pair<string, string> > fieldPairs = destructSouffleDecl(intermediateResult);
-         // resultPairs.push_back(make_pair(fieldPairs.begin()->first, fieldPairs.begin()->second));
+         vector<pair<string, string> > fieldPairs = destructSouffleDecl(symbolTable[type]);
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-            if (it->first == "version") {
-               if (type == "Version") {
-                  resultPairs.push_back(make_pair(it->first, it->second));
-               }
-               continue;
-            } else if (it->first == getIdName(type)) {
-               resultPairs.push_back(make_pair(it->first, it->second));
+            string currField = it->first;
+            if (currField == field) {
+               resultPairs.push_back(make_pair(findVarFieldReferredName(name, field), it->second));
+            } else if (currField == "version") {
+               resultPairs.push_back(make_pair(currField, it->second));
             }
          }
       }
@@ -78,19 +82,20 @@ string CodeVQLObjToSouffleOutput(unordered_set<string> outputVarsSet) {
    return constructSouffleDecl(resultPairs);
 }
 
-string CodeVQLObjToSouffleRuleBegin(unordered_set<string> outputVarsSet) {
+string CodeVQLObjToSouffleRuleBegin(unordered_map<string, string> outputVarFieldTable) {
    vector<string> resultPairs;
-   for (auto iter = outputVarsSet.begin(); iter != outputVarsSet.end(); iter++) {
-      string type = findVarDeclaration(*iter);
+   for (auto iter = outputVarFieldTable.begin(); iter != outputVarFieldTable.end(); iter++) {
+      string name = iter->first;
+      string field = iter->second;
+      string type = findVarDeclaration(name);
       if (symbolTable.find(type) != symbolTable.end()) {
-         string intermediateResult = symbolTable[type];
-         vector<pair<string, string> > fieldPairs = destructSouffleDecl(intermediateResult);
-         // resultPairs.push_back(fieldPairs.begin()->first);
+         vector<pair<string, string> > fieldPairs = destructSouffleDecl(symbolTable[type]);
          for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-            if (findVarFieldReferredName(*iter, fieldPairs[0].first) != "") {
-               resultPairs.push_back(findVarFieldReferredName(*iter, getIdName(type)));
-            } else if (it->first == "version" && type == "Version") {
-               resultPairs.push_back(*iter);
+            string currField = it->first;
+            if (currField == field) {
+               resultPairs.push_back(findVarFieldReferredName(name, field));
+            } else if (currField == "version") {
+               resultPairs.push_back(findVersionVarAssociation(name));
             }
          }
       }
@@ -110,9 +115,28 @@ bool isDirectFieldExtraction(string name, string field) {
    return false;
 }
 
-bool isClosureMethod(string name, string field) {
-   // TODO: Support other types of closures
-   return field == "getClosure";
+bool isTypeValidClosure(string type) {
+    vector<pair<string, string> > fieldPairs = destructSouffleDecl(symbolTable[type]);
+    if (fieldPairs.size() < 3) {
+        return false;
+    }
+    string firstFieldName = fieldPairs[0].first;
+    string secondFieldName = fieldPairs[1].first;
+    string lastFieldName = fieldPairs[fieldPairs.size()-1].first;
+    if (!hasEnding(firstFieldName, CLOSURE_FIRST_FIELD_SUFFIX)) {
+        return false;
+    }
+    if (!hasEnding(secondFieldName, CLOSURE_SECOND_FIELD_SUFFIX)) {
+        return false;
+    }
+    if (!hasEnding(lastFieldName, CLOSURE_LAST_FIELD)) {
+        return false;
+    }
+    return true;
+}
+
+bool isClosureMethod(string field) {
+   return field.back() == CLOSURE_SUFFIX;
 }
 
 /* APIs for Var Declaration Table */
@@ -190,12 +214,12 @@ string findVarFieldReferredName(string name, string field) {
 }
 
 /* APIs for handling output related things */
-void storeOutputVar(string output) {
-    outputVarsSet.insert(output);
+void storeOutputVarField(string output, string field) {
+   outputVarFieldTable[output] = field;
 }
 
-unordered_set<string> getoutputVarsSet() {
-   return outputVarsSet;
+unordered_map<string, string> getOutputVarFieldTable() {
+   return outputVarFieldTable;
 }
 
 /* APIs for storing and searching in NOT EXIST reasoning opts in WHERE clause */
