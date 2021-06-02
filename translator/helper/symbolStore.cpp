@@ -27,9 +27,9 @@ void initializeSymbolTable() {
    symbolTable["Class"] = "(fqn: String, isTestClass: String, getOuterClass: String, version: Version)";
    symbolTable["Method"] = "(fqn: String, getName: String, getClassName: String, getNumberOfParams: number, getReturn: String, isConstructor: String, version: Version)";
 
-   symbolTable["Update"] = "(fqn: String, parent: Version, version: Version)"; 
-   symbolTable["Insert"] = "(fqn: String, parent: Version, version: Version)";
-   symbolTable["Delete"] = "(fqn: String, parent: Version, version: Version)";
+   symbolTable["Update"] = "(fqn: String, parent: Version, commit: Version, version: Version)"; 
+   symbolTable["Insert"] = "(fqn: String, parent: Version, commit: Version, version: Version)";
+   symbolTable["Delete"] = "(fqn: String, parent: Version, commit: Version, version: Version)";
    
    symbolTable["MethodAccess"] = "(getCaller: String, getCallee: String, version: Version)";
    symbolTable["Containment"] = "(getContainer: String, getContainee: String, version: Version)";

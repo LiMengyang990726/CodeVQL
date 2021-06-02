@@ -25,7 +25,8 @@ void writeTemplate() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << "#include \""<< BASE_TYPES_DL_FILE_NAME << "\"" << endl;
-    mainDLFile << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl
+    mainDLFile << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl;
+    mainDLFile << "#include \"" << CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
                << endl;
     mainDLFile.close();
 }
@@ -175,8 +176,8 @@ void writeClosure(string type) {
         intermediateStr += ", ";
     }
     factTypesDL << ".decl " << type << "Closure(er: String, ee: String, version: Version)" << endl;
-    factTypesDL << type << "Closure(er, ee, version) :- " << type << "(er, ee, " << intermediateStr << "version)" << endl;
-    factTypesDL << type << "Closure(er, ee, version) :- " << type << "(er, " << intermediateStr << "version), " << type << "(" << intermediateStr << "ee, version)." << endl << endl;
+    factTypesDL << type << "Closure(er, ee, version) :- " << type << "(er, ee, " << intermediateStr << "version)." << endl;
+    factTypesDL << type << "Closure(er, ee, version) :- " << type << "(er, m, " << intermediateStr << "version), " << type << "(m, " << intermediateStr << "ee, version)." << endl << endl;
     factTypesDL.close();
 }
 

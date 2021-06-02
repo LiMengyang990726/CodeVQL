@@ -10,5 +10,5 @@ and ct.getContainer() = cl
 and cl.isTestClass())
 select cl.getOuterClass()
 
-define vNew ("e7fefdaddd99294d5842ef8c5b16070ce230d29e")
-define vChange ("e7fefdaddd99294d5842ef8c5b16070ce230d29e~2".."e7fefdaddd99294d5842ef8c5b16070ce230d29e")
+define vNew ("419a052c6842192e78f747d9f5af619c2ca56e78")
+define vChange ("6c9d06a658d87c01fb02d1efce15bf6b74eb7aab~2".."419a052c6842192e78f747d9f5af619c2ca56e78")

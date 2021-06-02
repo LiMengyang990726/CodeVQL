@@ -508,6 +508,7 @@ void translateComparison(struct ast *a)
                             writeNegationRule();
                         }
                         writeRule(nameStr, fieldStr, referer);
+                        writeParallelRule();
                         writeRule(nextName, nextNameIdName, referer);
                     }
                 } else if (findVarFieldReferredName(nameStr, fieldStr) != "") {
@@ -518,6 +519,7 @@ void translateComparison(struct ast *a)
                         writeNegationRule();
                     }
                     writeRule(nameStr, fieldStr, prevReferer);
+                    writeParallelRule();
                     writeRule(nextName, nextNameIdName, prevReferer);
                 } else {
                     // Case 3.3: lower_id and xxx.xx() have NOT been referrer before
