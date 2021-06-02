@@ -8,10 +8,10 @@ import java
 from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
 where exists (old, new, method that 
-old.caller() != new.caller() and
-old.getMethod() = method.method() and method.getName() = "getDirList" and method.getClassName() = "org.apache.commons.io.file.AccumulatorPathVisitor" and
-new.getMethod() = method.method() and method.getName() = "getDirList" and method.getClassName() = "org.apache.commons.io.file.AccumulatorPathVisitor")
-select new, v1
+old.getCaller() != new.getCaller() and
+old.getCallee() = method.fqn() and method.getName() = "getDirList" and method.getClassName() = "org.apache.commons.io.file.AccumulatorPathVisitor" and
+new.getCallee() = method.fqn() and method.getName() = "getDirList" and method.getClassName() = "org.apache.commons.io.file.AccumulatorPathVisitor")
+select new
 
 define v1 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~1".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~30")
 define v2 "c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea"

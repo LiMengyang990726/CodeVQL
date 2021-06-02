@@ -8,10 +8,10 @@ import java
 from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
 where exists (old, new, method that 
-old.caller() != new.caller() and
-old.getMethod() = method.method() and method.getName() = "parse" and method.getClassName() = "org.apache.fontbox.afm.AFMParser" and
-new.getMethod() = method.method() and method.getName() = "parse" and method.getClassName() = "org.apache.fontbox.afm.AFMParser")
-select new, v1
+old.getCaller() != new.getCaller() and
+old.getCallee() = method.fqn() and method.getName() = "parse" and method.getClassName() = "org.apache.fontbox.afm.AFMParser" and
+new.getCallee() = method.fqn() and method.getName() = "parse" and method.getClassName() = "org.apache.fontbox.afm.AFMParser")
+select new
 
 define v1 ("6457864c2de606cb17c63fc6dde50c8295517497~1".."6457864c2de606cb17c63fc6dde50c8295517497~60")
 define v2 "6457864c2de606cb17c63fc6dde50c8295517497"

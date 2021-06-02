@@ -8,10 +8,10 @@ import java
 from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
 where exists (old, new, method that 
-old.caller() != new.caller() and
-old.getMethod() = method.method() and method.getName() = "isBrotliCompressionAvailable" and method.getClassName() = "org.apache.commons.compress.compressors.brotli.BrotliUtils" and
-new.getMethod() = method.method() and method.getName() = "isBrotliCompressionAvailable" and method.getClassName() = "org.apache.commons.compress.compressors.brotli.BrotliUtils")
-select new, v1
+old.getCaller() != new.getCaller() and
+old.getCallee() = method.fqn() and method.getName() = "isBrotliCompressionAvailable" and method.getClassName() = "org.apache.commons.compress.compressors.brotli.BrotliUtils" and
+new.getCallee() = method.fqn() and method.getName() = "isBrotliCompressionAvailable" and method.getClassName() = "org.apache.commons.compress.compressors.brotli.BrotliUtils")
+select new
 
 define v1 ("1b7528fbd6295a3958daf1b1114621ee5e40e83c~1".."1b7528fbd6295a3958daf1b1114621ee5e40e83c~60")
 define v2 "1b7528fbd6295a3958daf1b1114621ee5e40e83c"

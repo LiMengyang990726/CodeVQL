@@ -9,9 +9,9 @@ from MethodAccess old, MethodAccess new, Method method
 range old @ v1, new @ v2, method @ v3
 where exists (old, new, method that 
 old.getCaller() != new.getCaller() and
-old.getCallee() = method.fqn() and method.getName() = "getAuth" and method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig" and
-new.getCallee() = method.fqn() and method.getName() = "getAuth" and method.getClassName() = "io.fabric8.maven.docker.access.AuthConfig")
-select new, v1
+old.getCallee() = method.fqn() and method.getName() = "isBrotliCompressionAvailable" and method.getClassName() = "org.apache.commons.compress.compressors.brotli.BrotliUtils" and
+new.getCallee() = method.fqn() and method.getName() = "isBrotliCompressionAvailable" and method.getClassName() = "org.apache.commons.compress.compressors.brotli.BrotliUtils")
+select new
 
 define v1 ("1b7528fbd6295a3958daf1b1114621ee5e40e83c~1".."1b7528fbd6295a3958daf1b1114621ee5e40e83c~10")
 define v2 "1b7528fbd6295a3958daf1b1114621ee5e40e83c"
