@@ -37,7 +37,7 @@ output_path = args.output_path
 validatePath(output_path)
 
 # Execute
-interMsgFileName = os.path.join(output_path, "rules/interMsgForPipeline")
+interMsgFileName = os.path.join(output_path, "rules/interMsgForPipeline.txt")
 # Step 1: Read each line inside the inter message file created by the translator
 if os.stat(interMsgFileName).st_size != 0:
     file = open(interMsgFileName, 'r')
@@ -63,7 +63,7 @@ if os.stat(interMsgFileName).st_size != 0:
             # Step 3: Move the needed files to the designated location
             for fact_type in results[2:]:
                 fact_type += ".facts"
-                fact_file = os.path.join(os.path.join(repo_path, ".facts/30-diffs"), fact_type)
+                fact_file = os.path.join(os.path.join(repo_path, ".facts/30-diff"), fact_type)
                 original_file = open(fact_file, 'r')
                 new_combined_file = open(os.path.join(os.path.join(output_path, ".facts"), fact_type), 'a+')
                 new_combined_file.write(original_file.read())

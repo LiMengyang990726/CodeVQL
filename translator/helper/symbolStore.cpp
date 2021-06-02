@@ -207,6 +207,7 @@ void writeDiffTypeVersionTypeAssoc() {
       vector<string> types = it->second;
       interMsgFile << startCommit << "\t" << endCommit << "\t";
       for (string type : types) {
+         transform(type.begin(), type.end(),type.begin(), ::toupper); // All DIFF facts's names are in upper case
          interMsgFile << type << "\t";
       }
       interMsgFile << endl;
