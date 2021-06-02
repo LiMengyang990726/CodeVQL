@@ -45,7 +45,8 @@ commit = args.commit
 # Step 1: Compile maven project
 os.chdir(repo_path)
 os.system("git checkout " + commit + "> /dev/null 2>&1")
-os.system('mvn compile && test-compile > /dev/null 2>&1')
+os.system('mvn compile > /dev/null 2>&1')
+os.system('mvn test-compile > /dev/null 2>&1')
 
 # Step 2: Create cslicer properties file
 os.system('touch cslicer.properties')

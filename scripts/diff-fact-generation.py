@@ -38,12 +38,12 @@ validatePath(output_path)
 
 # Execute
 interMsgFileName = os.path.join(output_path, "rules/interMsgForPipeline.txt")
+start_time = time.time()
 # Step 1: Read each line inside the inter message file created by the translator
 if os.stat(interMsgFileName).st_size != 0:
     file = open(interMsgFileName, 'r')
     lines = file.readlines()
     count = 0
-    start_time = time.time()
     for line in lines:
         results = line.strip().split("\t")
         if len(results) <= 2:
@@ -53,7 +53,8 @@ if os.stat(interMsgFileName).st_size != 0:
             endCommit = results[1]
             # Step 2: Generate the properties file and Run gitslice
             os.chdir(repo_path)
-            os.system('mvn compile && test-compile > /dev/null 2>&1')
+            os.system('mvn compile > /dev/null 2>&1')
+            os.system('mvn test-compile > /dev/null 2>&1')
             os.system('touch diff-%d.properties' % (count))
             os.system('echo "repoPath = %s/.git" >> diff-%d.properties' % (repo_path, count))
             os.system('echo "startCommit = %s" >> diff-%d.properties' % (startCommit, count))
@@ -74,9 +75,9 @@ if os.stat(interMsgFileName).st_size != 0:
             os.remove(os.path.join(repo_path, 'diff-%d.properties' % (count)))
             shutil.rmtree(os.path.join(repo_path, ".facts"))
             count += 1
-    end_time = time.time()
 
 # Step 5: Count statistics
+end_time = time.time()
 time_usage = end_time - start_time
 mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 print(str(time_usage) + "\t" + str(mem_usage))

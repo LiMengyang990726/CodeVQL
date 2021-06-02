@@ -25,8 +25,7 @@ void writeTemplate() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << "#include \""<< BASE_TYPES_DL_FILE_NAME << "\"" << endl;
-    mainDLFile << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl;
-    mainDLFile << "#include \"" << CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
+    mainDLFile << "#include \"" << FACT_TYPES_DL_FILE_NAME << "\"" << endl
                << endl;
     mainDLFile.close();
 }
@@ -161,6 +160,13 @@ void writeArithmethics(string var, string comparision, string value) {
 }
 
 void writeClosure(string type) {
+    if (closureTypes.size() == 0) {
+        ofstream mainDLFile;
+        mainDLFile.open(mainDLFileName, ios_base::app);
+        mainDLFile << "#include \"" << CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
+                   << endl;
+        mainDLFile.close();
+    }
     if (closureTypes.find(type) != closureTypes.end()) {
         return;
     }
