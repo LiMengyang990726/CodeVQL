@@ -25,7 +25,7 @@ validatePath(output_path)
 
 # Execute
 start_time = time.time()
-os.system('mkdir %s/output && souffle -F %s/.facts/20-deps/ -D %s/output %s/rules/main.dl' % (output_path, output_path, output_path, output_path))
+os.system('mkdir %s/output && souffle -F %s/.facts/ -D %s/output %s/rules/main.dl' % (output_path, output_path, output_path, output_path))
 end_time = time.time()
 time_usage = end_time - start_time
 mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss

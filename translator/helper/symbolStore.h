@@ -20,6 +20,12 @@ string CodeVQLObjToSouffleRuleBegin(unordered_map<string, string> outputVarField
 bool isDirectFieldExtraction(string name, string field);
 bool isTypeValidClosure(string type);
 bool isClosureMethod(string field);
+bool isDiffType(string type);
+
+void storeValidVersionForDiffTypeSet(string versionName, vector<string> rangeStrs);
+bool isValidVersionForDiffTypeSet(string versionName);
+void addTypeToDiffTypeVersionTypeAssocTable(string versionName, string type);
+void writeDiffTypeVersionTypeAssoc();
 
 void storeVarDeclarationTable(string type, string name);
 string findVarDeclaration(string name);

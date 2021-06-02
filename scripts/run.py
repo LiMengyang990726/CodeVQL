@@ -2,9 +2,6 @@ import argparse
 import os
 import sys
 import subprocess
-import resource
-import time
-from subprocess import check_output
 from pyfiglet import Figlet
 
 def validatePath(path):
@@ -89,8 +86,15 @@ os.system(
     echo Step 3 is done!' % (codevql_path, repo_path, cslicer_path, codevql_path, output_path)
 )
 
-# Step 4: Analyze to get the result
+# Step 4: Get diff facts
 os.system(
-    'echo Step 4: Start analyzing the query && \
+    'echo Step 4: Start Generating diff facts && \
+    python3.7 %s/scripts/diff-fact-generation.py --repo_path %s --cslicer_path %s --output_path %s && \
+    echo Step 4 is done!' % (codevql_path, repo_path, cslicer_path, output_path)
+)
+
+# Step 5: Analyze to get the result
+os.system(
+    'echo Step 5: Start analyzing the query && \
     python3.7 %s/scripts/query-analysis.py --output_path %s && \
-    echo Step 4 is done and program finished!' % (codevql_path, output_path))
+    echo Step 5 is done and program finished!' % (codevql_path, output_path))

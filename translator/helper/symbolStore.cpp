@@ -1,6 +1,8 @@
 
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <regex>
 #include <unordered_map>
 #include <unordered_set>
 #include <cstring>
@@ -12,7 +14,16 @@
 #include "constants.h"
 using namespace std;
 
+struct diffTypeVersion {
+   string startCommit;
+   string endCommit;
+};
+
 unordered_map<string, string> symbolTable;
+unordered_set<string> diffTypeSymbolSet;
+unordered_set<string> validVersionForDiffTypeSet;
+unordered_map<string, diffTypeVersion> diffTypeVersionNameDetailTable;
+unordered_map<string, vector<string> > diffTypeVersionTypeAssocTable;
 unordered_map<string, string> varDeclarationTable;
 vector<string> versionDeclarationVec;
 unordered_map<string, string> versionVarAssocTable;
@@ -24,12 +35,15 @@ unordered_set<string> notExistSpecifiedVarsSet;
 void initializeSymbolTable() {
    symbolTable["TestClass"] = "(fqn: String, version: Version)";
    symbolTable["AbstractClass"] = "(fqn: String, version: Version)";
-   symbolTable["Class"] = "(fqn: String, isTestClass: String, getOuterClass: String, version: Version)";
+   symbolTable["Class"] = "(fqn: String, isAbstract: String, getSuperClass: String, isNested: String, getOuterClass: String, isTestClass: String, version: Version)";
    symbolTable["Method"] = "(fqn: String, getName: String, getClassName: String, getNumberOfParams: number, getReturn: String, isConstructor: String, version: Version)";
 
-   symbolTable["Update"] = "(fqn: String, parent: Version, commit: Version, version: Version)"; 
-   symbolTable["Insert"] = "(fqn: String, parent: Version, commit: Version, version: Version)";
-   symbolTable["Delete"] = "(fqn: String, parent: Version, commit: Version, version: Version)";
+   symbolTable["Update"] = "(fqn: String, pos: String, version: Version, parent: Version)"; 
+   diffTypeSymbolSet.insert("Update");
+   symbolTable["Insert"] = "(fqn: String, pos: String, version: Version, parent: Version)";
+   diffTypeSymbolSet.insert("Insert");
+   symbolTable["Delete"] = "(fqn: String, pos: String, version: Version, parent: Version)";
+   diffTypeSymbolSet.insert("Delete");
    
    symbolTable["MethodAccess"] = "(getCaller: String, getCallee: String, version: Version)";
    symbolTable["Containment"] = "(getContainer: String, getContainee: String, version: Version)";
@@ -137,6 +151,67 @@ bool isTypeValidClosure(string type) {
 
 bool isClosureMethod(string field) {
    return field.back() == CLOSURE_SUFFIX;
+}
+
+bool isDiffType(string type) {
+   return diffTypeSymbolSet.find(type) != diffTypeSymbolSet.end();
+}
+
+/* APIs for Valid Versions (for Diff Type) Set*/
+bool isValidVersionForDiffType(vector<string> rangeStrs) {
+   if (rangeStrs.size() != 2) {
+      return false;
+   }
+   if (!regex_match(rangeStrs[0], regex(PLAIN_VERSION_REGEX))) {
+      return false;
+   }
+   if (!regex_match(rangeStrs[1], regex(PLAIN_VERSION_REGEX))) {
+      return false;
+   }
+   return true;
+}
+
+void storeValidVersionForDiffTypeSet(string versionName, vector<string> rangeStrs) {
+   if (isValidVersionForDiffType(rangeStrs)) {
+      validVersionForDiffTypeSet.insert(versionName);
+      diffTypeVersion d = {/* startCommit = */rangeStrs[1], /* endCommit = */rangeStrs[0] };
+      diffTypeVersionNameDetailTable[versionName] = d;
+   }
+}
+
+bool isValidVersionForDiffTypeSet(string versionName) {
+   return validVersionForDiffTypeSet.find(versionName) != validVersionForDiffTypeSet.end();
+}
+
+void addTypeToDiffTypeVersionTypeAssocTable(string versionName, string type) {
+   if (diffTypeVersionNameDetailTable.find(versionName) != diffTypeVersionNameDetailTable.end()) {
+      diffTypeVersionTypeAssocTable[versionName].push_back(type);
+   } else {
+      return;
+   }
+}
+
+void writeDiffTypeVersionTypeAssoc() {
+   ofstream interMsgFile;
+   interMsgFile.open(INTER_MSG_FOR_PIPELINE_FILE_NAME_ABS);
+
+   for (auto it = diffTypeVersionTypeAssocTable.begin(); it != diffTypeVersionTypeAssocTable.end(); it++) {
+      if (it->second.size() == 0) {
+         continue;
+      }
+      diffTypeVersion d = diffTypeVersionNameDetailTable[it->first];
+      string startCommit = d.startCommit;
+      startCommit.erase(remove(startCommit.begin(), startCommit.end(), '\"' ), startCommit.end());
+      string endCommit = d.endCommit;
+      endCommit.erase(remove(endCommit.begin(), endCommit.end(), '\"' ), endCommit.end());
+      vector<string> types = it->second;
+      interMsgFile << startCommit << "\t" << endCommit << "\t";
+      for (string type : types) {
+         interMsgFile << type << "\t";
+      }
+      interMsgFile << endl;
+   }
+   interMsgFile.close();
 }
 
 /* APIs for Var Declaration Table */

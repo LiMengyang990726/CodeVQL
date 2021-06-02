@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <unordered_set>
+#include <regex>
 #include "constants.h"
 #include "nodetype.h"
 #include "symbolStore.h"
@@ -156,6 +158,7 @@ void translateDefineOpts(struct ast *a)
         vector<string> rangeStrs;
         rangeStrs.push_back(fromCommitStr);
         rangeStrs.push_back(baseCommitStr);
+        storeValidVersionForDiffTypeSet(nameStr, rangeStrs);
         storeVarDeclarationTable(TYPE_VERISON, nameStr);
         storeVersionDeclarationTable(nameStr);
         writeVersion(nameStr);
@@ -227,6 +230,14 @@ void translateRange(struct ast *a, vector<string>& versions)
     if (!isVersionDeclared(versionNameStr)) {
         yyerror("version is not defined");
         return;
+    }
+    if (isDiffType(findVarDeclaration(varNameStr))) {
+        if (isValidVersionForDiffTypeSet(versionNameStr)) {
+            addTypeToDiffTypeVersionTypeAssocTable(versionNameStr, findVarDeclaration(varNameStr));
+        } else {
+            yyerror("This kind of version definition is currently not supported for DIFF type facts");
+            return;
+        }
     }
     storeVersionVarAssociationTable(versionNameStr, varNameStr);
     versions.push_back(versionNameStr);
@@ -699,6 +710,7 @@ void eval(struct ast *a)
         case 4:
             translateFrom(a->children[0]);
             translateRange(a->children[1], versions);
+            writeDiffTypeVersionTypeAssoc();
             translateSelect(a->children[3]);
             writeOutputDecl();
             writeRuleBegin();

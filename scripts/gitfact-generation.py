@@ -39,13 +39,13 @@ validatePath(output_path)
 # Execute
 start_time = time.time()
 process = subprocess.Popen(
-    'mkdir -p %s/.facts/20-deps && touch %s/.facts/20-deps/history.facts' % (output_path, output_path), 
+    'mkdir -p %s/.facts && touch %s/.facts/history.facts' % (output_path, output_path), 
     shell=True
 )
 process.wait()
 
 process = subprocess.Popen(
-    '%s/target/release/gitfacts %s -o %s/.facts/20-deps/history.facts' % (gitfacts_path, repo_path, output_path), 
+    '%s/target/release/gitfacts %s -o %s/.facts/history.facts' % (gitfacts_path, repo_path, output_path), 
     shell=True
 )
 process.wait()

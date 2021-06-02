@@ -67,7 +67,7 @@ for f in os.listdir(os.path.join(output_path, "rules")):
 result_sequence.append("Version.dl")
 os.chdir(os.path.join(output_path, "rules"))
 for file_name in result_sequence:
-    command = "souffle -F " + os.path.join(os.path.join(output_path, ".facts"), "20-deps") + " " + file_name
+    command = "souffle -F " + os.path.join(output_path, ".facts") + " -D " + os.path.join(output_path, ".facts") + " " + file_name
     os.system(command)
 for file_name in result_sequence:
     f = os.path.join(os.path.join(output_path, "rules"),file_name)
@@ -79,7 +79,7 @@ os.chdir(repo_path)
 original_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip().decode("utf-8")
 
 commits = []
-with open(os.path.join(output_path, ".facts/20-deps/VersionComb.facts")) as fp:
+with open(os.path.join(output_path, ".facts/VersionComb.facts")) as fp:
     for i, line in enumerate(fp):
         commits.extend(line.strip().split("\t"))
 commits = set(commits)

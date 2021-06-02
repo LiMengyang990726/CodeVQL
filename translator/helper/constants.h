@@ -7,9 +7,11 @@
 #define BASE_TYPES_DL_FILE_NAME "baseTypes.dl"
 #define FACT_TYPES_DL_FILE_NAME "factTypes.dl"
 #define CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME "codevqlUniqueMethod.dl"
+#define INTER_MSG_FOR_PIPELINE_FILE_NAME "interMsgForPipeline.txt"
 #define BASE_TYPES_DL_FILE_NAME_ABS "rules/baseTypes.dl"
 #define FACT_TYPES_DL_FILE_NAME_ABS "rules/factTypes.dl"
 #define CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME_ABS "rules/codevqlUniqueMethod.dl"
+#define INTER_MSG_FOR_PIPELINE_FILE_NAME_ABS "rules/interMsgForPipeline.txt"
 
 #define CLOSURE_SUFFIX '+'
 #define CLOSURE "Closure"

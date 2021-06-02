@@ -1,7 +1,6 @@
 import argparse
 import os
 import sys
-import subprocess
 import shutil
 import resource
 import time
@@ -46,7 +45,7 @@ commit = args.commit
 # Step 1: Compile maven project
 os.chdir(repo_path)
 os.system("git checkout " + commit + "> /dev/null 2>&1")
-os.system('mvn compile > /dev/null 2>&1')
+os.system('mvn compile && test-compile > /dev/null 2>&1')
 
 # Step 2: Create cslicer properties file
 os.system('touch cslicer.properties')
@@ -58,23 +57,24 @@ start_time = time.time()
 os.system('java -jar %s -c %s/cslicer.properties -e dl --ext dep > /dev/null 2>&1' % (cslicer_path, repo_path))
 end_time = time.time()
 
-# Step 4: Append version to get versionised fact file
-for f in os.listdir(os.path.join(repo_path, ".facts/20-deps")):
-    file_name = os.path.join(os.path.join(repo_path, ".facts/20-deps"), f)
-    if os.path.isfile(file_name):
+# Step 4: Append version to get versionised fact file (Note: only for those inside 20-deps)
+for path, _, files in os.walk(os.path.join(repo_path, ".facts/20-deps")):
+    for name in files:
+        file_name = os.path.join(path, name)
         with open(file_name, 'r') as fr:
             file_lines = [''.join([x.strip(), '\t' + commit, '\n']) for x in fr.readlines()]
         with open(file_name, 'w') as fw:
             fw.writelines(file_lines)
         original_file = open(file_name, 'r')
-        new_location_file = open(os.path.join(os.path.join(output_path, ".facts/20-deps"), f), 'a+')
-        new_location_file.write(original_file.read())
+        new_combined_file = open(os.path.join(os.path.join(output_path, ".facts"), name), 'a+')
+        new_combined_file.write(original_file.read())
+        new_combined_file.seek(0)
         original_file.close()
-        new_location_file.close()
+        new_combined_file.close()
 
 # Step 5: Remove intermediate files
 os.remove(os.path.join(repo_path, "cslicer.properties"))
-shutil.rmtree(os.path.join(repo_path, ".facts/20-deps"))
+shutil.rmtree(os.path.join(repo_path, ".facts"))
 
 time_usage = end_time - start_time
 mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
