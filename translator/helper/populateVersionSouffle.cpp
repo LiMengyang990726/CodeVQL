@@ -11,17 +11,14 @@
 #define VERSION_DL_PREFIX "rules/SelectedVersion"
 #define VERSION_DL_POSTFIX ".dl"
 #define VERSION_DL "rules/Version.dl"
-#define VERSION_OUTPUT_PREFIX "../.facts/20-deps/"
+#define VERSION_OUTPUT_PREFIX "../.facts/"
 #define VERSION_OUTPUT_POSTFIX ".facts"
-#define PLAIN_VERSION_REGEX "^\"[a-zA-Z0-9]{40}\"$"
-#define NTH_ANCESTOR_REGEX "^\"[a-zA-Z0-9]{40}~[0-9]+\"$"
-#define NTH_PARENT_REGEX "^\"[a-zA-Z0-9]{40}\\^[0-9]+\"$"
 #define VARNAME_PREFIX "SelectedVersion"
 using namespace std;
 
 int numVersions = 1;
 
-void writeVersionsCombination(vector<string> inputs)
+void writeVersionsCombination(unordered_set<string> inputs)
 {
     string filename = VERSION_DL;
     ofstream versionDL;
@@ -65,10 +62,11 @@ void writeVersionsCombination(vector<string> inputs)
         }
     }
 
-    for (int i = 0; i < inputs.size(); i++)
+    int i = 0;
+    for (string input : inputs)
     {
         char c = i + 'a';
-        string varName = VARNAME_PREFIX + inputs[i];
+        string varName = VARNAME_PREFIX + input;
         if (i == inputs.size() - 1)
         {
             versionDL << varName << "(" << c << "). " << endl;
@@ -77,6 +75,7 @@ void writeVersionsCombination(vector<string> inputs)
         {
             versionDL << varName << "(" << c << "), ";
         }
+        i++;
     }
     versionDL << ".output " << VARNAME_PREFIX << "(IO=file, filename=\"" << VERSION_OUTPUT_PREFIX << "VersionComb" << VERSION_OUTPUT_POSTFIX << "\")" << endl;
 }

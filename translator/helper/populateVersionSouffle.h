@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void writeVersionsCombination(vector<string> inputs);
+void writeVersionsCombination(unordered_set<string> inputs);
 
 void writeVersionDL(string varName, string version);
 void writeVersionDL(string varName, int type, vector<string> versions);

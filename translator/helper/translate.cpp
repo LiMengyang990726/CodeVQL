@@ -212,7 +212,7 @@ void translateFrom(struct ast *a)
     }
 }
 
-void translateRange(struct ast *a, vector<string>& versions)
+void translateRange(struct ast *a, unordered_set<string>& versions)
 {
     // No range opts, accept
     if (!a)
@@ -240,7 +240,7 @@ void translateRange(struct ast *a, vector<string>& versions)
         }
     }
     storeVersionVarAssociationTable(versionNameStr, varNameStr);
-    versions.push_back(versionNameStr);
+    versions.insert(versionNameStr);
 
     if (a->childrencount == 2)
     {
@@ -678,7 +678,7 @@ void eval(struct ast *a)
 
     writeAllRelDLs();
     writeTemplate();
-    vector<string> versions;
+    unordered_set<string> versions;
     switch (a->nodetype)
     {
     /* import statement */

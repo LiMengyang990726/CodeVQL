@@ -4,6 +4,10 @@
 #define TYPE_VERISON "Version"
 #define OUTPUT_NAME "query"
 
+#define PLAIN_VERSION_REGEX "^\"[a-zA-Z0-9]{40}\"$"
+#define NTH_ANCESTOR_REGEX "^\"[a-zA-Z0-9]{40}~[0-9]+\"$"
+#define NTH_PARENT_REGEX "^\"[a-zA-Z0-9]{40}\\^[0-9]+\"$"
+
 #define BASE_TYPES_DL_FILE_NAME "baseTypes.dl"
 #define FACT_TYPES_DL_FILE_NAME "factTypes.dl"
 #define CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME "codevqlUniqueMethod.dl"
