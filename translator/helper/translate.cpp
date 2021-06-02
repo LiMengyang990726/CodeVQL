@@ -719,6 +719,7 @@ void eval(struct ast *a)
             writeVersionCombInRule();
             writeRuleTermination();
             writeVersionComb();
+            writeIncludeCodeVQLUniqueMethod();
             break;
         default:
             yyerror("incomplete query");

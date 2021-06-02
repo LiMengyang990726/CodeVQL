@@ -159,14 +159,17 @@ void writeArithmethics(string var, string comparision, string value) {
     mainDLFile.close();
 }
 
-void writeClosure(string type) {
-    if (closureTypes.size() == 0) {
+void writeIncludeCodeVQLUniqueMethod() {
+    if (closureTypes.size() != 0) {
         ofstream mainDLFile;
         mainDLFile.open(mainDLFileName, ios_base::app);
         mainDLFile << "#include \"" << CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
                    << endl;
         mainDLFile.close();
     }
+}
+
+void writeClosure(string type) {
     if (closureTypes.find(type) != closureTypes.end()) {
         return;
     }
