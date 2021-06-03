@@ -7,9 +7,9 @@ import java
 
 from MethodAccess accessV1, MethodAccess accessV2, Method method
 range accessV1 @ v1, accessV2 @ v2, method @ v3
-where exists (accessV1 that accessV1.getMethod()=method.method() and method.getName() = "*")
-and not exist (accessV2 that accessV2.getMethod()=method.method() and method.getName() = "*")
-select method, v3
+where exists (accessV1 that accessV1.getCaller()=method.fqn() and method.getName() = "*")
+and not exist (accessV2 that accessV2.getCaller()=method.fqn() and method.getName() = "*")
+select method
 
 define v1 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~1".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~30")
 define v2 "c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea"

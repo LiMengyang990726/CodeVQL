@@ -3,11 +3,11 @@ import os
 
 repo_path_abs = "/home/mengyang/FYP/"
 gitfacts_path = "/home/mengyang/FYP/ext-gitfacts"
-output_path_abs = "/home/mengyang/FYP/experiments/"
-query_file_path_abs = "/home/mengyang/FYP/codeqltosouffle/experiements/"
-translator_path = "/home/mengyang/FYP/codeqltosouffle"
+output_path_abs = "/home/mengyang/FYP/experiments_2021_06_03/"
+query_file_path_abs = "/home/mengyang/FYP/CodeVQL/experiements/"
+codevql_path = "/home/mengyang/FYP/CodeVQL"
 cslicer_path = "/home/mengyang/FYP/gitslice/target/cslicer-1.0.0-jar-with-dependencies.jar"
-log_file = "/home/mengyang/FYP/experiments/log.txt"
+log_file = os.path.join(output_path_abs, "log-2021-06-03.txt")
 
 for path in Path('./').rglob('*.txt'):
     repo_path_rel = str(path.parents[1])
@@ -20,8 +20,8 @@ for path in Path('./').rglob('*.txt'):
          --gitfacts_path %s \
          --output_path %s \
          --query_file_path %s \
-         --translator_path %s \
-         --cslicer_path %s >> %s" % (repo_path, gitfacts_path, output_path, query_file_path, translator_path, cslicer_path, log_file)
+         --codevql_path %s \
+         --cslicer_path %s >> %s" % (repo_path, gitfacts_path, output_path, query_file_path, codevql_path, cslicer_path, log_file)
     f = open(log_file, "a")
     f.write(command)
     f.write("\n")
