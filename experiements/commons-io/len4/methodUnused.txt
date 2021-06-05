@@ -11,6 +11,6 @@ where exists (accessV1 that accessV1.getCaller()=method.fqn() and method.getName
 and not exist (accessV2 that accessV2.getCaller()=method.fqn() and method.getName() = "*")
 select method
 
-define v1 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~1".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~10")
+define v1 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~1".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~90")
 define v2 "c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea"
-define v3 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~10")
+define v3 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~90")

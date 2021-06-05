@@ -11,5 +11,5 @@ old.getReturn() = "void" and
 new.getReturn() != "void")
 select new
 
-define v1 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~1".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~10")
+define v1 ("c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~1".."c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea~90")
 define v2 "c54bf688e94b550c3ccd4c0789e0b3e00cf1d0ea"
