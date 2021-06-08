@@ -1,0 +1,15 @@
+/*
+    Check all methods who originally has (>=, >, <, <=, =, !=) n parameters in v1 now has (>=, >, <, <=, =, !=) m parameters in v2
+*/
+import java
+
+from Method old, Method new
+range old @ v1, new @ v2
+where exists (old, new that 
+old.getName()=new.getName() and 
+old.getClassName()=new.getClassName() and 
+old.getNumberOfParams() != new.getNumberOfParams())
+select new
+
+define v1 ("3d90d5d8cb2f6f0e028000de5a11d66dd3890c75~1".."3d90d5d8cb2f6f0e028000de5a11d66dd3890c75~30")
+define v2 "3d90d5d8cb2f6f0e028000de5a11d66dd3890c75"

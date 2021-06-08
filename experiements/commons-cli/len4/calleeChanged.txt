@@ -1,0 +1,18 @@
+/*
+    Check all differnt calls to a method in v2 comparing with v1
+    Alternatively, it can also 
+    Check all differnt calls to a constructor in v2 comparing with v1
+*/
+import java
+
+from MethodAccess old, MethodAccess new, Method method
+range old @ v1, new @ v2, method @ v3
+where exists (old, new, method that 
+old.getCaller() != new.getCaller() and
+old.getCallee() = method.fqn() and method.getName() = "createValue" and method.getClassName() = "org.apache.commons.cli.TypeHandler" and
+new.getCallee() = method.fqn() and method.getName() = "createValue" and method.getClassName() = "org.apache.commons.cli.TypeHandler")
+select new
+
+define v1 ("3d90d5d8cb2f6f0e028000de5a11d66dd3890c75~1".."3d90d5d8cb2f6f0e028000de5a11d66dd3890c75~90")
+define v2 "3d90d5d8cb2f6f0e028000de5a11d66dd3890c75"
+define v3 ("3d90d5d8cb2f6f0e028000de5a11d66dd3890c75".."3d90d5d8cb2f6f0e028000de5a11d66dd3890c75~90")

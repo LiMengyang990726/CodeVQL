@@ -1,0 +1,18 @@
+/*
+    Check all differnt calls to a method in v2 comparing with v1
+    Alternatively, it can also 
+    Check all differnt calls to a constructor in v2 comparing with v1
+*/
+import java
+
+from MethodAccess old, MethodAccess new, Method method
+range old @ v1, new @ v2, method @ v3
+where exists (old, new, method that 
+old.getCaller() != new.getCaller() and
+old.getCallee() = method.fqn() and method.getName() = "isValidAnnotationMemberType" and method.getClassName() = "org.apache.commons.lang3.AnnotationUtils" and
+new.getCallee() = method.fqn() and method.getName() = "isValidAnnotationMemberType" and method.getClassName() = "org.apache.commons.lang3.AnnotationUtils")
+select new
+
+define v1 ("197d50434748bfb2db935266cfe740fc01a607ee~1".."197d50434748bfb2db935266cfe740fc01a607ee~30")
+define v2 "197d50434748bfb2db935266cfe740fc01a607ee"
+define v3 ("197d50434748bfb2db935266cfe740fc01a607ee".."197d50434748bfb2db935266cfe740fc01a607ee~30")
