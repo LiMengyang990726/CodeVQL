@@ -1,4 +1,4 @@
-# Get Started With CodeVQL
+# Get Started With EvoMe
 ## Install Prelimilaries
 In this manual, we assume that you are using a Linux system. Particular to this manual, it is run on a Ubuntu system.
 
@@ -45,8 +45,8 @@ sudo apt-get update
 ```
 If you are in a different operating system, please refer [here](https://souffle-lang.github.io/install) for more information.
 
-### CodeVQL Translator
-Please refer to this [guide](https://github.com/LiMengyang990726/codeqltosouffle/tree/master/translator#translator-installation).
+### EvoMe Translator
+Please refer to this [guide](https://github.com/LiMengyang990726/EvoMe/tree/master/translator#translator-installation).
 ## Try out now!
 ### Command-line interface
 1. Install any repository you like and write a corresponding query file
@@ -57,7 +57,7 @@ python3.7 run.py --repo_path <todo> \
          --gitfacts_path <todo> \
          --output_path <todo> \
          --query_file_path <todo> \
-         --codevql_path <todo> \
+         --evome_path <todo> \
          --cslicer_path <todo>
 ```
 ### Web interface

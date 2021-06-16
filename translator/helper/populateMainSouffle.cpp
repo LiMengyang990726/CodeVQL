@@ -78,7 +78,7 @@ void writeVersionCombInRule() {
 void writeOutputDecl() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << ".decl " << OUTPUT_NAME << CodeVQLObjToSouffleOutput(getOutputVarFieldTable()) << endl;
+    mainDLFile << ".decl " << OUTPUT_NAME << EvoMeObjToSouffleOutput(getOutputVarFieldTable()) << endl;
     mainDLFile.close();
 }
 
@@ -92,7 +92,7 @@ void writeOutput() {
 void writeRuleBegin() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
-    mainDLFile << OUTPUT_NAME << CodeVQLObjToSouffleRuleBegin(getOutputVarFieldTable()) << ":- ";
+    mainDLFile << OUTPUT_NAME << EvoMeObjToSouffleRuleBegin(getOutputVarFieldTable()) << ":- ";
     mainDLFile.close();
 }
 
@@ -159,11 +159,11 @@ void writeArithmethics(string var, string comparision, string value) {
     mainDLFile.close();
 }
 
-void writeIncludeCodeVQLUniqueMethod() {
+void writeIncludeEvoMeUniqueMethod() {
     if (closureTypes.size() != 0) {
         ofstream mainDLFile;
         mainDLFile.open(mainDLFileName, ios_base::app);
-        mainDLFile << "#include \"" << CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
+        mainDLFile << "#include \"" << EVOME_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
                    << endl;
         mainDLFile.close();
     }
@@ -179,7 +179,7 @@ void writeClosure(string type) {
     }
     closureTypes.insert(type);
     ofstream factTypesDL;
-    factTypesDL.open(CODEVQL_UNIQUE_METHOD_REL_DL_FILE_NAME_ABS, ios_base::app);
+    factTypesDL.open(EVOME_UNIQUE_METHOD_REL_DL_FILE_NAME_ABS, ios_base::app);
     string intermediateStr = repeatString(string(1, IGNORED_SOUFFLE_FIELD), getFieldLen(type)-3);
     if (intermediateStr != "") {
         intermediateStr += ", ";
@@ -195,7 +195,7 @@ void writeRule(string name, string field, string value) {
     mainDLFile.open(mainDLFileName, ios_base::app);
 
     string type = findVarDeclaration(name);
-    vector<pair<string, string> > fieldsVector = destructSouffleDecl(CodeVQLObjToSouffleDecl(type));
+    vector<pair<string, string> > fieldsVector = destructSouffleDecl(EvoMeObjToSouffleDecl(type));
     string version = findVersionVarAssociation(name);
     string result = "";
 

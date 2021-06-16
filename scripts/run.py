@@ -12,13 +12,13 @@ def validatePath(path):
 # Print name of the APP
 title = Figlet(font='slant')
 subtitle = Figlet(font='bubble')
-print(title.renderText('CodeVQL'))
+print(title.renderText('EvoMe'))
 print(subtitle.renderText('Version-Aware Security Analysis'))
 
 # Create the parser
 runner = argparse.ArgumentParser(description='\
-            This is the Command Line Interface(CLI) of the CodeVQL language. \
-            CodeVQL can perform the basic security analysis in a version-aware way. \
+            This is the Command Line Interface(CLI) of the EvoMe language. \
+            EvoMe can perform the basic security analysis in a version-aware way. \
             For more information, please check at this link [TODO]. \
         ')
 
@@ -35,9 +35,9 @@ runner.add_argument('--output_path',
 runner.add_argument('--query_file_path',
                     type=str,
                     help='the path to the input query file')
-runner.add_argument('--codevql_path',
+runner.add_argument('--evome_path',
                     type=str,
-                    help='the path to the codevql from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/codevql/)')
+                    help='the path to the EvoMe from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/EvoMe/)')
 runner.add_argument('--cslicer_path',
                     type=str,
                     help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')            
@@ -59,8 +59,8 @@ validatePath(output_path)
 query_file_path = args.query_file_path
 validatePath(query_file_path)
 
-codevql_path = args.codevql_path
-validatePath(codevql_path)
+evome_path = args.evome_path
+validatePath(evome_path)
 
 cslicer_path = args.cslicer_path
 validatePath(cslicer_path)
@@ -69,32 +69,32 @@ validatePath(cslicer_path)
 os.system(
     'echo Step 1: Start generating git facts && \
     python3.7 %s/scripts/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
-    echo Step 1 is done!' % (codevql_path, repo_path, gitfacts_path, output_path)
+    echo Step 1 is done!' % (evome_path, repo_path, gitfacts_path, output_path)
 )
 
-# Step 2: Translate CodeVQL to Souffle
+# Step 2: Translate EvoMe to Souffle
 os.system(
-    'echo Step 2: Start translating CodeVQL to Souffle && \
-    python3.7 %s/scripts/translate.py --query_file_path %s --codevql_path %s --output_path %s && \
-    echo Step 2 is done!' % (codevql_path, query_file_path, codevql_path, output_path)
+    'echo Step 2: Start translating EvoMe to Souffle && \
+    python3.7 %s/scripts/translate.py --query_file_path %s --evome_path %s --output_path %s && \
+    echo Step 2 is done!' % (evome_path, query_file_path, evome_path, output_path)
 )
 
 # Step 3: Get multiversion facts
 os.system(
     'echo Step 3: Start Generating program facts in selected version && \
-    python3.7 %s/scripts/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --codevql_path %s --output_path %s && \
-    echo Step 3 is done!' % (codevql_path, repo_path, cslicer_path, codevql_path, output_path)
+    python3.7 %s/scripts/multiversion-fact-generation.py --repo_path %s --cslicer_path %s --evome_path %s --output_path %s && \
+    echo Step 3 is done!' % (evome_path, repo_path, cslicer_path, evome_path, output_path)
 )
 
 # Step 4: Get diff facts
 os.system(
     'echo Step 4: Start Generating diff facts && \
     python3.7 %s/scripts/diff-fact-generation.py --repo_path %s --cslicer_path %s --output_path %s && \
-    echo Step 4 is done!' % (codevql_path, repo_path, cslicer_path, output_path)
+    echo Step 4 is done!' % (evome_path, repo_path, cslicer_path, output_path)
 )
 
 # Step 5: Analyze to get the result
 os.system(
     'echo Step 5: Start analyzing the query && \
     python3.7 %s/scripts/query-analysis.py --output_path %s && \
-    echo Step 5 is done and program finished!' % (codevql_path, output_path))
+    echo Step 5 is done and program finished!' % (evome_path, output_path))

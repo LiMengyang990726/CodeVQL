@@ -67,7 +67,7 @@ int getFieldLen(string type) {
    return destructSouffleDecl(symbolTable[type]).size();
 }
 
-string CodeVQLObjToSouffleDecl(string type) {
+string EvoMeObjToSouffleDecl(string type) {
    string result = "";
    if (symbolTable.find(type) != symbolTable.end()) {
       result = symbolTable[type];
@@ -75,7 +75,7 @@ string CodeVQLObjToSouffleDecl(string type) {
    return result;
 }
 
-string CodeVQLObjToSouffleOutput(unordered_map<string, string> outputVarFieldTable) {
+string EvoMeObjToSouffleOutput(unordered_map<string, string> outputVarFieldTable) {
    vector<pair<string, string> > resultPairs;
    for (auto iter = outputVarFieldTable.begin(); iter != outputVarFieldTable.end(); iter++) {
       string name = iter->first;
@@ -96,7 +96,7 @@ string CodeVQLObjToSouffleOutput(unordered_map<string, string> outputVarFieldTab
    return constructSouffleDecl(resultPairs);
 }
 
-string CodeVQLObjToSouffleRuleBegin(unordered_map<string, string> outputVarFieldTable) {
+string EvoMeObjToSouffleRuleBegin(unordered_map<string, string> outputVarFieldTable) {
    vector<string> resultPairs;
    for (auto iter = outputVarFieldTable.begin(); iter != outputVarFieldTable.end(); iter++) {
       string name = iter->first;
@@ -119,7 +119,7 @@ string CodeVQLObjToSouffleRuleBegin(unordered_map<string, string> outputVarField
 
 bool isDirectFieldExtraction(string name, string field) {
    string type = findVarDeclaration(name);
-   string fields = CodeVQLObjToSouffleDecl(type);
+   string fields = EvoMeObjToSouffleDecl(type);
    vector<pair<string, string> > fieldsVector = destructSouffleDecl(fields);
    for(auto iter = fieldsVector.begin(); iter != fieldsVector.end(); iter++) {
       if(iter->first == field) {

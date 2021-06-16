@@ -12,7 +12,7 @@ def validatePath(path):
         sys.exit()
 
 # Create the parser
-runner = argparse.ArgumentParser(description='This script automate the process of translating CodeVQL to Souffle.')
+runner = argparse.ArgumentParser(description='This script automate the process of translating EvoMe to Souffle.')
 
 # Add the arguments
 runner.add_argument('--repo_path',
@@ -21,9 +21,9 @@ runner.add_argument('--repo_path',
 runner.add_argument('--output_path',
                     type=str,
                     help='the path to the analysis output')   
-runner.add_argument('--codevql_path',
+runner.add_argument('--evome_path',
                     type=str,
-                    help='the path to the codevql from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/codevql/)')
+                    help='the path to the EvoMe from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/EvoMe/)')
 runner.add_argument('--cslicer_path',
                     type=str,
                     help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')            
@@ -37,8 +37,8 @@ validatePath(repo_path)
 output_path = args.output_path
 validatePath(output_path)
 
-codevql_path = args.codevql_path
-validatePath(codevql_path)
+evome_path = args.evome_path
+validatePath(evome_path)
 
 cslicer_path = args.cslicer_path
 validatePath(cslicer_path)
@@ -87,7 +87,7 @@ end_time = time.time()
 
 subprocesses_usage = []
 for commit in commits:
-    command = "python3.7 " + os.path.join(codevql_path, "scripts/fact-generation.py") + \
+    command = "python3.7 " + os.path.join(evome_path, "scripts/fact-generation.py") + \
         " --repo_path " + repo_path + \
         " --cslicer_path " + cslicer_path + \
         " --output_path " + output_path + \

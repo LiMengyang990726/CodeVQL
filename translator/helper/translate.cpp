@@ -573,7 +573,7 @@ void translateComparison(struct ast *a)
                     writeRule(lNameStr, lFieldStr, referer);
                 }
             } else {
-                // Case 2: CodeVQL unique object methods
+                // Case 2: EvoMe unique object methods
                 if (isClosureMethod(lFieldStr) && isClosureMethod(rFieldStr)) {
                     // Case 2.1: Both sides are closure
                     if (!isTypeValidClosure(findVarDeclaration(lNameStr)) || !isTypeValidClosure(findVarDeclaration(rNameStr))) {
@@ -719,7 +719,7 @@ void eval(struct ast *a)
             writeVersionCombInRule();
             writeRuleTermination();
             writeVersionComb();
-            writeIncludeCodeVQLUniqueMethod();
+            writeIncludeEvoMeUniqueMethod();
             break;
         default:
             yyerror("incomplete query");

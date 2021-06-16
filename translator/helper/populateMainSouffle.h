@@ -26,7 +26,7 @@ void writeRightBracket();
 void writeEquality(string a, string b);
 void writeInequality(string a, string b);
 void writeArithmethics(string var, string comparision, string value);
-void writeIncludeCodeVQLUniqueMethod();
+void writeIncludeEvoMeUniqueMethod();
 void writeClosure(string type);
 void writeRule(string name, string field, string value);
 
