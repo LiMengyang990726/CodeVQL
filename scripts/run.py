@@ -2,18 +2,18 @@ import argparse
 import os
 import sys
 import subprocess
-from pyfiglet import Figlet
+import logging
+from util import print_cli_banner
+
+logger = logging.getLogger(__name__)
 
 def validatePath(path):
     if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
         print('The path or file ' + path + ' specified does not exist')
         sys.exit()
 
-# Print name of the APP
-title = Figlet(font='slant')
-subtitle = Figlet(font='bubble')
-print(title.renderText('EvoMe'))
-print(subtitle.renderText('Version-Aware Security Analysis'))
+
+print_cli_banner()
 
 # Create the parser
 runner = argparse.ArgumentParser(description='\
@@ -67,7 +67,7 @@ validatePath(cslicer_path)
 
 # Step 1: Generate Git Facts
 os.system(
-    'echo Step 1: Start generating git facts && \
+    'echo step 1: start generating git facts && \
     python3.7 %s/scripts/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
     echo Step 1 is done!' % (evome_path, repo_path, gitfacts_path, output_path)
 )

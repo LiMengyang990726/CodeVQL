@@ -2,18 +2,16 @@ import argparse
 import os
 import sys
 import subprocess
-from pyfiglet import Figlet
+from util import print_cli_banner
+
 
 def validatePath(path):
     if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
         print('The path or file ' + path + ' specified does not exist')
         sys.exit()
 
-# Print name of the APP
-title = Figlet(font='slant')
-subtitle = Figlet(font='bubble')
-print(title.renderText('EvoMe'))
-print(subtitle.renderText('Version-Aware Security Analysis'))
+
+print_cli_banner()
 
 # Create the parser
 runner = argparse.ArgumentParser(description='\
