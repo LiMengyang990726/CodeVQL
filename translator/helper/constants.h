@@ -12,10 +12,12 @@
 #define FACT_TYPES_DL_FILE_NAME "factTypes.dl"
 #define EVOME_UNIQUE_METHOD_REL_DL_FILE_NAME "evomeUniqueMethod.dl"
 #define INTER_MSG_FOR_PIPELINE_FILE_NAME "interMsgForPipeline.txt"
+#define RESULT_TABLE_HEADER_FILE_NAME "resultTableHeader.txt"
 #define BASE_TYPES_DL_FILE_NAME_ABS "rules/baseTypes.dl"
 #define FACT_TYPES_DL_FILE_NAME_ABS "rules/factTypes.dl"
 #define EVOME_UNIQUE_METHOD_REL_DL_FILE_NAME_ABS "rules/evomeUniqueMethod.dl"
 #define INTER_MSG_FOR_PIPELINE_FILE_NAME_ABS "rules/interMsgForPipeline.txt"
+#define RESULT_TABLE_HEADER_FILE_NAME_ABS "rules/resultTableHeader.txt"
 
 #define CLOSURE_SUFFIX '+'
 #define CLOSURE "Closure"

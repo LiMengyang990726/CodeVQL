@@ -29,6 +29,7 @@ vector<string> versionDeclarationVec;
 unordered_map<string, string> versionVarAssocTable;
 unordered_map<string, unordered_map<string, string> > varFeildReferenceTable;
 unordered_map<string, string> outputVarFieldTable;
+unordered_map<string, string> outputAliasTable;
 unordered_set<string> notExistSpecifiedVarsSet;
 
 /* APIs for Symbol Table */
@@ -294,8 +295,28 @@ void storeOutputVarField(string output, string field) {
    outputVarFieldTable[output] = field;
 }
 
+void storeOutputAlias(string output, string field, string alias) {
+   outputAliasTable[output+field] = alias;
+}
+
 unordered_map<string, string> getOutputVarFieldTable() {
    return outputVarFieldTable;
+}
+
+void writeResultTableHeader() {
+   ofstream resultTableHeaderFile;
+   resultTableHeaderFile.open(RESULT_TABLE_HEADER_FILE_NAME_ABS);
+
+   for (auto it = outputVarFieldTable.begin(); it != outputVarFieldTable.end(); it++) {
+      if (outputAliasTable.find(it->first + it->second) != outputAliasTable.end()) {
+         resultTableHeaderFile << outputAliasTable[it->first + it->second];
+      } else {
+         resultTableHeaderFile << it->second;
+      }
+      resultTableHeaderFile << endl;
+   } 
+   resultTableHeaderFile << "version" << endl;
+   resultTableHeaderFile.close();
 }
 
 /* APIs for storing and searching in NOT EXIST reasoning opts in WHERE clause */

@@ -328,7 +328,7 @@ void translateSelect(struct ast *a)
         yyerror("error in select opts");
         return;
     }
-    else if (a->childrencount < 1 || a->childrencount > 2)
+    else if (a->childrencount < 1 || a->childrencount > 3)
     {
         yyerror("error in SELECT node in AST construction");
         return;
@@ -336,8 +336,8 @@ void translateSelect(struct ast *a)
 
     struct ast *name = a->children[0];
     string nameStr = ((struct stringval *)name)->value;
+    string fieldStr;
     if (findVarDeclaration(nameStr) != "Version") {
-        string fieldStr;
         if (name->nodetype == CALL_NODE) {
             // Select result is CALL
             nameStr = ((struct stringval *)name->children[0])->value;
@@ -349,6 +349,19 @@ void translateSelect(struct ast *a)
         }
         storeVarFieldReferenceTable(nameStr + "." + fieldStr, fieldStr + nameStr);
         storeOutputVarField(nameStr, fieldStr);
+    }
+    
+    if (a->nodetype == SELECT_AS_OPTS_NODE) {
+        storeOutputAlias(nameStr, fieldStr, ((struct stringval *)a->children[1])->value);
+        if (a->childrencount == 2) 
+        {
+            return;
+        }
+        else 
+        {
+            translateSelect(a->children[2]);
+            return;
+        }
     }
 
     if (a->childrencount == 1)
@@ -712,6 +725,7 @@ void eval(struct ast *a)
             translateRange(a->children[1], versions);
             writeDiffTypeVersionTypeAssoc();
             translateSelect(a->children[3]);
+            writeResultTableHeader();
             writeOutputDecl();
             writeRuleBegin();
             translateWhere(a->children[2]);

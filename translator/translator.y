@@ -106,9 +106,9 @@ select_stmt: SELECT select_opts { $$ = newast(SELECT_STMT_NODE, 1, $2); }
   ;
 
 select_opts: expr { $$ = newast(SELECT_OPTS_NODE, 1, $1); }
-  | expr AS LOWER_ID { $$ = newast(SELECT_OPTS_NODE, 1, newstringval($3)); }
+  | expr AS LOWER_ID { $$ = newast(SELECT_AS_OPTS_NODE, 2, $1, newstringval($3)); }
   | select_opts COMMA expr { $$ = newast(SELECT_OPTS_NODE, 2, $3, $1); }
-  | select_opts COMMA expr AS LOWER_ID  { $$ = newast(SELECT_OPTS_NODE, 2, newstringval($5), $1); }
+  | select_opts COMMA expr AS LOWER_ID  { $$ = newast(SELECT_AS_OPTS_NODE, 3, $3, newstringval($5), $1); }
   ;
 
 from_opts: UPPER_ID LOWER_ID { $$ = newast(FROM_OPTS_NODE, 2, newstringval($1), newstringval($2)); }

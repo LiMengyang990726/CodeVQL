@@ -41,7 +41,9 @@ void storeVarFieldReferenceTable(string referred, string referer);
 string findVarFieldReferredName(string name, string field);
 
 void storeOutputVarField(string output, string field);
+void storeOutputAlias(string output, string field, string alias);
 unordered_map<string, string> getOutputVarFieldTable();
+void writeResultTableHeader();
 
 void storenotExistSpecifiedVarsSet(string name);
 void clearnotExistSpecifiedVarsSet();
