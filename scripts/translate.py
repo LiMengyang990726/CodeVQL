@@ -1,56 +1,65 @@
 import argparse
+import datetime
+import logging
 import os
-import sys
-import subprocess
 import resource
+import shutil
+import subprocess
+import sys
 import time
+from pathlib import Path
+from typing import Optional
 
-def validatePath(path):
-    if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
-        print('The path or file ' + path + ' specified does not exist')
-        sys.exit()
+from util import validate_path, ensure_dir, ErrorCode, CFG_PATHS, init_logging
 
-# Create the parser
-runner = argparse.ArgumentParser(description='This script automate the process of translating EvoMe to Souffle.')
+logger = logging.getLogger(__name__)
 
-# Add the arguments
-runner.add_argument('--output_path',
-                    type=str,
-                    help='the path to the analysis output')   
-runner.add_argument('--query_file_path',
-                    type=str,
-                    help='the path to the input query file')
-runner.add_argument('--evome_path',
-                    type=str,
-                    help='the path to the EvoMe from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/EvoMe/)') 
 
-# Get all the input arguments and validate
-args = runner.parse_args()
+def run_translator():
+    # Create the parser
+    runner = argparse.ArgumentParser(description='This script automate the process of translating EvoMe to Souffle.')
+    # Add the arguments
+    runner.add_argument('--output_path', type=str, help='the path to the analysis output')
+    runner.add_argument('--query_file_path', type=str, help='the path to the input query file')
+    runner.add_argument('--evome_path', type=str,
+                        help='the path to the EvoMe from query langauge to internal declarative langauge, '
+                             'install here(https://github.com/LiMengyang990726/EvoMe/)')
+    # Get all the input arguments and validate
+    args = runner.parse_args()
+    output_path = Path(args.output_path)
+    query_file_path = Path(args.query_file_path)
+    evome_path = Path(args.evome_path)
+    for p in [output_path, query_file_path, evome_path]:
+        validate_path(p)
+    translate(output_path, query_file_path, evome_path)
 
-output_path = args.output_path
-validatePath(output_path)
 
-query_file_path = args.query_file_path
-validatePath(query_file_path)
+def translate(output_path: Path, query_file_path: Path, evome_path: Path):
+    # Execute
+    start_time = time.time()
+    create_dir_err: Optional[ErrorCode] = ensure_dir(evome_path / "translator/rules")
+    if create_dir_err is not None:
+        sys.exit(create_dir_err)
+    stdout_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.log"
+    stderr_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.err"
+    ensure_dir(os.path.dirname(stdout_log))
+    with open(stdout_log, 'w') as logf, open(stderr_log, 'w') as errf:
+        logger.info(f"Start running translator, logs will be written to {stdout_log} and {stderr_log}")
+        run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator",
+                                       stdout=logf, stderr=errf)
+    shutil.move(evome_path / "translator/rules", output_path / "rules")
+    end_time = time.time()
 
-evome_path = args.evome_path
-validatePath(evome_path)
+    time_usage = end_time - start_time
+    mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
+        resource.RUSAGE_SELF).ru_maxrss
+    logger.info(f"Time usage:{time_usage}\nMem usage:{mem_usage}\n")
 
-# Execute
-start_time = time.time()
-process = subprocess.Popen(
-    'cd %s/translator && mkdir -p rules && ./translator %s' % (evome_path, query_file_path), 
-    shell=True
-)
-process.wait()
 
-process = subprocess.Popen(
-    'mv %s/translator/rules %s/rules' % (evome_path, output_path), 
-    shell=True
-)
-process.wait()
-end_time = time.time()
+def get_cur_time_str() -> str:
+    return str(datetime.datetime.now().isoformat()).replace(':', '-')
 
-time_usage = end_time - start_time
-mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(str(time_usage) + "\t" + str(mem_usage))
+
+if __name__ == "__main__":
+    init_logging()
+    run_translator()

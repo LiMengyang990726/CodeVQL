@@ -3,81 +3,70 @@ import os
 import sys
 import subprocess
 import logging
-from util import print_cli_banner
+from util import print_cli_banner, ensure_dir, validate_path, init_logging
+from pathlib import Path
+from gitfact_generation import git_fact_gen
+from translate import translate
 
 logger = logging.getLogger(__name__)
 
-def validatePath(path):
-    if ((not os.path.isdir(path)) and (not os.path.isfile(path))):
-        print('The path or file ' + path + ' specified does not exist')
-        sys.exit()
 
 
-print_cli_banner()
+def main():
+    print_cli_banner()
 
-# Create the parser
-runner = argparse.ArgumentParser(description='\
-            This is the Command Line Interface(CLI) of the EvoMe language. \
-            EvoMe can perform the basic security analysis in a version-aware way. \
-            For more information, please check at this link [TODO]. \
-        ')
+    # Create the parser
+    runner = argparse.ArgumentParser(description='\
+                This is the Command Line Interface(CLI) of the EvoMe language. \
+                EvoMe can perform the basic security analysis in a version-aware way. \
+                For more information, please check at this link [TODO]. \
+            ')
 
-# Add the arguments
-runner.add_argument('--repo_path',
-                    type=str,
-                    help='the path to the program to be analyzed upon')
-runner.add_argument('--gitfacts_path',
-                    type=str,
-                    help='the path to the tool that generates git facts, install here(https://github.com/uxhg/ext-gitfacts)')
-runner.add_argument('--output_path',
-                    type=str,
-                    help='the path to the analysis output')   
-runner.add_argument('--query_file_path',
-                    type=str,
-                    help='the path to the input query file')
-runner.add_argument('--evome_path',
-                    type=str,
-                    help='the path to the EvoMe from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/EvoMe/)')
-runner.add_argument('--cslicer_path',
-                    type=str,
-                    help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')            
+    # Add the arguments
+    runner.add_argument('--repo_path',
+                        type=str,
+                        help='the path to the program to be analyzed upon')
+    runner.add_argument('--gitfacts_path',
+                        type=str,
+                        help='the path to the tool that generates git facts, install here(https://github.com/uxhg/ext-gitfacts)')
+    runner.add_argument('--output_path',
+                        type=str,
+                        help='the path to the analysis output')
+    runner.add_argument('--query_file_path',
+                        type=str,
+                        help='the path to the input query file')
+    runner.add_argument('--evome_path',
+                        type=str,
+                        help='the path to the EvoMe from query langauge to internal declarative langauge, install here(https://github.com/LiMengyang990726/EvoMe/)')
+    runner.add_argument('--cslicer_path',
+                        type=str,
+                        help='the path to the tool that generates program facts, install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')
 
-# Get all the input arguments and validate
-args = runner.parse_args()
+    # Get all the input arguments and validate
+    args = runner.parse_args()
+    repo_path = Path(args.repo_path)
+    gitfacts_path = Path(args.gitfacts_path)
+    output_path = Path(args.output_path)
+    ensure_dir(output_path)
+    query_file_path = Path(args.query_file_path)
+    evome_path = Path(args.evome_path)
+    cslicer_path = Path(args.cslicer_path)
+    for p in [repo_path, gitfacts_path, output_path, query_file_path, evome_path, cslicer_path]:
+        validate_path(p)
 
-repo_path = args.repo_path
-validatePath(repo_path)
+    # Step 1: Generate Git Facts
+    logger.info("Step 1: start generating git facts")
+    git_fact_gen(repo_path, gitfacts_path, output_path)
+    #"python3.7 %s/scripts/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
+    # %(evome_path, repo_path, gitfacts_path, output_path)
+    logger.info("Step 1 is done.")
 
-gitfacts_path = args.gitfacts_path
-validatePath(gitfacts_path)
-
-output_path = args.output_path
-subprocess.run(['mkdir', '-p', output_path])
-subprocess.run(['chmod', '-R', '777', output_path])
-validatePath(output_path)
-
-query_file_path = args.query_file_path
-validatePath(query_file_path)
-
-evome_path = args.evome_path
-validatePath(evome_path)
-
-cslicer_path = args.cslicer_path
-validatePath(cslicer_path)
-
-# Step 1: Generate Git Facts
-os.system(
-    'echo step 1: start generating git facts && \
-    python3.7 %s/scripts/gitfact-generation.py --repo_path %s --gitfacts_path %s --output_path %s && \
-    echo Step 1 is done!' % (evome_path, repo_path, gitfacts_path, output_path)
-)
-
-# Step 2: Translate EvoMe to Souffle
-os.system(
-    'echo Step 2: Start translating EvoMe to Souffle && \
-    python3.7 %s/scripts/translate.py --query_file_path %s --evome_path %s --output_path %s && \
-    echo Step 2 is done!' % (evome_path, query_file_path, evome_path, output_path)
-)
+    # Step 2: Translate EvoMe to Souffle
+    logger.info("Step 2: Start translating EvoMe to Souffle")
+    translate(output_path, query_file_path, evome_path)
+    # python3.7 %s/scripts/translate.py --query_file_path %s --evome_path %s --output_path %s && \
+    # % (evome_path, query_file_path, evome_path, output_path)
+    logger.info("Step 2 is done.")
 
 # Step 3: Get multiversion facts
 os.system(
@@ -98,3 +87,8 @@ os.system(
     'echo Step 5: Start analyzing the query && \
     python3.7 %s/scripts/query-analysis.py --output_path %s && \
     echo Step 5 is done and program finished!' % (evome_path, output_path))
+
+
+if __name__ == "__main__":
+    init_logging()
+    main()
