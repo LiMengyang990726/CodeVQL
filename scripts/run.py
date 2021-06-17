@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import logging
+from util import print_cli_banner
 
 logger = logging.getLogger(__name__)
 
@@ -12,13 +13,7 @@ def validatePath(path):
         sys.exit()
 
 
-if not os.environ.get("NO_DISPLAY_CLI_BANNER"):
-    # Print name of the APP
-    from pyfiglet import Figlet
-    title = Figlet(font='slant')
-    subtitle = Figlet(font='bubble')
-    print(title.renderText('EvoMe'))
-    print(subtitle.renderText('Version-Aware Security Analysis'))
+print_cli_banner()
 
 # Create the parser
 runner = argparse.ArgumentParser(description='\
