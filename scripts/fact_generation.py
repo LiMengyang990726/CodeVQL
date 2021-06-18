@@ -64,7 +64,7 @@ def gen_fact(repo_path: Path, output_path: Path, cslicer_path: Path, commit: str
     start_time = time.time()
     with open(CFG_PATHS["logging"] / "cslicer-dep.log", 'w') as collect_log:
         # check the implementation of -ver, to make sure it writes the correct version
-        cslicer_cmd = ["java", "-jar", cslicer_path, "-c", cslicer_cfg, "-e", "dl", "-ver" "-ext", "dep"]
+        cslicer_cmd = ["java", "-jar", cslicer_path, "-c", cslicer_cfg, "-e", "dl", "-ext", "dep"]
         subprocess.run(args=cslicer_cmd, stdout=collect_log, stderr=subprocess.STDOUT, check=True)
         ensure_dir(output_path / ".facts")
         # for f in os.listdir(repo_path/".facts/20-deps"):
