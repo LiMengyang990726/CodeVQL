@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 import logging
 
 from diff_fact_generation import diff_fact_gen
@@ -17,8 +18,7 @@ def main():
     runner = argparse.ArgumentParser(description='\
                 This is the Command Line Interface(CLI) of the EvoMe language. \
                 EvoMe can perform the basic security analysis in a version-aware way. \
-                For more information, please check at this link [TODO]. \
-            ')
+                For more information, please check at this link [TODO].')
 
     # Add the arguments
     runner.add_argument('--repo_path', type=str,
@@ -41,17 +41,18 @@ def main():
 
     # Get all the input arguments and validate
     args = runner.parse_args()
+    logger.info(f"Running tool with following arguments: {args}")
 
-    repo_path = args.repo_path
-    gitfacts_path = args.gitfacts_path
-    output_path = args.output_path
+    repo_path = Path(args.repo_path)
+    gitfacts_path = Path(args.gitfacts_path)
+    output_path = Path(args.output_path)
     ensure_dir(output_path)
     # subprocess.run(['mkdir', '-p', output_path])
     # subprocess.run(['chmod', '-R', '777', output_path])
-    query_file_path = args.query_file_path
-    evome_path = args.evome_path
-    cslicer_path = args.cslicer_path
-    program_fact_path = args.program_fact_path
+    query_file_path = Path(args.query_file_path)
+    evome_path = Path(args.evome_path)
+    cslicer_path = Path(args.cslicer_path)
+    program_fact_path = Path(args.program_fact_path)
 
     for p in [repo_path, gitfacts_path, output_path, query_file_path,
               evome_path, cslicer_path, program_fact_path]:
