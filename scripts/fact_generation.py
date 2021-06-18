@@ -2,11 +2,12 @@ import argparse
 import os
 import resource
 import shutil
+import subprocess
 import time
 from pathlib import Path
-import subprocess
 
-from util import validate_path, checkout_commit, mvn_build, generate_config_file, CFG_PATHS, ensure_dir
+from util import validate_path, checkout_commit, mvn_build, generate_config_file, CFG_PATHS, ensure_dir, RevPair, \
+    init_logging
 
 
 def run_fact_gen():
@@ -37,9 +38,10 @@ def run_fact_gen():
     commit = args.commit
     for p in [repo_path, output_path, cslicer_path]:
         validate_path(p)
+    gen_fact(repo_path, output_path, cslicer_path, commit)
 
 
-def gen_fact(repo_path: Path, output_path: Path, cslicer_path: Path, commit: str):
+def gen_fact(repo_path: Path, output_path: Path, cslicer_path: Path, commit: str) -> str:
     # Step 1: Compile maven project
     # os.chdir(repo_path)
     # os.system("git checkout " + commit + "> /dev/null 2>&1")
@@ -49,41 +51,40 @@ def gen_fact(repo_path: Path, output_path: Path, cslicer_path: Path, commit: str
     # only applied to single-mod projects
     mvn_build(repo_path)
 
-
     # Step 2: Create cslicer properties file
     # os.system('touch cslicer.properties')
     # os.system('echo "repoPath = %s/.git" >> cslicer.properties' % (repo_path))
     # os.system('echo "classRoot = %s/target" >> cslicer.properties' % (repo_path))
-    cslicer_cfg: Path = repo_path/"cslicer.properties"
-    generate_config_file(repo_path, None, None, cslicer_cfg)
+    cslicer_cfg: Path = repo_path / "cslicer.properties"
+    generate_config_file(repo_path, None, RevPair(None, commit), cslicer_cfg)
 
     # Step 3: Run CSlicer to get fact files
-    start_time = time.time()
-    os.system('java -jar %s -c %s/cslicer.properties -e dl --ext dep > /dev/null 2>&1' % (cslicer_path, repo_path))
-    end_time = time.time()
+    # os.system('java -jar %s -c %s/cslicer.properties -e dl --ext dep > /dev/null 2>&1' % (cslicer_path, repo_path))
 
-    with open(CFG_PATHS["logging"]/"cslicer-dep.log", 'w') as collect_log:
+    start_time = time.time()
+    with open(CFG_PATHS["logging"] / "cslicer-dep.log", 'w') as collect_log:
         # check the implementation of -ver, to make sure it writes the correct version
         cslicer_cmd = ["java", "-jar", cslicer_path, "-c", cslicer_cfg, "-e", "dl", "-ver" "-ext", "dep"]
         subprocess.run(args=cslicer_cmd, stdout=collect_log, stderr=subprocess.STDOUT, check=True)
-        ensure_dir(output_path/".facts")
-        for f in os.listdir(repo_path/".facts/20-deps"):
-            shutil.move(repo_path/".facts/20-deps"/f, output_path/".facts")
+        ensure_dir(output_path / ".facts")
+        # for f in os.listdir(repo_path/".facts/20-deps"):
+        #     shutil.move(repo_path/".facts/20-deps"/f, output_path/".facts")
+    end_time = time.time()
 
     # Step 4: Append version to get versionised fact file (Note: only for those inside 20-deps)
-    # for path, _, files in os.walk(os.path.join(repo_path, ".facts/20-deps")):
-    #     for name in files:
-    #         file_name = os.path.join(path, name)
-    #         with open(file_name, 'r') as fr:
-    #             file_lines = [''.join([x.strip(), '\t' + commit, '\n']) for x in fr.readlines()]
-    #         with open(file_name, 'w') as fw:
-    #             fw.writelines(file_lines)
-    #         original_file = open(file_name, 'r')
-    #         new_combined_file = open(os.path.join(os.path.join(output_path, ".facts"), name), 'a+')
-    #         new_combined_file.write(original_file.read())
-    #         new_combined_file.seek(0)
-    #         original_file.close()
-    #         new_combined_file.close()
+    for path, _, files in os.walk(os.path.join(repo_path, ".facts/20-deps")):
+        for name in files:
+            file_name = os.path.join(path, name)
+            with open(file_name, 'r') as fr:
+                file_lines = [''.join([x.strip(), '\t' + commit, '\n']) for x in fr.readlines()]
+            with open(file_name, 'w') as fw:
+                fw.writelines(file_lines)
+            original_file = open(file_name, 'r')
+            new_combined_file = open(os.path.join(os.path.join(output_path, ".facts"), name), 'a+')
+            new_combined_file.write(original_file.read())
+            new_combined_file.seek(0)
+            original_file.close()
+            new_combined_file.close()
 
     # Step 5: Remove intermediate files
     os.remove(os.path.join(repo_path, "cslicer.properties"))
@@ -91,5 +92,12 @@ def gen_fact(repo_path: Path, output_path: Path, cslicer_path: Path, commit: str
 
     time_usage = end_time - start_time
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
-            resource.RUSAGE_SELF).ru_maxrss
-    print(str(time_usage) + "\t" + str(mem_usage))
+        resource.RUSAGE_SELF).ru_maxrss
+    usage = f"{time_usage}\t{mem_usage}"
+    print(usage)
+    return usage
+
+
+if __name__ == "__main__":
+    init_logging()
+    run_fact_gen()

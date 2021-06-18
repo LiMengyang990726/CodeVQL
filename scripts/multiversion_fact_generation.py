@@ -7,7 +7,8 @@ import time
 from pathlib import Path
 import shlex
 
-from util import validate_path, init_logging
+from util import validate_path, init_logging, checkout_commit
+from fact_generation import gen_fact
 
 
 def run_multi_ver_fact_gen():
@@ -80,16 +81,18 @@ def multi_ver_fact_gen(repo_path, output_path, evome_path, cslicer_path):
 
     subprocesses_usage = []
     for commit in commits:
-        command = "python3.7 " + os.path.join(evome_path, "scripts/fact-generation.py") + \
-                  " --repo_path " + repo_path + \
-                  " --cslicer_path " + cslicer_path + \
-                  " --output_path " + output_path + \
-                  " --commit " + commit
-        usage = subprocess.check_output(command, shell=True).strip().decode("utf-8")
+        usage = gen_fact(repo_path, output_path, cslicer_path, commit)
+        # command = "python3.7 " + os.path.join(evome_path, "scripts/fact-generation.py") + \
+        #           " --repo_path " + repo_path + \
+        #           " --cslicer_path " + cslicer_path + \
+        #           " --output_path " + output_path + \
+        #           " --commit " + commit
+        # usage = subprocess.check_output(command, shell=True).strip().decode("utf-8")
         subprocesses_usage.append(usage)
 
-    command = "git checkout " + original_commit + "> /dev/null 2>&1"
-    os.system(command)
+    # command = "git checkout " + original_commit + "> /dev/null 2>&1"
+    # os.system(command)
+    checkout_commit(repo_path, original_commit)
 
     time_usage = end_time - start_time
     for subprocess_usage in subprocesses_usage:

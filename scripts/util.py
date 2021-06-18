@@ -134,6 +134,11 @@ def generate_config_file(repo_path: Path, build_path: Optional[Path], rev_pair: 
     lines = [f"repoPath = {repo_path / '.git'}\n",
              f"classRoot = {build_path / 'target/classes'}\n"]
     if rev_pair:
-        lines.extend([f"startCommit = {rev_pair.rev_old}\n", f"endCommit = {rev_pair.rev_new}\n"])
+        if rev_pair.rev_old:
+            lines.append(f"startCommit = {rev_pair.rev_old}\n")
+        if rev_pair.rev_new:
+            lines.append(f"endCommit = {rev_pair.rev_new}\n")
+        # lines.insert([f"startCommit = {rev_pair.rev_old}\n", f"endCommit = {rev_pair.rev_new}\n"])
+
     with out_file.open("w") as f_out:
         f_out.writelines(lines)

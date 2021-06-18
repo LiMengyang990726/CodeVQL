@@ -3,7 +3,7 @@ import resource
 import subprocess
 import time
 
-from util import validate_path, ensure_dir
+from util import validate_path, ensure_dir, init_logging
 
 
 def run_git_fact_gen():
@@ -38,3 +38,8 @@ def git_fact_gen(repo_path, gitfacts_path, output_path):
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
         resource.RUSAGE_SELF).ru_maxrss
     print(str(time_usage) + "\t" + str(mem_usage))
+
+
+if __name__ == "__main__":
+    init_logging()
+    run_git_fact_gen()

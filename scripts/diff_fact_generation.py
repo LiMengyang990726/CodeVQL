@@ -2,12 +2,13 @@ import argparse
 import logging
 import os
 import resource
+import shlex
 import shutil
 import subprocess
 import time
 from pathlib import Path
 
-from util import validate_path, ensure_dir, RevPair, mvn_build, generate_config_file
+from util import validate_path, ensure_dir, RevPair, mvn_build, generate_config_file, init_logging
 
 logger = logging.getLogger(__name__)
 
@@ -53,18 +54,20 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
                 # os.chdir(repo_path)
                 # os.system('mvn compile > /dev/null 2>&1')
                 # os.system('mvn test-compile > /dev/null 2>&1')
-                if mvn_build(repo_path) is not None:
-                    logger.warning(f"Error happened during build for {repo_path} @ {rev_pair[1]}.")
+                # if mvn_build(repo_path) is not None:
+                #    logger.warning(f"Error happened during build for {repo_path} @ {rev_pair[1]}.")
                 # os.system('touch diff-%d.properties' % count)
                 # os.system('echo "repoPath = %s/.git" >> diff-%d.properties' % (repo_path, count))
                 # os.system('echo "startCommit = %s" >> diff-%d.properties' % (start_commit, count))
                 # os.system('echo "endCommit = %s" >> diff-%d.properties' % (end_commit, count))
                 # os.system('echo "classRoot = %s/target" >> diff-%d.properties' % (repo_path, count))
                 cfg_path = repo_path / f"diff-{count}.properties"
-                generate_config_file(repo_path, repo_path / "target", rev_pair, cfg_path)
+                generate_config_file(repo_path, None, rev_pair, cfg_path)
 
-                os.system('java -jar %s -c %s/diff-%d.properties -e dl --ext dep diff > /dev/null 2>&1' % (
-                    cslicer_path, repo_path, count))
+                # os.system('java -jar %s -c %s/diff-%d.properties -e dl --ext dep diff > /dev/null 2>&1' % (
+                #     cslicer_path, repo_path, count))
+                cslicer_cmd = f"java -jar {cslicer_path} -c {cfg_path} -e dl -ext diff"
+                subprocess.run(shlex.split(cslicer_cmd), check=True, stdout=open(os.devnull), stderr=open(os.devnull))
                 # Step 3: Move the needed files to the designated location
                 for fact_type in results[2:]:
                     fact_type += ".facts"
@@ -86,3 +89,8 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
         resource.RUSAGE_SELF).ru_maxrss
     print(str(time_usage) + "\t" + str(mem_usage))
+
+
+if __name__ == "__main__":
+    init_logging()
+    run_diff_fact_gen()
