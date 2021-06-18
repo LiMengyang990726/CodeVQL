@@ -51,6 +51,7 @@ def ensure_dir(path: Path) -> Optional[ErrorCode]:
             return ErrorCode.PATH_ERROR
         else:
             logger.info(f"{path} does not exist, create dir now.")
+            os.makedirs(path)
     else:
         logger.info(f'Directory "{path}" already exists.')
 
