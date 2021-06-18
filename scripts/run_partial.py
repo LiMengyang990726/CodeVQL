@@ -57,6 +57,8 @@ def main():
     for p in [repo_path, gitfacts_path, output_path, query_file_path,
               evome_path, cslicer_path, program_fact_path]:
         validate_path(p)
+    run_partial(repo_path, gitfacts_path, output_path, query_file_path,
+                evome_path, cslicer_path, program_fact_path)
 
 
 def run_partial(repo_path, gitfacts_path, output_path, query_file_path,
