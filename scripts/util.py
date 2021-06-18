@@ -30,7 +30,7 @@ class ErrorCode(IntEnum):
 
 def print_cli_banner():
     # print name of the APP
-    if not os.environ.get("NO_DISPLAY_CLI_BANNER"):
+    if not os.environ.get("NO_CLI_BANNER"):
         from pyfiglet import Figlet
         title = Figlet(font='slant')
         subtitle = Figlet(font='bubble')
