@@ -45,6 +45,12 @@ def validate_path(path: Path):
 
 
 def ensure_dir(path: Path) -> Optional[ErrorCode]:
+    if not isinstance(path, Path):
+        try:
+            path = Path(path)
+        except:
+            logger.error(f"{path} is not a Path object and cannot be converted to Path")
+            return ErrorCode.PATH_ERROR
     if not path.exists():
         if path.is_file():
             logger.error(f"{path} is a file, cannot mkdir.")

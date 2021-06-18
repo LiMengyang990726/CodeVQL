@@ -42,7 +42,7 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
         sys.exit(create_dir_err)
     stdout_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.log"
     stderr_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.err"
-    ensure_dir(os.path.dirname(stdout_log))
+    ensure_dir(stdout_log.parent)
     with open(stdout_log, 'w') as logf, open(stderr_log, 'w') as errf:
         logger.info(f"Start running translator, logs will be written to {stdout_log} and {stderr_log}")
         run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator",
