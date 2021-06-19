@@ -51,32 +51,32 @@ def sample_repo_fact_gen(output_path, program_fact_path):
     start_time = time.time()
     result_sequence = []
     regex_from = re.compile(r'SelectedVersion[\w]+from\.dl')
-    for f in os.listdir(os.path.join(output_path, "rules")):
-        file_name = os.path.join(os.path.join(output_path, "rules"), f)
+    for f in os.listdir(output_path / "rules"):
+        file_name = output_path / "rules" / f
         if os.path.isfile(file_name) and regex_from.match(f):
             result_sequence.append(f)
 
     regex_base = re.compile(r'SelectedVersion[\w]+base\.dl')
-    for f in os.listdir(os.path.join(output_path, "rules")):
-        file_name = os.path.join(os.path.join(output_path, "rules"), f)
+    for f in os.listdir(output_path / "rules"):
+        file_name = output_path / "rules" / f
         if os.path.isfile(file_name) and regex_base.match(f):
             result_sequence.append(f)
 
     regex_plain = re.compile(r'SelectedVersion[\w]+\.dl')
-    for f in os.listdir(os.path.join(output_path, "rules")):
-        file_name = os.path.join(os.path.join(output_path, "rules"), f)
+    for f in os.listdir(output_path / "rules"):
+        file_name = output_path / "rules" / f
         if os.path.isfile(file_name) and regex_plain.match(f):
             result_sequence.append(f)
 
     result_sequence.append("Version.dl")
-    os.chdir(os.path.join(output_path, "rules"))
+    # os.chdir(os.path.join(output_path, "rules"))
     for file_name in result_sequence:
         # command = "souffle -F " + os.path.join(output_path, ".facts") + " -D " + os.path.join(output_path, ".facts") + " " + file_name
         # os.system(command)
         command = f"souffle -F {output_path}/.facts -D {output_path}/.facts {file_name}"
-        subprocess.run(shlex.split(command), check=True)
+        subprocess.run(shlex.split(command), check=True, cwd=output_path/"rules")
     for file_name in result_sequence:
-        f = os.path.join(os.path.join(output_path, "rules"), file_name)
+        f = output_path / "rules" / file_name
         if os.path.isfile(f):
             os.remove(f)
 
