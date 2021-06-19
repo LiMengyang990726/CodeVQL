@@ -54,19 +54,19 @@ def sample_repo_fact_gen(output_path, program_fact_path):
     for f in os.listdir(os.path.join(output_path, "rules")):
         file_name = os.path.join(os.path.join(output_path, "rules"), f)
         if os.path.isfile(file_name) and regex_from.match(f):
-                result_sequence.append(f)
+            result_sequence.append(f)
 
     regex_base = re.compile(r'SelectedVersion[\w]+base\.dl')
     for f in os.listdir(os.path.join(output_path, "rules")):
         file_name = os.path.join(os.path.join(output_path, "rules"), f)
         if os.path.isfile(file_name) and regex_base.match(f):
-                result_sequence.append(f)
+            result_sequence.append(f)
 
     regex_plain = re.compile(r'SelectedVersion[\w]+\.dl')
     for f in os.listdir(os.path.join(output_path, "rules")):
         file_name = os.path.join(os.path.join(output_path, "rules"), f)
         if os.path.isfile(file_name) and regex_plain.match(f):
-                result_sequence.append(f)
+            result_sequence.append(f)
 
     result_sequence.append("Version.dl")
     os.chdir(os.path.join(output_path, "rules"))
