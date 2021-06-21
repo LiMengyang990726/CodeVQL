@@ -68,10 +68,10 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
                 #     cslicer_path, repo_path, count))
                 cslicer_cmd = f"java -jar {cslicer_path} -c {cfg_path} -e dl -ext diff"
                 run_cslicer = sub.run(shlex.split(cslicer_cmd), check=True, stdout=open(os.devnull), stderr=sub.PIPE)
-                if run_cslicer.stderr:
+                if len(run_cslicer.stderr) > 0:
                     logger.warning(f"Errors occured when running CSlicer:\n\t{cslicer_cmd}")
                     logger.warning(f"------------------")
-                    print(run_cslicer.stderr.decode("utf-8"))
+                    logger.warning(run_cslicer.stderr.decode("utf-8"))
                     logger.warning(f"------------------")
                 # Step 3: Move the needed files to the designated location
                 for fact_type in results[2:]:
