@@ -4,11 +4,11 @@ import os
 import resource
 import shlex
 import shutil
-import subprocess
+import subprocess as sub
 import time
 from pathlib import Path
 
-from util import validate_path, ensure_dir, RevPair, mvn_build, generate_config_file, init_logging
+from util import validate_path, RevPair, generate_config_file, init_logging
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,12 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
                 # os.system('java -jar %s -c %s/diff-%d.properties -e dl --ext dep diff > /dev/null 2>&1' % (
                 #     cslicer_path, repo_path, count))
                 cslicer_cmd = f"java -jar {cslicer_path} -c {cfg_path} -e dl -ext diff"
-                subprocess.run(shlex.split(cslicer_cmd), check=True, stdout=open(os.devnull), stderr=open(os.devnull))
+                run_cslicer = sub.run(shlex.split(cslicer_cmd), check=True, stdout=open(os.devnull), stderr=sub.PIPE)
+                if run_cslicer.stderr:
+                    logger.warning(f"Errors occured when running CSlicer:\n\t{cslicer_cmd}")
+                    logger.warning(f"------------------")
+                    print(run_cslicer.stderr.decode("utf-8"))
+                    logger.warning(f"------------------")
                 # Step 3: Move the needed files to the designated location
                 for fact_type in results[2:]:
                     fact_type += ".facts"
