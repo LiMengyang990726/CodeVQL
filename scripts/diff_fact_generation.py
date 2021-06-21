@@ -69,7 +69,7 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
                 cslicer_cmd = f"java -jar {cslicer_path} -c {cfg_path} -e dl -ext diff"
                 run_cslicer = sub.run(shlex.split(cslicer_cmd), check=True, stdout=open(os.devnull), stderr=sub.PIPE)
                 if len(run_cslicer.stderr) > 0:
-                    logger.warning(f"Errors occured when running CSlicer:\n\t{cslicer_cmd}")
+                    logger.warning(f"Errors occurred when running CSlicer:\n\t{cslicer_cmd}")
                     logger.warning(f"------------------")
                     logger.warning(run_cslicer.stderr.decode("utf-8"))
                     logger.warning(f"------------------")
