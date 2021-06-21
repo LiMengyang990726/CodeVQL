@@ -1,18 +1,21 @@
 import argparse
+import logging
 import os
-import shlex
-import shutil
-import sys
-import subprocess
 import re
 import resource
+import shlex
+import subprocess
 import time
+
 from util import validate_path
+
+logger = logging.getLogger(__name__)
 
 
 def main():
     # Create the parser
-    runner = argparse.ArgumentParser(description='This script automate the process of translating EvoMe to Souffle.')
+    runner = argparse.ArgumentParser(
+        description='This script automate the process of translating EvoMe to Souffle.')
 
     # Add the arguments
     runner.add_argument('--repo_path',
@@ -69,12 +72,13 @@ def sample_repo_fact_gen(output_path, program_fact_path):
             result_sequence.append(f)
 
     result_sequence.append("Version.dl")
+    logger.info(f"Queries for listing versions selected: {result_sequence}")
     # os.chdir(os.path.join(output_path, "rules"))
     for file_name in result_sequence:
         # command = "souffle -F " + os.path.join(output_path, ".facts") + " -D " + os.path.join(output_path, ".facts") + " " + file_name
         # os.system(command)
         command = f"souffle -F {output_path}/.facts -D {output_path}/.facts {file_name}"
-        subprocess.run(shlex.split(command), check=True, cwd=output_path/"rules")
+        subprocess.run(shlex.split(command), check=True, cwd=output_path / "rules")
     for file_name in result_sequence:
         f = output_path / "rules" / file_name
         if os.path.isfile(f):
@@ -86,5 +90,6 @@ def sample_repo_fact_gen(output_path, program_fact_path):
 
     end_time = time.time()
     time_usage = end_time - start_time
-    mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
+        resource.RUSAGE_SELF).ru_maxrss
     print(str(time_usage) + "\t" + str(mem_usage))

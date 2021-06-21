@@ -46,7 +46,7 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
     with open(stdout_log, 'w') as logf, open(stderr_log, 'w') as errf:
         logger.info(f"Start running translator, logs will be written to {stdout_log} and {stderr_log}")
         run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator",
-                                       stdout=logf, stderr=errf)
+                                       check=True, stdout=logf, stderr=errf)
     shutil.move(evome_path / "translator/rules", output_path / "rules")
     end_time = time.time()
 

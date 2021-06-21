@@ -96,8 +96,9 @@ class ColorFormatter(logging.Formatter):
         color = self.COLORS[record.levelno]
         color_reset = self.COLORS["RESET"]
         self.datefmt = "%m-%d %H:%M:%S"
-        # self._style._fmt = color + '[%(asctime)s] [%(levelname)8s] [%(name)s > %(funcName)s()] ' + color_reset + '%(message)s'
-        self._style._fmt = color + '[%(asctime)s] [%(levelname)8s] ' + color_reset + '%(message)s'
+        self._style._fmt = color + '[%(asctime)s] [%(levelname)8s] [%(name)s > %(funcName)s()] ' \
+                           + color_reset + '%(message)s'
+        # self._style._fmt = color + '[%(asctime)s] [%(levelname)8s] ' + color_reset + '%(message)s'
         return super().format(record)
 
 
@@ -107,7 +108,8 @@ def checkout_commit(repo_path: Path, commit: str, alt_dir=None) -> Optional[Erro
     if alt_dir:
         logger.info(f"Checkout {commit} @ {alt_dir}")
         worktree_add_cmd = f'git worktree add {alt_dir} {commit}'
-        worktree_add = subprocess.run(shlex.split(worktree_add_cmd), cwd=repo_path, stderr=subprocess.PIPE)
+        worktree_add = subprocess.run(shlex.split(worktree_add_cmd), cwd=repo_path,
+                                      stderr=subprocess.PIPE)
         if worktree_add.stderr:
             logger.error(f"Error when: {worktree_add_cmd}")
             return ErrorCode.GIT_FAILURE
@@ -135,7 +137,8 @@ def mvn_build(build_root: Path) -> Optional[ErrorCode]:
         return ErrorCode.MAVEN_BUILD_ERROR
 
 
-def generate_config_file(repo_path: Path, build_path: Optional[Path], rev_pair: Optional[RevPair], out_file: Path):
+def generate_config_file(repo_path: Path, build_path: Optional[Path], rev_pair: Optional[RevPair],
+                         out_file: Path):
     if not build_path:
         build_path = repo_path
     lines = [f"repoPath = {repo_path / '.git'}\n",
