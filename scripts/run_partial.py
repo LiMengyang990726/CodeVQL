@@ -92,7 +92,7 @@ def run_partial(repo_path, gitfacts_path, output_path, query_file_path,
 
     # Step 4: Get diff facts
     logger.info("Step 4: Start Generating diff facts")
-    diff_fact_gen(cslicer_path, output_path, repo_path)
+    diff_fact_gen(repo_path, output_path, cslicer_path)
     logger.info("Step 4 is done.")
     # python3.7 %s/scripts/diff-fact-generation.py --repo_path %s --cslicer_path %s --output_path %s && \
     # echo Step 4 is done!' % (evome_path, repo_path, cslicer_path, output_path)
