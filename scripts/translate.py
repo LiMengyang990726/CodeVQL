@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from util import validate_path, ensure_dir, ErrorCode, CFG_PATHS, init_logging
+from util import validate_path, ensure_dir, ErrorCode, CFG_PATHS, init_logging, write_logs
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +42,11 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
         sys.exit(create_dir_err)
     stdout_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.log"
     stderr_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.err"
-    ensure_dir(stdout_log.parent)
-    with open(stdout_log, 'w') as logf, open(stderr_log, 'w') as errf:
-        logger.info(f"Start running translator, logs will be written to {stdout_log} and {stderr_log}")
-        run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator",
-                                       check=True, stdout=logf, stderr=errf)
+    logger.info(f"Start running translator, logs will be written to {stdout_log} and {stderr_log}")
+    run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator", check=True)
+    write_logs(run_translate.stdout.decode(), stdout_log)
+    write_logs(run_translate.stderr.decode(), stderr_log)
+
     shutil.move(evome_path / "translator/rules", output_path / "rules")
     end_time = time.time()
 

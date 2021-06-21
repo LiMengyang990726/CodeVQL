@@ -152,3 +152,10 @@ def generate_config_file(repo_path: Path, build_path: Optional[Path], rev_pair: 
 
     with out_file.open("w") as f_out:
         f_out.writelines(lines)
+
+
+def write_logs(contents: str, log_file: Path, name: str = None):
+    if len(contents) > 0:
+        ensure_dir(log_file.parent)
+        with open(log_file, 'w') as log_f:
+            log_f.write(contents)
