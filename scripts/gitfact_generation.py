@@ -1,14 +1,18 @@
 import argparse
+import logging
 import resource
 import subprocess
 import time
 
 from util import validate_path, ensure_dir, init_logging
 
+logger = logging.getLogger(__name__)
+
 
 def run_git_fact_gen():
     # Create the parser
-    runner = argparse.ArgumentParser(description='This script automate the process of generating git facts.')
+    runner = argparse.ArgumentParser(
+        description='This script automate the process of generating git facts.')
 
     # Add the arguments
     runner.add_argument('--repo_path', type=str, help='the path to the program to be analyzed upon')
@@ -31,13 +35,14 @@ def git_fact_gen(repo_path, gitfacts_path, output_path):
     # Execute
     start_time = time.time()
     ensure_dir(output_path / ".facts")
-    subprocess.run([gitfacts_path / "target/release/gitfacts", repo_path, "-o", output_path / ".facts/history.facts"])
+    subprocess.run([gitfacts_path / "target/release/gitfacts", repo_path, "-o",
+                    output_path / ".facts/history.facts"])
     end_time = time.time()
 
     time_usage = end_time - start_time
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
         resource.RUSAGE_SELF).ru_maxrss
-    print(str(time_usage) + "\t" + str(mem_usage))
+    logger.info(f"Time usage:{time_usage}\tMem usage:{mem_usage}\n")
 
 
 if __name__ == "__main__":

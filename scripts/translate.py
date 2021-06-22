@@ -43,8 +43,8 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
     stdout_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.log"
     stderr_log: Path = CFG_PATHS["logging"] / f"translate-{get_cur_time_str()}.err"
     logger.info(f"Start running translator, logs will be written to {stdout_log} and {stderr_log}")
-    run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator", check=True,
-                                   capture_output=True)
+    run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator",
+                                   check=True, capture_output=True)
     write_logs(run_translate.stdout.decode(), stdout_log)
     write_logs(run_translate.stderr.decode(), stderr_log)
 
@@ -54,7 +54,7 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
     time_usage = end_time - start_time
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
         resource.RUSAGE_SELF).ru_maxrss
-    logger.info(f"Time usage:{time_usage}\nMem usage:{mem_usage}\n")
+    logger.info(f"Time usage:{time_usage}\tMem usage:{mem_usage}\n")
 
 
 def get_cur_time_str() -> str:

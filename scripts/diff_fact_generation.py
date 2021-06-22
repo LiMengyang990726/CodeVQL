@@ -99,7 +99,7 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
     time_usage = end_time - start_time
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
         resource.RUSAGE_SELF).ru_maxrss
-    print(str(time_usage) + "\t" + str(mem_usage))
+    logger.info(f"Time usage:{time_usage}\tMem usage:{mem_usage}\n")
 
 
 if __name__ == "__main__":
