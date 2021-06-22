@@ -265,8 +265,7 @@ void writeRule(const string& name, string field, string value) {
         result[result.length() - 1] = ')';
         result += ("," + VERSION_DECL_PREFIX + version + "(" + version + ")");
         mainDLFile << result;
-        std::cout << result << std::endl;
-
+        // std::cout << result << std::endl;
         mainDLFile.close();
     } catch (std::ofstream::failure &e) {
         std::cerr << "Exceptions when writing following contents to file " << mainDLFileName  << "\n"

@@ -157,8 +157,10 @@ def generate_config_file(repo_path: Path, build_path: Optional[Path], rev_pair: 
         f_out.writelines(lines)
 
 
-def write_logs(contents: str, name: str):
+def write_logs(contents: str, name: str, notify_err: bool = False):
     if len(contents) > 0:
+        if notify_err:
+            logger.error(contents)
         log_file = CFG_PATHS["logging"] / f"{name}-{get_cur_time_str()}.log"
         logger.info(f"[{name}] Write logs to {log_file}")
         ensure_dir(log_file.parent)

@@ -38,7 +38,7 @@ def souffle_analysis(out_path):
     souffle_cmd = f"souffle -F {out_path}/.facts -D {out_path}/output {out_path}/rules/main.dl"
     logger.info(f"Running souffle: {souffle_cmd}")
     run_souffle = subprocess.run(shlex.split(souffle_cmd), check=True, capture_output=True)
-    write_logs(run_souffle.stderr.decode(), "analysis.err")
+    write_logs(run_souffle.stderr.decode(), "analysis.err", True)
 
     end_time = time.time()
     time_usage = end_time - start_time
