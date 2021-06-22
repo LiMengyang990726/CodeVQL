@@ -192,78 +192,84 @@ void writeClosure(const string& type) {
 
 void writeRule(const string& name, string field, string value) {
     ofstream mainDLFile;
-    mainDLFile.open(mainDLFileName, ios_base::app);
-
-    string type = findVarDeclaration(name);
-    vector<pair<string, string> > fieldsVector = destructSouffleDecl(EvoMeObjToSouffleDecl(type));
-    string version = findVersionVarAssociation(name);
     string result;
+    mainDLFile.exceptions ( std::ifstream::failbit | std::ifstream::badbit );
+    try {
+        mainDLFile.open(mainDLFileName, ios_base::app);
+        string type = findVarDeclaration(name);
+        vector<pair<string, string> > fieldsVector = destructSouffleDecl(EvoMeObjToSouffleDecl(type));
+        string version = findVersionVarAssociation(name);
 
-    // Check 1: If the rule is closure
-    if (field.back() == CLOSURE_SUFFIX) {
-        type += CLOSURE;
-    }
-
-    // Check 2: This part of rule is enclosed in "WHERE NOT EXIST (...)"
-    if (isVariableSpecifiedInNotExist(name)) {
-        result += "!";
-    }
-
-    // Check 3: This part of rule is enclosed in "WHERE ... (... SUCH THAT NOT ...)"
-    for (const pair<string, string>& fieldPair : fieldsVector) {
-        string currField = fieldPair.first;
-        string currFieldClosure = currField + "+";
-        string referer;
-        if (!findVarFieldReferredName(name, currField).empty()) {
-            referer = findVarFieldReferredName(name, currField);
-        } else if (!findVarFieldReferredName(name, currFieldClosure).empty()) {
-            referer = findVarFieldReferredName(name, currField + "+");
+        // Check 1: If the rule is closure
+        if (field.back() == CLOSURE_SUFFIX) {
+            type += CLOSURE;
         }
-        if (!referer.empty() && referer[0] == '!') {
+
+        // Check 2: This part of rule is enclosed in "WHERE NOT EXIST (...)"
+        if (isVariableSpecifiedInNotExist(name)) {
             result += "!";
         }
-    }
- 
-    // Step 1: Write the TYPE of this part of rule
-    result += type;
-    result += "(";
 
-    // Step 2: Write this part of rule with references shown
-    for (const pair<string, string>& fieldPair : fieldsVector) {
-        string currField = fieldPair.first;
-        string currFieldClosure = currField + "+";
-        if (currField == field || currFieldClosure == field) {
-            if (!value.empty() && value[0] == '!') {
-                result += value.substr(1,value.length()-1);
-            } else {
-                result += value;
+        // Check 3: This part of rule is enclosed in "WHERE ... (... SUCH THAT NOT ...)"
+        for (const pair<string, string> &fieldPair : fieldsVector) {
+            string currField = fieldPair.first;
+            string currFieldClosure = currField + "+";
+            string referer;
+            if (!findVarFieldReferredName(name, currField).empty()) {
+                referer = findVarFieldReferredName(name, currField);
+            } else if (!findVarFieldReferredName(name, currFieldClosure).empty()) {
+                referer = findVarFieldReferredName(name, currField + "+");
             }
-        } else if (!findVarFieldReferredName(name, currField).empty()) {
-            string referer = findVarFieldReferredName(name, currField);
-            if (referer[0] == '!') {
-                result += referer.substr(1,referer.length()-1);
-            } else {
-                result += referer;
+            if (!referer.empty() && referer[0] == '!') {
+                result += "!";
             }
-        } else if (!findVarFieldReferredName(name, currFieldClosure).empty()) {
-            string referer = findVarFieldReferredName(name, currFieldClosure);
-            if (referer[0] == '!') {
-                result += referer.substr(1,referer.length()-1);
-            } else {
-                result += referer;
-            }
-        } else if (currField == "version") {
-            result += version; 
-        } else {
-            result += "_";
         }
-        result += ",";
+
+        // Step 1: Write the TYPE of this part of rule
+        result += type;
+        result += "(";
+
+        // Step 2: Write this part of rule with references shown
+        for (const pair<string, string> &fieldPair : fieldsVector) {
+            string currField = fieldPair.first;
+            string currFieldClosure = currField + "+";
+            if (currField == field || currFieldClosure == field) {
+                if (!value.empty() && value[0] == '!') {
+                    result += value.substr(1, value.length() - 1);
+                } else {
+                    result += value;
+                }
+            } else if (!findVarFieldReferredName(name, currField).empty()) {
+                string referer = findVarFieldReferredName(name, currField);
+                if (referer[0] == '!') {
+                    result += referer.substr(1, referer.length() - 1);
+                } else {
+                    result += referer;
+                }
+            } else if (!findVarFieldReferredName(name, currFieldClosure).empty()) {
+                string referer = findVarFieldReferredName(name, currFieldClosure);
+                if (referer[0] == '!') {
+                    result += referer.substr(1, referer.length() - 1);
+                } else {
+                    result += referer;
+                }
+            } else if (currField == "version") {
+                result += version;
+            } else {
+                result += "_";
+            }
+            result += ",";
+        }
+
+        // Step 3: Enclose this part of rule
+        result[result.length() - 1] = ')';
+        result += ("," + VERSION_DECL_PREFIX + version + "(" + version + ")");
+        mainDLFile << result;
+        std::cout << result << std::endl;
+
+        mainDLFile.close();
+    } catch (std::ofstream::failure &e) {
+        std::cerr << "Exceptions when writing following contents to file " << mainDLFileName  << "\n"
+                  <<  result << std::endl;
     }
-
-    // Step 3: Enclose this part of rule
-    result[result.length()-1] = ')';
-    result += ("," + VERSION_DECL_PREFIX + version + "(" + version + ")");
-    mainDLFile << result;
-
-    mainDLFile.close();
 }
