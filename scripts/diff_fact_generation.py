@@ -74,18 +74,23 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
                     logger.warning(run_cslicer.stderr.decode("utf-8"))
                     logger.warning(f"------------------")
                 # Step 3: Move the needed files to the designated location
+                diff_facts_dir = repo_path / ".facts" / "30-diff"
                 for fact_type in results[2:]:
-                    fact_type += ".facts"
-                    fact_file = os.path.join(os.path.join(repo_path, ".facts/30-diff"), fact_type)
-                    original_file = open(fact_file, 'r')
-                    new_combined_file = open(os.path.join(os.path.join(output_path, ".facts"), fact_type), 'a+')
-                    new_combined_file.write(original_file.read())
-                    new_combined_file.seek(0)
-                    original_file.close()
-                    new_combined_file.close()
+                    fact_file = f"{fact_type}.facts"
+                    fact_file_path = diff_facts_dir / fact_file
+                    # original_file = open(fact_file, 'r')
+                    combined_file_path = output_path / ".facts" / fact_file
+                    with open(fact_file_path, 'r') as orig_file, open(combined_file_path, 'a+') as comb_file:
+                        logger.info(f"Move generated differential facts: "
+                                    f"{fact_file_path} => {combined_file_path}")
+                        comb_file.write(orig_file.read())
+                        comb_file.seek(0)
                 # Step 4: Remove intermediate files
-                os.remove(os.path.join(repo_path, 'diff-%d.properties' % (count)))
-                shutil.rmtree(os.path.join(repo_path, ".facts"))
+                # os.remove(os.path.join(repo_path, 'diff-%d.properties' % (count)))
+                logger.info(f"Remove CSlicer configuration file @ {cfg_path}")
+                os.remove(cfg_path)
+                logger.info(f"Remove facts dir @ {diff_facts_dir}")
+                shutil.rmtree(diff_facts_dir)
                 count += 1
 
     # Step 5: Count statistics
