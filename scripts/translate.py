@@ -1,7 +1,5 @@
 import argparse
-import datetime
 import logging
-import os
 import resource
 import shutil
 import subprocess
@@ -10,14 +8,16 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from util import validate_path, ensure_dir, ErrorCode, CFG_PATHS, init_logging, write_logs
+from util import validate_path, ensure_dir, ErrorCode, CFG_PATHS, init_logging, write_logs, \
+    get_cur_time_str
 
 logger = logging.getLogger(__name__)
 
 
 def run_translator():
     # Create the parser
-    runner = argparse.ArgumentParser(description='This script automate the process of translating EvoMe to Souffle.')
+    runner = argparse.ArgumentParser(
+        description='This script automate the process of translating EvoMe to Souffle.')
     # Add the arguments
     runner.add_argument('--output_path', type=str, help='the path to the analysis output')
     runner.add_argument('--query_file_path', type=str, help='the path to the input query file')
@@ -55,10 +55,6 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
         resource.RUSAGE_SELF).ru_maxrss
     logger.info(f"Time usage:{time_usage}\tMem usage:{mem_usage}\n")
-
-
-def get_cur_time_str() -> str:
-    return str(datetime.datetime.now().isoformat()).replace(':', '-')
 
 
 if __name__ == "__main__":

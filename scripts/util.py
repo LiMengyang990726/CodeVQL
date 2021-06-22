@@ -1,3 +1,4 @@
+import datetime
 import logging
 import os
 import shlex
@@ -161,3 +162,7 @@ def write_logs(contents: str, log_file: Path, name: str = None):
         ensure_dir(log_file.parent)
         with open(log_file, 'w') as log_f:
             log_f.write(contents)
+
+
+def get_cur_time_str() -> str:
+    return str(datetime.datetime.now().isoformat()).replace(':', '-')
