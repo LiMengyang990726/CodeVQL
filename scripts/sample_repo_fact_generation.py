@@ -80,8 +80,8 @@ def sample_repo_fact_gen(output_path, program_fact_path):
         rule_full_path = output_path / "rules" / file_name
         command = f"souffle -F {output_path}/.facts -D {output_path}/.facts {rule_full_path}"
         run_souffle = subprocess.run(shlex.split(command), check=True, cwd=output_path / "rules",
-                       capture_output=True)
-        write_logs(run_souffle.stderr.decode(), "Souffle.getVersions.err" )
+                                     capture_output=True)
+        write_logs(run_souffle.stderr.decode(), "Souffle.getVersions.err")
     for file_name in result_sequence:
         f = output_path / "rules" / file_name
         if os.path.isfile(f):
