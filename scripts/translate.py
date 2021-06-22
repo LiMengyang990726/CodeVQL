@@ -46,7 +46,7 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
     write_logs(run_translate.stdout.decode(), "Translator.out")
     write_logs(run_translate.stderr.decode(), "Translator.err", True)
 
-    shutil.move(evome_path / "translator/rules", output_path / "rules")
+    shutil.move(str(evome_path / "translator/rules"), str(output_path / "rules"))
     end_time = time.time()
 
     time_usage = end_time - start_time
