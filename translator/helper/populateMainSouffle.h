@@ -28,6 +28,7 @@ void writeInequality(const string& a, const string& b);
 void writeArithmethics(const string& var, const string& comparision, const string& value);
 void writeIncludeEvoMeUniqueMethod();
 void writeClosure(const string& type);
-void writeRule(const string& name, string field, string value);
+void writeRule(const string& name, const string& field, const string& value);
+void writeRule(const string& name, const string& field, const string& value, const string&);
 
 #endif

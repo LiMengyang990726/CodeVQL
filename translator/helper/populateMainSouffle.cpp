@@ -10,10 +10,9 @@
 #include "symbolStore.h"
 #include "utils.h"
 
-#define mainDLFileName "rules/main.dl"
 using namespace std;
 
-const string VERSION_DECL_PREFIX = "SelectedVersion";
+const string mainDLFileName = "rules/main.dl";
 static bool isTemplateWritten = false;
 unordered_set<string> closureTypes;
 
@@ -190,7 +189,11 @@ void writeClosure(const string& type) {
     factTypesDL.close();
 }
 
-void writeRule(const string& name, string field, string value) {
+void writeRule(const string& name, const string& field, const string& value) {
+    writeRule(name, field, value, "SelectedVersion");
+}
+
+void writeRule(const string& name, const string& field, const string& value, const string& versionDeclPrefix) {
     ofstream mainDLFile;
     string result;
     mainDLFile.exceptions ( std::ifstream::failbit | std::ifstream::badbit );
@@ -263,7 +266,7 @@ void writeRule(const string& name, string field, string value) {
 
         // Step 3: Enclose this part of rule
         result[result.length() - 1] = ')';
-        result += ("," + VERSION_DECL_PREFIX + version + "(" + version + ")");
+        result += ("," + versionDeclPrefix + version + "(" + version + ")");
         mainDLFile << result;
         // std::cout << result << std::endl;
         mainDLFile.close();
