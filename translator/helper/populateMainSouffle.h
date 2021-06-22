@@ -11,7 +11,7 @@
 using namespace std;
 
 void writeTemplate();
-void writeVersion(string name);
+void writeVersion(const string& name);
 void writeVersionComb();
 void writeVersionCombInRule();
 void writeOutputDecl();
@@ -23,11 +23,11 @@ void writeParallelRule();
 void writeOrRule();
 void writeLeftBracket();
 void writeRightBracket();
-void writeEquality(string a, string b);
-void writeInequality(string a, string b);
-void writeArithmethics(string var, string comparision, string value);
+void writeEquality(const string& a, const string& b);
+void writeInequality(const string& a, const string& b);
+void writeArithmethics(const string& var, const string& comparision, const string& value);
 void writeIncludeEvoMeUniqueMethod();
-void writeClosure(string type);
-void writeRule(string name, string field, string value);
+void writeClosure(const string& type);
+void writeRule(const string& name, string field, string value);
 
 #endif

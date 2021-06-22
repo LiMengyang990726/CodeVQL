@@ -1,8 +1,5 @@
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
 #include <unordered_set>
 #include <regex>
 #include "constants.h"
@@ -27,7 +24,7 @@ void translateImportStmt(struct ast *a)
     }
 
     struct ast *importOpts = a->children[0];
-    if (strcmp(((struct stringval *)importOpts)->value, "java"))
+    if (strcmp(((struct stringval *)importOpts)->value, "java") != 0)
     {
         yyerror("only java is supported");
         return;
@@ -44,7 +41,6 @@ void translateDefineStmt(struct ast *a)
     } 
 
     translateDefineOpts(a->children[0]);
-    return;
 }
 
 vector<string> translateMultipleVersionType1Opts(struct ast *a, vector<string> &prev)
@@ -265,7 +261,7 @@ void translateReasonOpts(struct ast *a, vector<string>& reasonOpts)
     struct ast *varName = a->children[0];
     string varNameStr = ((struct stringval *)varName)->value;
     string versionNameStr = findVersionVarAssociation(varNameStr);
-    if (versionNameStr == "") {
+    if (versionNameStr.empty()) {
         yyerror("The current variable has not declared its selected versions");
     }
     reasonOpts.push_back(varNameStr);
@@ -483,7 +479,7 @@ void translateComparison(struct ast *a)
             string nameStr = ((struct stringval *)l->children[0])->value;
             string fieldStr = ((struct stringval *)l->children[1])->value;
             string nextName = ((struct stringval *)r)->value;
-            int nextNameLen = nextName.length();
+            auto nextNameLen = nextName.length();
             if (nextNameLen >= 2 && nextName[0] == '\"' && nextName[nextName.length()-1] == '\"') {
                 // Case 1: xxx.xx() = "..."
                 if (comparison == "!=") {
@@ -514,10 +510,10 @@ void translateComparison(struct ast *a)
                     writeClosure(type);
                 }
                 string nextNameIdName = getIdName(findVarDeclaration(nextName));
-                if (findVarFieldReferredName(nextName, nextNameIdName) != "") {
+                if (!findVarFieldReferredName(nextName, nextNameIdName).empty()) {
                     // Case 3.1: lower_id has been referred before
                     string referer = findVarFieldReferredName(nextName, nextNameIdName);
-                    if (findVarFieldReferredName(nameStr, fieldStr) != "") {
+                    if (!findVarFieldReferredName(nameStr, fieldStr).empty()) {
                         // Case 3.1.1: xxx.xx() also have been referred before
                         string prevReferer = findVarFieldReferredName(nameStr, fieldStr);
                         if (comparison == "!=") {
@@ -535,7 +531,7 @@ void translateComparison(struct ast *a)
                         writeParallelRule();
                         writeRule(nextName, nextNameIdName, referer);
                     }
-                } else if (findVarFieldReferredName(nameStr, fieldStr) != "") {
+                } else if (!findVarFieldReferredName(nameStr, fieldStr).empty()) {
                     // Case 3.2: lower_id has NOT been referred before, xxx.xx() has been referred before
                     string prevReferer = findVarFieldReferredName(nameStr, fieldStr);
                     storeVarFieldReferenceTable(nextName + "." + nextNameIdName, prevReferer);
@@ -547,7 +543,7 @@ void translateComparison(struct ast *a)
                     writeRule(nextName, nextNameIdName, prevReferer);
                 } else {
                     // Case 3.3: lower_id and xxx.xx() have NOT been referrer before
-                    string referer = "";
+                    string referer;
                     if (isClosureMethod(fieldStr)) {
                         referer = fieldStr.substr(0, fieldStr.length()-1) + nameStr;
                     } else {
@@ -651,7 +647,6 @@ void translateComparison(struct ast *a)
     {
         // TODO: Handle other types of comparisons when seen
     }
-    return;
 }
 
 void translateCall(struct ast *a, bool negated)
@@ -678,7 +673,6 @@ void translateCall(struct ast *a, bool negated)
         // For indirect translate call, it is a boolean value
         writeRule(nameStr, fieldStr, "\"true\"");
     }
-    return;
 }
 
 void eval(struct ast *a)
@@ -745,5 +739,4 @@ void eval(struct ast *a)
         yyerror("internal error: bad node %c\n", a->nodetype);
         return;
     }
-    return;
 }

@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <cstring>
+#include <utility>
 #include <vector>
 #include <sstream>
 #include "symbolStore.h"
@@ -196,16 +197,16 @@ void writeDiffTypeVersionTypeAssoc() {
    ofstream interMsgFile;
    interMsgFile.open(INTER_MSG_FOR_PIPELINE_FILE_NAME_ABS);
 
-   for (auto it = diffTypeVersionTypeAssocTable.begin(); it != diffTypeVersionTypeAssocTable.end(); it++) {
-      if (it->second.size() == 0) {
+   for (auto & it : diffTypeVersionTypeAssocTable) {
+      if (it.second.empty()) {
          continue;
       }
-      diffTypeVersion d = diffTypeVersionNameDetailTable[it->first];
+      diffTypeVersion d = diffTypeVersionNameDetailTable[it.first];
       string startCommit = d.startCommit;
       startCommit.erase(remove(startCommit.begin(), startCommit.end(), '\"' ), startCommit.end());
       string endCommit = d.endCommit;
       endCommit.erase(remove(endCommit.begin(), endCommit.end(), '\"' ), endCommit.end());
-      vector<string> types = it->second;
+      vector<string> types = it.second;
       interMsgFile << startCommit << "\t" << endCommit << "\t";
       for (string type : types) {
          transform(type.begin(), type.end(),type.begin(), ::toupper); // All DIFF facts's names are in upper case
@@ -217,12 +218,12 @@ void writeDiffTypeVersionTypeAssoc() {
 }
 
 /* APIs for Var Declaration Table */
-void storeVarDeclarationTable(string type, string name) {
-   varDeclarationTable[name] = type;
+void storeVarDeclarationTable(string type, const string& name) {
+   varDeclarationTable[name] = std::move(type);
 }
 
-string findVarDeclaration(string name) {
-   string result = "";
+string findVarDeclaration(const string& name) {
+   string result;
    if (varDeclarationTable.find(name) != varDeclarationTable.end()) {
       result = varDeclarationTable[name];
    } 
@@ -230,17 +231,13 @@ string findVarDeclaration(string name) {
 }
 
 /* APIs for Version Declaration Table */
-void storeVersionDeclarationTable(string name) {
+void storeVersionDeclarationTable(const string& name) {
    versionDeclarationVec.push_back(name);
 }
 
-bool isVersionDeclared(string name) {
-   for (int i = 0; i < versionDeclarationVec.size(); i++) {
-      if (versionDeclarationVec[i] == name) {
-         return true;
-      }
-   }
-   return false;
+bool isVersionDeclared(const string& name) {
+    return any_of(versionDeclarationVec.begin(), versionDeclarationVec.end(),
+                  [name](const string& i){return i==name;});
 }
 
 vector<string> getVersions() {
@@ -248,12 +245,12 @@ vector<string> getVersions() {
 }
 
 /* APIs for Version Variable Association Table */
-void storeVersionVarAssociationTable(string version, string name) {
-   versionVarAssocTable[name] = version;
+void storeVersionVarAssociationTable(string version, const string& name) {
+   versionVarAssocTable[name] = std::move(version);
 }
 
-string findVersionVarAssociation(string name) {
-   string result = "";
+string findVersionVarAssociation(const string& name) {
+   string result;
    if (versionVarAssocTable.find(name) != versionVarAssocTable.end()) {
       result = versionVarAssocTable[name];
    } 
@@ -264,22 +261,22 @@ string findVersionVarAssociation(string name) {
 void storeVarFieldReferenceTable(string referred, string referer) {
    size_t pos = 0;
    vector<string> tokens; 
-   while ((pos = referred.find(".")) != std::string::npos) {
+   while ((pos = referred.find('.')) != std::string::npos) {
       tokens.push_back(referred.substr(0, pos));
       referred.erase(0, pos + 1);
    }
    tokens.push_back(referred);
 
    if (tokens.size() == 2) {
-      varFeildReferenceTable[tokens[0]][tokens[1]] = referer;
+      varFeildReferenceTable[tokens[0]][tokens[1]] = std::move(referer);
    } else {
       yyerror("Invalid function call");
    }
 }
 
-string findVarFieldReferredName(string name, string field) {
+string findVarFieldReferredName(const string& name, const string& field) {
    unordered_map<string, string> referredFieldName = varFeildReferenceTable[name];
-   if (referredFieldName.size() == 0) {
+   if (referredFieldName.empty()) {
       return "";
    }
 
@@ -291,12 +288,12 @@ string findVarFieldReferredName(string name, string field) {
 }
 
 /* APIs for handling output related things */
-void storeOutputVarField(string output, string field) {
-   outputVarFieldTable[output] = field;
+void storeOutputVarField(const string& output, string field) {
+   outputVarFieldTable[output] = std::move(field);
 }
 
-void storeOutputAlias(string output, string field, string alias) {
-   outputAliasTable[output+field] = alias;
+void storeOutputAlias(const string& output, const string& field, string alias) {
+   outputAliasTable[output+field] = std::move(alias);
 }
 
 unordered_map<string, string> getOutputVarFieldTable() {
@@ -307,11 +304,11 @@ void writeResultTableHeader() {
    ofstream resultTableHeaderFile;
    resultTableHeaderFile.open(RESULT_TABLE_HEADER_FILE_NAME_ABS);
 
-   for (auto it = outputVarFieldTable.begin(); it != outputVarFieldTable.end(); it++) {
-      if (outputAliasTable.find(it->first + it->second) != outputAliasTable.end()) {
-         resultTableHeaderFile << outputAliasTable[it->first + it->second];
+   for (auto & it : outputVarFieldTable) {
+      if (outputAliasTable.find(it.first + it.second) != outputAliasTable.end()) {
+         resultTableHeaderFile << outputAliasTable[it.first + it.second];
       } else {
-         resultTableHeaderFile << it->second;
+         resultTableHeaderFile << it.second;
       }
       resultTableHeaderFile << endl;
    } 
@@ -320,7 +317,7 @@ void writeResultTableHeader() {
 }
 
 /* APIs for storing and searching in NOT EXIST reasoning opts in WHERE clause */
-void storenotExistSpecifiedVarsSet(string name) {
+void storenotExistSpecifiedVarsSet(const string& name) {
    notExistSpecifiedVarsSet.insert(name);
 }
 
@@ -328,6 +325,6 @@ void clearnotExistSpecifiedVarsSet() {
    notExistSpecifiedVarsSet.clear();
 }
 
-bool isVariableSpecifiedInNotExist(string name) {
+bool isVariableSpecifiedInNotExist(const string& name) {
    return (notExistSpecifiedVarsSet.find(name) != notExistSpecifiedVarsSet.end());
 }

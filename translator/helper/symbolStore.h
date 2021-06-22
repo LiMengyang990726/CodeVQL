@@ -27,26 +27,26 @@ bool isValidVersionForDiffTypeSet(string versionName);
 void addTypeToDiffTypeVersionTypeAssocTable(string versionName, string type);
 void writeDiffTypeVersionTypeAssoc();
 
-void storeVarDeclarationTable(string type, string name);
-string findVarDeclaration(string name);
+void storeVarDeclarationTable(string type, const string& name);
+string findVarDeclaration(const string& name);
 
-void storeVersionDeclarationTable(string name);
-bool isVersionDeclared(string name);
+void storeVersionDeclarationTable(const string& name);
+bool isVersionDeclared(const string& name);
 vector<string> getVersions();
 
-void storeVersionVarAssociationTable(string version, string name);
-string findVersionVarAssociation(string name);
+void storeVersionVarAssociationTable(string version, const string& name);
+string findVersionVarAssociation(const string& name);
 
 void storeVarFieldReferenceTable(string referred, string referer);
-string findVarFieldReferredName(string name, string field);
+string findVarFieldReferredName(const string& name, const string& field);
 
-void storeOutputVarField(string output, string field);
-void storeOutputAlias(string output, string field, string alias);
+void storeOutputVarField(const string& output, string field);
+void storeOutputAlias(const string& output, const string& field, string alias);
 unordered_map<string, string> getOutputVarFieldTable();
 void writeResultTableHeader();
 
-void storenotExistSpecifiedVarsSet(string name);
+void storenotExistSpecifiedVarsSet(const string& name);
 void clearnotExistSpecifiedVarsSet();
-bool isVariableSpecifiedInNotExist(string name);
+bool isVariableSpecifiedInNotExist(const string& name);
 
 #endif

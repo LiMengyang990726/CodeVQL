@@ -30,7 +30,7 @@ void writeTemplate() {
     mainDLFile.close();
 }
 
-void writeVersion(string name) {
+void writeVersion(const string& name) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << ".decl SelectedVersion" << name << "(version: Version)" << endl;  
@@ -43,7 +43,7 @@ void writeVersionComb() {
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << ".decl VersionComb(";  
 
-    string result = "";
+    string result;
     vector<string> versions = getVersions(); 
     for (auto it = versions.rbegin(); it != versions.rend(); it++) {
         result += *it;
@@ -61,7 +61,7 @@ void writeVersionCombInRule() {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
 
-    string result = "";
+    string result;
     result += "VersionComb(";
     vector<string> versions = getVersions(); 
     for (auto it = versions.rbegin(); it != versions.rend(); it++) {
@@ -138,21 +138,21 @@ void writeRightBracket() {
     mainDLFile.close();
 }
 
-void writeEquality(string a, string b) {
+void writeEquality(const string& a, const string& b) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << a << "=" << b;
     mainDLFile.close();
 }
 
-void writeInequality(string a, string b) {
+void writeInequality(const string& a, const string& b) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << a << "!=" << b;
     mainDLFile.close();
 }
 
-void writeArithmethics(string var, string comparision, string value) {
+void writeArithmethics(const string& var, const string& comparision, const string& value) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
     mainDLFile << var << comparision << value;
@@ -160,7 +160,7 @@ void writeArithmethics(string var, string comparision, string value) {
 }
 
 void writeIncludeEvoMeUniqueMethod() {
-    if (closureTypes.size() != 0) {
+    if (!closureTypes.empty()) {
         ofstream mainDLFile;
         mainDLFile.open(mainDLFileName, ios_base::app);
         mainDLFile << "#include \"" << EVOME_UNIQUE_METHOD_REL_DL_FILE_NAME << "\"" << endl 
@@ -169,7 +169,7 @@ void writeIncludeEvoMeUniqueMethod() {
     }
 }
 
-void writeClosure(string type) {
+void writeClosure(const string& type) {
     if (closureTypes.find(type) != closureTypes.end()) {
         return;
     }
@@ -181,7 +181,7 @@ void writeClosure(string type) {
     ofstream factTypesDL;
     factTypesDL.open(EVOME_UNIQUE_METHOD_REL_DL_FILE_NAME_ABS, ios_base::app);
     string intermediateStr = repeatString(string(1, IGNORED_SOUFFLE_FIELD), getFieldLen(type)-3);
-    if (intermediateStr != "") {
+    if (!intermediateStr.empty()) {
         intermediateStr += ", ";
     }
     factTypesDL << ".decl " << type << "Closure(er: String, ee: String, version: Version)" << endl;
@@ -190,14 +190,14 @@ void writeClosure(string type) {
     factTypesDL.close();
 }
 
-void writeRule(string name, string field, string value) {
+void writeRule(const string& name, string field, string value) {
     ofstream mainDLFile;
     mainDLFile.open(mainDLFileName, ios_base::app);
 
     string type = findVarDeclaration(name);
     vector<pair<string, string> > fieldsVector = destructSouffleDecl(EvoMeObjToSouffleDecl(type));
     string version = findVersionVarAssociation(name);
-    string result = "";
+    string result;
 
     // Check 1: If the rule is closure
     if (field.back() == CLOSURE_SUFFIX) {
@@ -210,16 +210,16 @@ void writeRule(string name, string field, string value) {
     }
 
     // Check 3: This part of rule is enclosed in "WHERE ... (... SUCH THAT NOT ...)"
-    for (pair<string, string> fieldPair : fieldsVector) {
-        string currField = fieldPair.first.c_str();
+    for (const pair<string, string>& fieldPair : fieldsVector) {
+        string currField = fieldPair.first;
         string currFieldClosure = currField + "+";
-        string referer = "";
-        if (findVarFieldReferredName(name, currField) != "") {
+        string referer;
+        if (!findVarFieldReferredName(name, currField).empty()) {
             referer = findVarFieldReferredName(name, currField);
-        } else if (findVarFieldReferredName(name, currFieldClosure) != "") {
+        } else if (!findVarFieldReferredName(name, currFieldClosure).empty()) {
             referer = findVarFieldReferredName(name, currField + "+");
         }
-        if (referer != "" && referer[0] == '!') {
+        if (!referer.empty() && referer[0] == '!') {
             result += "!";
         }
     }
@@ -229,23 +229,23 @@ void writeRule(string name, string field, string value) {
     result += "(";
 
     // Step 2: Write this part of rule with references shown
-    for (pair<string, string> fieldPair : fieldsVector) {
-        string currField = fieldPair.first.c_str();
+    for (const pair<string, string>& fieldPair : fieldsVector) {
+        string currField = fieldPair.first;
         string currFieldClosure = currField + "+";
         if (currField == field || currFieldClosure == field) {
-            if (value != "" && value[0] == '!') {
+            if (!value.empty() && value[0] == '!') {
                 result += value.substr(1,value.length()-1);
             } else {
                 result += value;
             }
-        } else if (findVarFieldReferredName(name, currField) != "") {
+        } else if (!findVarFieldReferredName(name, currField).empty()) {
             string referer = findVarFieldReferredName(name, currField);
             if (referer[0] == '!') {
                 result += referer.substr(1,referer.length()-1);
             } else {
                 result += referer;
             }
-        } else if (findVarFieldReferredName(name, currFieldClosure) != "") {
+        } else if (!findVarFieldReferredName(name, currFieldClosure).empty()) {
             string referer = findVarFieldReferredName(name, currFieldClosure);
             if (referer[0] == '!') {
                 result += referer.substr(1,referer.length()-1);

@@ -1,5 +1,5 @@
 
-#include <stdarg.h>
+#include <cstdarg>
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -11,7 +11,7 @@
 #include "constants.h"
 
 /* Utility for flex */
-void yyerror(char *s, ...) {
+void yyerror(const char *s, ...) {
   extern int yylineno;
   va_list ap;
   va_start(ap, s);
@@ -37,25 +37,25 @@ vector<pair<string, string> > destructSouffleDecl(string fields) {
     return result;
 }
 
-string constructSouffleDecl(vector<pair<string, string> > fieldPairs) {
+string constructSouffleDecl(const vector<pair<string, string> >& fieldPairs) {
     string result = "(";
     unordered_set<string> seenFields;
-    for (auto it = fieldPairs.begin(); it != fieldPairs.end(); it++) {
-        if (seenFields.find(it->first) != seenFields.end()) {
+    for (auto & fieldPair : fieldPairs) {
+        if (seenFields.find(fieldPair.first) != seenFields.end()) {
             continue;
         }
-        seenFields.insert(it->first);
-        result += it->first + ": " + it->second + ", ";
+        seenFields.insert(fieldPair.first);
+        result += fieldPair.first + ": " + fieldPair.second + ", ";
     }
     result = result.substr(0, result.length()-2);
     result += ")";
     return result;
 }
 
-string constructSouffleRuleBegin(vector<string> fields) {
+string constructSouffleRuleBegin(const vector<string>& fields) {
     string result = "(";
     unordered_set<string> seenFields;
-    for (string field : fields) {
+    for (const string& field : fields) {
         if (seenFields.find(field) != seenFields.end()) {
             continue;
         }
@@ -67,8 +67,8 @@ string constructSouffleRuleBegin(vector<string> fields) {
     return result;
 }
 
-string repeatString(string s, int times) {
-    string result = "";
+string repeatString(const string& s, int times) {
+    string result;
     while (times) {
         result += s;
         times--;
