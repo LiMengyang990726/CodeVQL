@@ -4,14 +4,16 @@ import shlex
 import shutil
 import subprocess
 import sys
-from collections import namedtuple
 from enum import IntEnum, unique
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, NamedTuple
 
 logger = logging.getLogger(__name__)
 
-RevPair = namedtuple("RevPair", ["rev_old", "rev_new"])
+
+class RevPair(NamedTuple):
+    rev_old: str
+    rev_new: str
 
 
 @unique

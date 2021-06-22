@@ -49,6 +49,7 @@ def diff_fact_gen(repo_path: Path, output_path: Path, cslicer_path: Path):
                 continue
             else:
                 rev_pair = RevPair(results[0], results[1])
+                logger.info(f"Generating facts for commits {rev_pair.rev_old} - {rev_pair.rev_new}")
                 # Step 2: Generate the properties file and Run gitslice
 
                 # os.chdir(repo_path)
