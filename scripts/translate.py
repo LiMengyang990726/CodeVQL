@@ -43,8 +43,8 @@ def translate(output_path: Path, query_file_path: Path, evome_path: Path):
     logger.info("Start running translator")
     run_translate = subprocess.run(["./translator", query_file_path], cwd=evome_path / "translator",
                                    check=True, capture_output=True)
-    write_logs(run_translate.stdout.decode(), "translator.out")
-    write_logs(run_translate.stderr.decode(), "translator.err", True)
+    write_logs(run_translate.stdout.decode(), "Translator.out")
+    write_logs(run_translate.stderr.decode(), "Translator.err", True)
 
     shutil.move(evome_path / "translator/rules", output_path / "rules")
     end_time = time.time()

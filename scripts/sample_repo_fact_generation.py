@@ -7,7 +7,7 @@ import shlex
 import subprocess
 import time
 
-from util import validate_path
+from util import validate_path, write_logs
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +79,9 @@ def sample_repo_fact_gen(output_path, program_fact_path):
         # os.system(command)
         rule_full_path = output_path / "rules" / file_name
         command = f"souffle -F {output_path}/.facts -D {output_path}/.facts {rule_full_path}"
-        subprocess.run(shlex.split(command), check=True, cwd=output_path / "rules")
+        run_souffle = subprocess.run(shlex.split(command), check=True, cwd=output_path / "rules",
+                       capture_output=True)
+        write_logs(run_souffle.stderr.decode(), "Souffle.getVersions.err" )
     for file_name in result_sequence:
         f = output_path / "rules" / file_name
         if os.path.isfile(f):
