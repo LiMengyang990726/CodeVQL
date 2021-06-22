@@ -1,8 +1,13 @@
 import argparse
 import resource
 import time
+import shlex
+import subprocess
+import logging
 
 from util import validate_path, ensure_dir
+
+logger = logging.getLogger(__name__)
 
 
 def run_souffle_analysis():
@@ -28,6 +33,8 @@ def souffle_analysis(out_path):
     # % (output_path, output_path, output_path, output_path))
     ensure_dir(out_path / "output")
     souffle_cmd = f"souffle -F {out_path}/.facts -D {out_path}/output {out_path}/rules/main.dl"
+    logger.info(f"Running souffle: {souffle_cmd}")
+    run_souffle = subprocess.run(shlex.split(souffle_cmd), check=True, capture_output=True)
     end_time = time.time()
     time_usage = end_time - start_time
     mem_usage = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss + resource.getrusage(
