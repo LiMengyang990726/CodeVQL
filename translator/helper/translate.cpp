@@ -3,7 +3,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
-#include <unordered_set>
+#include <vector>
+#include <algorithm>
 #include <regex>
 #include "constants.h"
 #include "nodetype.h"
@@ -212,7 +213,7 @@ void translateFrom(struct ast *a)
     }
 }
 
-void translateRange(struct ast *a, unordered_set<string>& versions)
+void translateRange(struct ast *a, vector<string>& versions)
 {
     // No range opts, accept
     if (!a)
@@ -240,7 +241,9 @@ void translateRange(struct ast *a, unordered_set<string>& versions)
         }
     }
     storeVersionVarAssociationTable(versionNameStr, varNameStr);
-    versions.insert(versionNameStr);
+    if (find(versions.begin(), versions.end(), versionNameStr) == versions.end()) {
+        versions.push_back(versionNameStr);
+    }
 
     if (a->childrencount == 2)
     {
@@ -691,7 +694,7 @@ void eval(struct ast *a)
 
     writeAllRelDLs();
     writeTemplate();
-    unordered_set<string> versions;
+    vector<string> versions;
     switch (a->nodetype)
     {
     /* import statement */
