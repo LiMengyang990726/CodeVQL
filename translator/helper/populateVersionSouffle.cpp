@@ -18,7 +18,7 @@ using namespace std;
 
 int numVersions = 1;
 
-void writeVersionsCombination(unordered_set<string> inputs)
+void writeVersionsCombination(vector<string> inputs)
 {
     string filename = VERSION_DL;
     ofstream versionDL;
