@@ -133,7 +133,7 @@ def mvn_build(build_root: Path) -> Optional[ErrorCode]:
         logger.error(f"Maven is not installed or not callable from this script")
         return ErrorCode.EXT_TOOL_NOT_AVAIL
     try:
-        subprocess.run(["mvn" "test-compile"], cwd=build_root, check=True,
+        subprocess.run(["mvn", "test-compile"], cwd=build_root, check=True,
                        stdout=open(os.devnull), stderr=open(os.devnull))
     except subprocess.CalledProcessError:
         logger.error("Errors in mvn test-compile")
