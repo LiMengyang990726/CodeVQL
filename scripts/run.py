@@ -90,7 +90,7 @@ def main():
     # Step 5: Analyze to get the result
     logger.info("Step 5: Start analyzing the query")
     souffle_analysis(output_path, souffle_path)
-    logger.info("Step 4 is done.")
+    logger.info("Step 5 is done.")
     # python3.7 %s/scripts/query-analysis.py --output_path %s && \
     # echo Step 5 is done and program finished!' % (evome_path, output_path))
 
