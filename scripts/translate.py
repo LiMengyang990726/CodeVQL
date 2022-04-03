@@ -8,8 +8,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from util import validate_path, ensure_dir, ErrorCode, CFG_PATHS, init_logging, write_logs, \
-    get_cur_time_str
+from util import validate_path, ensure_dir, ErrorCode, init_logging, write_logs
 
 logger = logging.getLogger(__name__)
 

@@ -6,6 +6,8 @@ import resource
 import shlex
 import subprocess
 import time
+from pathlib import Path
+from typing import Optional
 
 from util import validate_path, write_logs
 
@@ -35,6 +37,9 @@ def main():
     runner.add_argument('--program_fact_path',
                         type=str,
                         help='the path to the pre-generated fact path')
+    runner.add_argument('--souffle_path',
+                        type=str, required=False,
+                        help='the path to Soufflé binary')
 
     # Get all the input arguments and validate
     args = runner.parse_args()
@@ -44,12 +49,13 @@ def main():
     evome_path = args.evome_path
     cslicer_path = args.cslicer_path
     program_fact_path = args.program_fact_path
+    souffle_path: Optional[Path] = Path(args.souffle_path) if args.souffle_path else None
 
     for p in [repo_path, output_path, evome_path, cslicer_path, program_fact_path]:
         validate_path(p)
 
 
-def sample_repo_fact_gen(output_path, program_fact_path):
+def sample_repo_fact_gen(output_path, program_fact_path, souffle_path: Optional[Path] = None):
     # Step 1: Execute version related souffle files to generate facts in the required sequence
     start_time = time.time()
     result_sequence = []
@@ -74,11 +80,13 @@ def sample_repo_fact_gen(output_path, program_fact_path):
     result_sequence.append("Version.dl")
     logger.info(f"Queries for listing versions selected: {result_sequence}")
     # os.chdir(os.path.join(output_path, "rules"))
+
+    souffle_bin = souffle_path if souffle_path else "souffle"
     for file_name in result_sequence:
         # command = "souffle -F " + os.path.join(output_path, ".facts") + " -D " + os.path.join(output_path, ".facts") + " " + file_name
         # os.system(command)
         rule_full_path = output_path / "rules" / file_name
-        command = f"souffle -F {output_path}/.facts -D {output_path}/.facts {rule_full_path}"
+        command = f"{souffle_bin} -F {output_path}/.facts -D {output_path}/.facts {rule_full_path}"
         run_souffle = subprocess.run(shlex.split(command), check=True, cwd=output_path / "rules",
                                      capture_output=True)
         write_logs(run_souffle.stderr.decode(), "Souffle.getVersions.err")

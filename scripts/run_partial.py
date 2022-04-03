@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import logging
+from typing import Optional
 
 from diff_fact_generation import diff_fact_gen
 from gitfact_generation import git_fact_gen
@@ -38,6 +39,9 @@ def main():
                              'install here(https://bitbucket.org/liyistc/gitslice/src/facts-dl4ql/)')
     runner.add_argument('--program_fact_path', type=str,
                         help='the path to the pre-generated fact path')
+    runner.add_argument('--souffle_path',
+                        type=str, required=False,
+                        help='the path to Soufflé binary')
 
     # Get all the input arguments and validate
     args = runner.parse_args()
@@ -53,16 +57,18 @@ def main():
     evome_path = Path(args.evome_path)
     cslicer_path = Path(args.cslicer_path)
     program_fact_path = Path(args.program_fact_path)
+    souffle_path: Optional[Path] = Path(args.souffle_path) if args.souffle_path else None
 
     for p in [repo_path, gitfacts_path, output_path, query_file_path,
               evome_path, cslicer_path, program_fact_path]:
         validate_path(p)
     run_partial(repo_path, gitfacts_path, output_path, query_file_path,
-                evome_path, cslicer_path, program_fact_path)
+                evome_path, cslicer_path, program_fact_path, souffle_path)
 
 
 def run_partial(repo_path, gitfacts_path, output_path, query_file_path,
-                evome_path, cslicer_path, program_fact_path):
+                evome_path, cslicer_path, program_fact_path,
+                souffle_path: Optional[Path] = None):
     # Step 1: Generate Git Facts
     logger.info("Step 1: start generating git facts")
     git_fact_gen(repo_path, gitfacts_path, output_path)
@@ -79,7 +85,7 @@ def run_partial(repo_path, gitfacts_path, output_path, query_file_path,
 
     # Step 3: Get program facts
     logger.info("Step 3: Start Obtaining and Generating program facts in selected version")
-    sample_repo_fact_gen(output_path, program_fact_path)
+    sample_repo_fact_gen(output_path, program_fact_path, souffle_path)
     # python3.7 %s/scripts/sample-repo-fact-generation.py --repo_path %s --cslicer_path %s --evome_path %s --output_path %s --program_fact_path %s && \
     # echo Step 3 is done!' % (evome_path, repo_path, cslicer_path, evome_path, output_path, program_fact_path)
     logger.info("Step 3 is done.")
@@ -99,7 +105,7 @@ def run_partial(repo_path, gitfacts_path, output_path, query_file_path,
 
     # Step 5: Analyze to get the result
     logger.info("Step 5: Start analyzing the query")
-    souffle_analysis(output_path)
+    souffle_analysis(output_path, souffle_path)
     logger.info("Step 5 is done.")
     # python3.7 %s/scripts/query-analysis.py --output_path %s && \
     # echo Step 5 is done and program finished!' % (evome_path, output_path))
