@@ -34,11 +34,16 @@ class ErrorCode(IntEnum):
 def print_cli_banner():
     # print name of the APP
     if not os.environ.get("NO_CLI_BANNER"):
-        from pyfiglet import Figlet
-        title = Figlet(font='slant')
-        subtitle = Figlet(font='bubble')
-        print(title.renderText('EvoMe'))
-        print(subtitle.renderText('Version-Aware Security Analysis'))
+        try:
+            from pyfiglet import Figlet
+            title = Figlet(font='slant')
+            subtitle = Figlet(font='bubble')
+            print(title.renderText('EvoMe'))
+            print(subtitle.renderText('Version-Aware Security Analysis'))
+        except ImportError:
+            logger.warning("No pyfiglet, will not draw banner")
+    else:
+        logger.info("NO_CLI_BANNER set, will not draw banner")
 
 
 def validate_path(path: Path):
